@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <net.kdt.pojavlaunch.prefs.BackButtonPreference/>
+
+    <PreferenceCategory
+        android:title="@string/preference_category_appearance">
+
+        <ListPreference
+            android:key="screen_transition"
+            android:title="@string/preference_screen_transition_title"
+            android:summary="@string/preference_screen_transition_summary"
+            android:entries="@array/screen_transition_names"
+            android:entryValues="@array/screen_transition_values"
+            android:defaultValue="none"
+            android:icon="@drawable/ic_px_alt_sliders" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>
