@@ -2,12 +2,12 @@
 <resources>
     <string-array name="screen_transition_names">
         <item>@string/preference_screen_transition_none</item>
-        <item>@string/preference_screen_transition_slice</item>
+        <item>@string/preference_screen_transition_fade</item>
         <item>@string/preference_screen_transition_bounce</item>
     </string-array>
     <string-array name="screen_transition_values">
         <item>none</item>
-        <item>slice</item>
+        <item>fade</item>
         <item>bounce</item>
     </string-array>
 </resources>

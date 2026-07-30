@@ -803,9 +803,6 @@ public final class Tools {
         FragmentTransaction transaction = fragmentActivity.getSupportFragmentManager().beginTransaction();
         
         switch (LauncherPreferences.PREF_SCREEN_TRANSITION) {
-            case "slice":
-                transaction.setCustomAnimations(R.anim.slice_enter, R.anim.slice_exit, R.anim.slice_pop_enter, R.anim.slice_pop_exit);
-                break;
             case "bounce":
                 transaction.setCustomAnimations(R.anim.bounce_enter, R.anim.bounce_exit, R.anim.bounce_pop_enter, R.anim.bounce_pop_exit);
                 break;

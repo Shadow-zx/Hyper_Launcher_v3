@@ -53,7 +53,7 @@
     <string name="preference_screen_transition_title">Screen transition</string>
     <string name="preference_screen_transition_summary">Animation when switching between screens</string>
     <string name="preference_screen_transition_none">None</string>
-    <string name="preference_screen_transition_slice">Slice</string>
+    <string name="preference_screen_transition_fade">Fade</string>
     <string name="preference_screen_transition_bounce">Bounce</string>
 
 
