@@ -168,7 +168,7 @@ fun AccountSpinnerCompose(
             modifier = Modifier
                 .fillMaxSize()
                 .clickable { expanded = true },
-            color = Color(0xFF0A0A0A),
+            color = MaterialTheme.colorScheme.surface,
             shape = RoundedCornerShape(0.dp)
         ) {
             Box(modifier = Modifier.fillMaxSize()) {
@@ -207,14 +207,12 @@ fun AccountSpinnerCompose(
                         trackColor = Color.Transparent,
                     )
                 } else {
-                    LinearProgressIndicator(
-                        progress = { 1f },
+                    Box(
                         modifier = Modifier
                             .align(Alignment.BottomStart)
                             .fillMaxWidth()
-                            .height(2.dp),
-                        color = MaterialTheme.colorScheme.primary,
-                        trackColor = Color.Transparent,
+                            .height(2.dp)
+                            .background(MaterialTheme.colorScheme.primary)
                     )
                 }
             }

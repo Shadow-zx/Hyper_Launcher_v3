@@ -9,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.system.Os;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -19,9 +20,9 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-
+import androidx.preference.Preference;
+import androidx.preference.PreferenceFragmentCompat;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-
 import net.kdt.pojavlaunch.authenticator.accounts.Accounts;
 import net.kdt.pojavlaunch.extra.ExtraConstants;
 import net.kdt.pojavlaunch.extra.ExtraCore;
@@ -48,7 +49,7 @@ import net.kdt.pojavlaunch.utils.NotificationUtils;
 
 import net.ashmeet.hyperlauncher.R;
 
-public class LauncherActivity extends BaseActivity {
+public class LauncherActivity extends BaseActivity implements PreferenceFragmentCompat.OnPreferenceStartFragmentCallback {
     public static final String SETTING_FRAGMENT_TAG = "SETTINGS_FRAGMENT";
 
     private ProgressServiceKeeper mProgressServiceKeeper;
@@ -251,6 +252,21 @@ public class LauncherActivity extends BaseActivity {
         }
 
         super.onBackPressed();
+    }
+
+    @Override
+    public boolean onPreferenceStartFragment(@NonNull PreferenceFragmentCompat caller, @NonNull Preference pref) {
+        String fragmentName = pref.getFragment();
+        if (fragmentName == null) return false;
+        try {
+            @SuppressWarnings("unchecked")
+            Class<? extends Fragment> fragmentClass = (Class<? extends Fragment>) getClassLoader().loadClass(fragmentName);
+            Tools.swapFragment(this, fragmentClass, null, pref.getExtras());
+            return true;
+        } catch (ClassNotFoundException e) {
+            Log.e("LauncherActivity", "Could not find fragment class: " + fragmentName, e);
+            return false;
+        }
     }
 
     @SuppressWarnings("SameParameterValue")
