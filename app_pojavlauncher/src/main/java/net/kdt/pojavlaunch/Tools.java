@@ -45,6 +45,8 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 
+import androidx.fragment.app.FragmentTransaction;
+
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -798,9 +800,18 @@ public final class Tools {
     public static void swapFragment(FragmentActivity fragmentActivity , Class<? extends Fragment> fragmentClass,
                                     @Nullable String fragmentTag, @Nullable Bundle bundle) {
         // When people tab out, it might happen
-        //TODO handle custom animations
-        fragmentActivity.getSupportFragmentManager().beginTransaction()
-                .setReorderingAllowed(true)
+        FragmentTransaction transaction = fragmentActivity.getSupportFragmentManager().beginTransaction();
+        
+        switch (LauncherPreferences.PREF_SCREEN_TRANSITION) {
+            case "slice":
+                transaction.setCustomAnimations(R.anim.slice_enter, R.anim.slice_exit, R.anim.slice_pop_enter, R.anim.slice_pop_exit);
+                break;
+            case "bounce":
+                transaction.setCustomAnimations(R.anim.bounce_enter, R.anim.bounce_exit, R.anim.bounce_pop_enter, R.anim.bounce_pop_exit);
+                break;
+        }
+
+        transaction.setReorderingAllowed(true)
                 .addToBackStack(fragmentClass.getName())
                 .replace(R.id.container_fragment, fragmentClass, bundle, fragmentTag).commit();
     }
