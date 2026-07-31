@@ -191,11 +191,9 @@ fun MainMenuFragmentCompose(
     DisposableEffect(Unit) {
         if (isPreview) return@DisposableEffect onDispose {}
 
-        val accountListener = object : ExtraListener<Any> {
-            override fun onValueSet(key: String, value: Any): Boolean {
-                currentAccount = Accounts.getCurrent()
-                return false
-            }
+        val accountListener = ExtraListener<Any> { key, value ->
+            currentAccount = Accounts.getCurrent()
+            false
         }
 
         ExtraCore.addExtraListener(ExtraConstants.REFRESH_ACCOUNT_SPINNER, accountListener)

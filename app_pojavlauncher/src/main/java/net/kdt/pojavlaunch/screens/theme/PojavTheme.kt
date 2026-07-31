@@ -40,6 +40,7 @@ fun PojavTheme(
         else -> isSystemInDarkTheme()
     }
 
+    // dont touch this tuff material lmao
     val colorScheme = if (isDark) {
         darkColorScheme(
             primary = colorResource(R.color.minebutton_color),

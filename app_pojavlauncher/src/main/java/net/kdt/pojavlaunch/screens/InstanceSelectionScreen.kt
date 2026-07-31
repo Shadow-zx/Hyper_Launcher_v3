@@ -51,7 +51,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -170,7 +169,7 @@ fun InstanceSelectionScreen(
                         ) {
                             items(
                                 items = filteredInstances,
-                                key = { it.name + it.versionId }
+                                key = { it.mInstanceRoot.absolutePath }
                             ) { instance ->
                                 val actualIndex = instances.indexOf(instance)
                                 val isSelected = actualIndex == selectedIndex

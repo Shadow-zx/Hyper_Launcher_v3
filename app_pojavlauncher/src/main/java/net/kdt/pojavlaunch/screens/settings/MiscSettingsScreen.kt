@@ -8,7 +8,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Input
 import androidx.compose.material.icons.filled.Bolt
 import androidx.compose.material.icons.filled.Download
-import androidx.compose.material.icons.filled.FileDownload
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.Numbers
 import androidx.compose.material.icons.filled.Settings
