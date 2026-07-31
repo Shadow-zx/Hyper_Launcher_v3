@@ -277,8 +277,15 @@ public final class Tools {
         WindowInsetsController insetsController = window.getInsetsController();
         if(insetsController != null) {
             insetsController.setSystemBarsBehavior(WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
-            if(noSystemBars) insetsController.hide(WindowInsets.Type.systemBars());
-            else insetsController.show(WindowInsets.Type.systemBars());
+            if (noSystemBars) insetsController.hide(WindowInsets.Type.systemBars());
+            else {
+                insetsController.show(WindowInsets.Type.systemBars());
+                int appearance = 0;
+                if (bgColor == Color.WHITE) {
+                    appearance = WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS | WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS;
+                }
+                insetsController.setSystemBarsAppearance(appearance, WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS | WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS);
+            }
         }
 
         boolean fFullscreen = noSystemBars;

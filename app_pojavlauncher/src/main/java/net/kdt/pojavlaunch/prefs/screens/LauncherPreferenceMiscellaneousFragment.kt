@@ -1,80 +1,94 @@
-package net.kdt.pojavlaunch.prefs.screens;
+package net.kdt.pojavlaunch.prefs.screens
 
-import android.Manifest;
-import android.app.Activity;
-import android.content.pm.PackageManager;
-import android.net.Uri;
-import android.os.Bundle;
-import android.widget.Toast;
+import android.Manifest
+import android.content.SharedPreferences
+import android.content.pm.PackageManager
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.ComposeView
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import net.ashmeet.hyperlauncher.R
+import net.kdt.pojavlaunch.prefs.LauncherPreferences
+import net.kdt.pojavlaunch.screens.settings.MiscSettingsScreen
+import net.kdt.pojavlaunch.screens.theme.PojavTheme
+import net.kdt.pojavlaunch.tasks.DataMigrator
+import net.kdt.pojavlaunch.utils.GLInfoUtils
+import net.kdt.pojavlaunch.utils.RendererCompatUtil
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.appcompat.app.AlertDialog;
-import androidx.preference.Preference;
+class LauncherPreferenceMiscellaneousFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListener {
 
-import net.ashmeet.hyperlauncher.R;
+    private var mIsMicPermissionGranted by mutableStateOf(false)
 
-import net.kdt.pojavlaunch.LauncherActivity;
-import net.kdt.pojavlaunch.progresskeeper.ProgressKeeper;
-import net.kdt.pojavlaunch.tasks.DataMigrator;
-import net.kdt.pojavlaunch.utils.GLInfoUtils;
-import net.kdt.pojavlaunch.utils.RendererCompatUtil;
+    private val mRecordAudioPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+        mIsMicPermissionGranted = isGranted
+        if (!isGranted) {
+            Toast.makeText(requireContext(), R.string.notification_permission_toast, Toast.LENGTH_SHORT).show()
+        }
+    }
 
-public class LauncherPreferenceMiscellaneousFragment extends LauncherPreferenceFragment {
+    private val mDataMigrationLauncher = registerForActivityResult(ActivityResultContracts.OpenDocumentTree()) { uri ->
+        if (uri != null) {
+            DataMigrator(requireActivity(), uri).migrateData()
+        }
+    }
 
-    private final ActivityResultLauncher<Uri> mMigrateLauncher = registerForActivityResult(
-            new ActivityResultContracts.OpenDocumentTree(), (uri) -> {
-                if(uri != null) {
-                    new AlertDialog.Builder(getLauncherActivity())
-                            .setTitle(R.string.migration_progress_warning_title)
-                            .setMessage(R.string.migration_progress_warning_summary)
-                            .setPositiveButton(android.R.string.ok, (d, w) -> new DataMigrator(getLauncherActivity(), uri).migrateData())
-                            .setNegativeButton(android.R.string.cancel, null)
-                            .show();
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        mIsMicPermissionGranted = ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        val supportsTurnip = RendererCompatUtil.checkVulkanSupport(requireContext().packageManager) && GLInfoUtils.getGlInfo().isAdreno
+        return ComposeView(requireContext()).apply {
+            setContent {
+                PojavTheme {
+                    MiscSettingsScreen(
+                        onBack = { requireActivity().onBackPressedDispatcher.onBackPressed() },
+                        isZinkPreferSystemDriverVisible = supportsTurnip,
+                        isMicrophonePermissionGranted = mIsMicPermissionGranted,
+                        onMicrophoneAccessClick = {
+                            mRecordAudioPermission.launch(Manifest.permission.RECORD_AUDIO)
+                        },
+                        onRunDataMigrationClick = {
+                            MaterialAlertDialogBuilder(requireContext())
+                                .setTitle(R.string.migration_progress_warning_title)
+                                .setMessage(R.string.migration_progress_warning_summary)
+                                .setPositiveButton(R.string.global_yes) { _, _ ->
+                                    mDataMigrationLauncher.launch(null)
+                                }
+                                .setNegativeButton(R.string.global_no, null)
+                                .show()
+                        }
+                    )
                 }
             }
-    );
-
-    @Override
-    public void onCreatePreferences(Bundle b, String str) {
-        mVisibilityUpdater = this::updateVisibility;
-        addPreferencesFromResource(R.xml.pref_misc);
-        Preference driverPreference = requirePreference("zinkPreferSystemDriver");
-        PackageManager packageManager = driverPreference.getContext().getPackageManager();
-        boolean supportsTurnip = RendererCompatUtil.checkVulkanSupport(packageManager) && GLInfoUtils.getGlInfo().isAdreno();
-        driverPreference.setVisible(supportsTurnip);
-        Preference importPreference = requirePreference("runDataMigration");
-        importPreference.setOnPreferenceClickListener(preference -> {
-            if(ProgressKeeper.getTaskCount() > 0) {
-                Toast.makeText(getContext(), R.string.tasks_ongoing, Toast.LENGTH_SHORT).show();
-                return true;
-            }
-            mMigrateLauncher.launch(null);
-            return true;
-        });
-        setupMicrophoneRequestPreference();
-    }
-
-    private void updateVisibility(){
-        requirePreference("microphoneAccessRequest").setVisible(!getLauncherActivity().checkForPermissionRationale(33, Manifest.permission.RECORD_AUDIO));
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-    }
-
-    private void setupMicrophoneRequestPreference() {
-        Preference mRequestMicrophonePermissionPreference = requirePreference("microphoneAccessRequest");
-        Activity activity = getActivity();
-        if(activity instanceof LauncherActivity) {
-            mRequestMicrophonePermissionPreference.setOnPreferenceClickListener(preference -> {
-                ((LauncherActivity) activity).askForPermission(23, Manifest.permission.RECORD_AUDIO);
-                return true;
-            });
-        } else {
-            mRequestMicrophonePermissionPreference.setVisible(false);
         }
-        updateVisibility();
+    }
+
+    override fun onResume() {
+        super.onResume()
+        LauncherPreferences.DEFAULT_PREF?.registerOnSharedPreferenceChangeListener(this)
+    }
+
+    override fun onPause() {
+        LauncherPreferences.DEFAULT_PREF?.unregisterOnSharedPreferenceChangeListener(this)
+        super.onPause()
+    }
+
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
+        LauncherPreferences.loadPreferences(context)
     }
 }

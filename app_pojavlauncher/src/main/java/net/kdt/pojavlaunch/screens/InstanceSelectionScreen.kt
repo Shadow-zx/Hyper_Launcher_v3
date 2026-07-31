@@ -3,6 +3,7 @@ package net.kdt.pojavlaunch.screens
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -15,13 +16,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
@@ -51,6 +51,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -105,7 +106,6 @@ fun InstanceSelectionScreen(
         color = MaterialTheme.colorScheme.background
     ) {
         Row(modifier = Modifier.fillMaxSize()) {
-            // Sidebar using NavigationRail
             InstanceNavigationRail(
                 onCreateNew = onCreateNew,
                 onRefresh = { loadInstances() },
@@ -113,7 +113,6 @@ fun InstanceSelectionScreen(
                 onBack = onBack
             )
 
-            // Main Content Area wrapped in a Rounded Card
             Surface(
                 modifier = Modifier
                     .weight(1f)
@@ -126,7 +125,7 @@ fun InstanceSelectionScreen(
                 Column(
                     modifier = Modifier.fillMaxSize()
                 ) {
-                    // M3 Tabs at the top edges of the card
+
                     TabRow(
                         selectedTabIndex = selectedTab,
                         containerColor = Color.Transparent,
@@ -162,16 +161,27 @@ fun InstanceSelectionScreen(
                             CircularProgressIndicator()
                         }
                     } else {
-                        // Instances in a List (Vertical Scroll, One Column)
+                        val lazyListState = rememberLazyListState()
                         LazyColumn(
+                            state = lazyListState,
                             modifier = Modifier.fillMaxSize(),
                             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
                             verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            items(filteredInstances) { instance ->
+                            items(
+                                items = filteredInstances,
+                                key = { it.name + it.versionId }
+                            ) { instance ->
                                 val actualIndex = instances.indexOf(instance)
                                 val isSelected = actualIndex == selectedIndex
+                                
                                 InstanceListItem(
+                                    modifier = Modifier
+                                        .animateItem(
+                                            fadeInSpec = tween(300),
+                                            fadeOutSpec = tween(300),
+                                            placementSpec = tween(300) // Standard tween instead of bouncy spring
+                                        ),
                                     instance = instance,
                                     isSelected = isSelected,
                                     onClick = {

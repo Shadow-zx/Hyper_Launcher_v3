@@ -1,17 +1,12 @@
 package net.kdt.pojavlaunch.prefs;
 
 import static android.os.Build.VERSION.SDK_INT;
-import static android.os.Build.VERSION_CODES.P;
-
 import static net.kdt.pojavlaunch.Architecture.is32BitsDevice;
-
-import android.app.Activity;
 import android.content.*;
-import android.graphics.Rect;
 import android.os.Build;
 import android.util.DisplayMetrics;
 import android.util.Log;
-
+import androidx.appcompat.app.AppCompatDelegate;
 import net.kdt.pojavlaunch.*;
 import net.kdt.pojavlaunch.multirt.MultiRTUtils;
 import net.kdt.pojavlaunch.utils.JREUtils;
@@ -78,6 +73,7 @@ public class LauncherPreferences {
     public static boolean PREF_MIGRATION_NOTICE = true;
     public static boolean PREF_ALSOFT_FORCE_OPENSL = false;
     public static String PREF_SCREEN_TRANSITION = "none";
+    public static String PREF_THEME = "system";
 
 
     public static void loadPreferences(Context ctx) {
@@ -128,6 +124,8 @@ public class LauncherPreferences {
         PREF_MIGRATION_NOTICE = DEFAULT_PREF.getBoolean("migrationNotice", true);
         PREF_ALSOFT_FORCE_OPENSL = DEFAULT_PREF.getBoolean("alsoftForceOpenSL", false);
         PREF_SCREEN_TRANSITION = DEFAULT_PREF.getString("screen_transition", "none");
+        PREF_THEME = DEFAULT_PREF.getString("app_theme", "system");
+        updateNightMode();
 
         String argLwjglLibname = "-Dorg.lwjgl.opengl.libname=";
         for (String arg : JREUtils.parseJavaArguments(PREF_CUSTOM_JAVA_ARGS)) {
@@ -146,6 +144,20 @@ public class LauncherPreferences {
             }
             PREF_DEFAULT_RUNTIME = MultiRTUtils.getRuntimes().get(0).name;
             LauncherPreferences.DEFAULT_PREF.edit().putString("defaultRuntime",LauncherPreferences.PREF_DEFAULT_RUNTIME).apply();
+        }
+    }
+
+    public static void updateNightMode() {
+        switch (PREF_THEME) {
+            case "light":
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                break;
+            case "dark":
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                break;
+            default:
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+                break;
         }
     }
 
@@ -210,22 +222,5 @@ public class LauncherPreferences {
             Log.e("LauncherPreferences", "Failed to read CPU frequencies", e);
         }
         return false;
-    }
-
-    /** Check if the device has a display cutout */
-    public static boolean hasNotch(Activity activity) {
-        if (Build.VERSION.SDK_INT < P) return false;
-        try {
-            final Rect cutout;
-            if(SDK_INT >= Build.VERSION_CODES.S){
-                cutout = activity.getWindowManager().getCurrentWindowMetrics().getWindowInsets().getDisplayCutout().getBoundingRects().get(0);
-            } else {
-                cutout = activity.getWindow().getDecorView().getRootWindowInsets().getDisplayCutout().getBoundingRects().get(0);
-            }
-            return cutout.width() != 0 || cutout.height() != 0;
-        }catch (Exception e){
-            Log.i("NOTCH DETECTION", "No notch detected, or the device if in split screen mode");
-            return false;
-        }
     }
 }

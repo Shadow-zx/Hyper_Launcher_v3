@@ -1,110 +1,64 @@
-package net.kdt.pojavlaunch.prefs.screens;
+package net.kdt.pojavlaunch.prefs.screens
 
+import android.Manifest
+import android.content.SharedPreferences
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.compose.ui.platform.ComposeView
+import androidx.fragment.app.Fragment
+import net.kdt.pojavlaunch.LauncherActivity
+import net.kdt.pojavlaunch.Tools
+import net.kdt.pojavlaunch.prefs.LauncherPreferences
+import net.kdt.pojavlaunch.screens.settings.MainSettingsScreen
+import net.kdt.pojavlaunch.screens.theme.PojavTheme
 
-import android.Manifest;
-import android.app.Activity;
-import android.content.SharedPreferences;
-import android.os.Bundle;
-import android.view.View;
+open class LauncherPreferenceFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListener {
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.DialogFragment;
-import androidx.preference.Preference;
-import androidx.preference.PreferenceFragmentCompat;
-
-import net.kdt.pojavlaunch.LauncherActivity;
-import net.ashmeet.hyperlauncher.R;
-import net.kdt.pojavlaunch.prefs.LauncherPreferences;
-import net.kdt.pojavlaunch.prefs.MaterialListPreference;
-import net.kdt.pojavlaunch.prefs.RuntimeListPreference;
-import net.kdt.pojavlaunch.prefs.RuntimeListPreferenceDialogFragment;
-
-/**
- * Preference for the main screen, any sub-screen should inherit this class for consistent behavior,
- * overriding only onCreatePreferences
- */
-public class LauncherPreferenceFragment extends PreferenceFragmentCompat implements SharedPreferences.OnSharedPreferenceChangeListener {
-    protected Runnable mVisibilityUpdater = () -> {};
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        view.setBackgroundColor(getResources().getColor(R.color.background_app));
-        super.onViewCreated(view, savedInstanceState);
-    }
-
-    @Override
-    public void onCreatePreferences(Bundle b, String str) {
-        mVisibilityUpdater = this::updateVisibility;
-        addPreferencesFromResource(R.xml.pref_main);
-        setupNotificationRequestPreference();
-    }
-
-    private void updateVisibility(){
-        requirePreference("notification_permission_request").setVisible(!getLauncherActivity().checkForPermission(33, Manifest.permission.POST_NOTIFICATIONS));
-    }
-
-    private void setupNotificationRequestPreference() {
-        Preference mRequestNotificationPermissionPreference = requirePreference("notification_permission_request");
-        Activity activity = getActivity();
-        if(activity instanceof LauncherActivity) {
-            mRequestNotificationPermissionPreference.setOnPreferenceClickListener(preference -> {
-                ((LauncherActivity) activity).askForPermission(33, Manifest.permission.POST_NOTIFICATIONS);
-                return true;
-            });
-        }else{
-            mRequestNotificationPermissionPreference.setVisible(false);
-        }
-        updateVisibility();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        SharedPreferences sharedPreferences = getPreferenceManager().getSharedPreferences();
-        if(sharedPreferences != null) sharedPreferences.registerOnSharedPreferenceChangeListener(this);
-        mVisibilityUpdater.run();
-    }
-
-    @Override
-    public void onPause() {
-        SharedPreferences sharedPreferences = getPreferenceManager().getSharedPreferences();
-        if(sharedPreferences != null) sharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
-        super.onPause();
-    }
-
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences p, String s) {
-        LauncherPreferences.loadPreferences(getContext());
-    }
-
-    @Override
-    public void onDisplayPreferenceDialog(@NonNull Preference preference) {
-        if (preference instanceof MaterialListPreference) {
-            DialogFragment dialogFragment = MaterialListPreference.MaterialListPreferenceDialogFragment.newInstance(preference.getKey());
-            dialogFragment.setTargetFragment(this, 0);
-            dialogFragment.show(getParentFragmentManager(), "androidx.preference.PreferenceFragment.DIALOG");
-        } else if (preference instanceof RuntimeListPreference) {
-            DialogFragment dialogFragment = RuntimeListPreferenceDialogFragment.newInstance(preference.getKey());
-            dialogFragment.setTargetFragment(this, 0);
-            dialogFragment.show(getParentFragmentManager(), "androidx.preference.PreferenceFragment.DIALOG");
-        } else {
-            super.onDisplayPreferenceDialog(preference);
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        return ComposeView(requireContext()).apply {
+            setContent {
+                PojavTheme {
+                    MainSettingsScreen(
+                        onBack = { requireActivity().onBackPressed() },
+                        onNavigateToVideo = { navigateTo(LauncherPreferenceVideoFragment::class.java) },
+                        onNavigateToControl = { navigateTo(LauncherPreferenceControlFragment::class.java) },
+                        onNavigateToJava = { navigateTo(LauncherPreferenceJavaFragment::class.java) },
+                        onNavigateToMisc = { navigateTo(LauncherPreferenceMiscellaneousFragment::class.java) },
+                        onNavigateToExperimental = { navigateTo(LauncherPreferenceExperimentalFragment::class.java) },
+                        onNavigateToAppearance = { navigateTo(LauncherPreferenceAppearanceFragment::class.java) },
+                        showNotificationRequest = !getLauncherActivity().checkForPermission(33, Manifest.permission.POST_NOTIFICATIONS),
+                        onNotificationRequestClick = { getLauncherActivity().askForPermission(33, Manifest.permission.POST_NOTIFICATIONS) }
+                    )
+                }
+            }
         }
     }
 
-    protected Preference requirePreference(CharSequence key) {
-        Preference preference = findPreference(key);
-        if(preference != null) return preference;
-        throw new IllegalStateException("Preference "+key+" is null");
+    protected fun navigateTo(fragmentClass: Class<out Fragment>) {
+        Tools.swapFragment(requireActivity(), fragmentClass, null, null)
     }
-    @SuppressWarnings("unchecked")
-    protected <T extends Preference> T requirePreference(CharSequence key, Class<T> preferenceClass) {
-        Preference preference = requirePreference(key);
-        if(preferenceClass.isInstance(preference)) return (T)preference;
-        throw new IllegalStateException("Preference "+key+" is not an instance of "+preferenceClass.getSimpleName());
+
+    override fun onResume() {
+        super.onResume()
+        LauncherPreferences.DEFAULT_PREF?.registerOnSharedPreferenceChangeListener(this)
     }
-    protected LauncherActivity getLauncherActivity(){
-        return ((LauncherActivity) getActivity());
+
+    override fun onPause() {
+        LauncherPreferences.DEFAULT_PREF?.unregisterOnSharedPreferenceChangeListener(this)
+        super.onPause()
+    }
+
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
+        LauncherPreferences.loadPreferences(context)
+    }
+
+    protected fun getLauncherActivity(): LauncherActivity {
+        return activity as LauncherActivity
     }
 }

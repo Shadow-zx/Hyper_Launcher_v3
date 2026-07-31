@@ -1,40 +1,104 @@
-package net.kdt.pojavlaunch.prefs.screens;
+package net.kdt.pojavlaunch.prefs.screens
 
-import static net.kdt.pojavlaunch.Architecture.is32BitsDevice;
-import static net.kdt.pojavlaunch.Tools.getTotalDeviceMemory;
+import android.content.SharedPreferences
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.activity.result.ActivityResultLauncher
+import androidx.compose.ui.platform.ComposeView
+import androidx.fragment.app.Fragment
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import net.ashmeet.hyperlauncher.R
+import net.kdt.pojavlaunch.Architecture
+import net.kdt.pojavlaunch.PojavApplication
+import net.kdt.pojavlaunch.Tools
+import net.kdt.pojavlaunch.contracts.OpenDocumentWithExtension
+import net.kdt.pojavlaunch.multirt.MultiRTUtils
+import net.kdt.pojavlaunch.multirt.Runtime
+import net.kdt.pojavlaunch.prefs.LauncherPreferences
+import net.kdt.pojavlaunch.screens.settings.JavaSettingsScreen
+import net.kdt.pojavlaunch.screens.theme.PojavTheme
 
-import android.os.Bundle;
-import android.widget.TextView;
+class LauncherPreferenceJavaFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListener {
 
-import androidx.preference.EditTextPreference;
-
-import net.ashmeet.hyperlauncher.R;
-import net.kdt.pojavlaunch.prefs.CustomSeekBarPreference;
-import net.kdt.pojavlaunch.prefs.LauncherPreferences;
-
-public class LauncherPreferenceJavaFragment extends LauncherPreferenceFragment {
-    @Override
-    public void onCreatePreferences(Bundle b, String str) {
-        int ramAllocation = LauncherPreferences.PREF_RAM_ALLOCATION;
-        // Triggers a write for some reason
-        addPreferencesFromResource(R.xml.pref_java);
-
-        CustomSeekBarPreference memorySeekbar = requirePreference("allocation",
-                CustomSeekBarPreference.class);
-
-        int maxRAM;
-        int deviceRam = getTotalDeviceMemory(memorySeekbar.getContext());
-
-        if(is32BitsDevice() || deviceRam < 2048) maxRAM = Math.min(1024, deviceRam);
-        else maxRAM = deviceRam - (deviceRam < 3064 ? 800 : 1024); //To have a minimum for the device to breathe
-
-        memorySeekbar.setMaxKeepIncrement(maxRAM);
-        memorySeekbar.setValue(ramAllocation);
-        memorySeekbar.setSuffix(" MB");
-
-        EditTextPreference editJVMArgs = findPreference("javaArgs");
-        if (editJVMArgs != null) {
-            editJVMArgs.setOnBindEditTextListener(TextView::setSingleLine);
+    private val mVmInstallLauncher: ActivityResultLauncher<Any?> =
+        registerForActivityResult(OpenDocumentWithExtension("xz")) { data ->
+            if (data != null) {
+                Tools.installRuntimeFromUri(context, data)
+                // The dialog needs to be reopened to see changes, or we'd need a way to observe the runtimes list
+            }
         }
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        val deviceRam = Tools.getTotalDeviceMemory(requireContext())
+        val maxRAM = if (Architecture.is32BitsDevice() || deviceRam < 2048) {
+            Math.min(1024, deviceRam)
+        } else {
+            deviceRam - if (deviceRam < 3064) 800 else 1024
+        }
+
+        return ComposeView(requireContext()).apply {
+            setContent {
+                PojavTheme {
+                    JavaSettingsScreen(
+                        onBack = { requireActivity().onBackPressed() },
+                        onAddRuntime = { mVmInstallLauncher.launch(null) },
+                        onDeleteRuntime = { runtime -> deleteRuntime(runtime) },
+                        maxRam = maxRAM
+                    )
+                }
+            }
+        }
+    }
+
+    private fun deleteRuntime(runtime: Runtime) {
+        if (MultiRTUtils.getRuntimes().size < 2) {
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.global_error)
+                .setMessage(R.string.multirt_config_removeerror_last)
+                .setPositiveButton(android.R.string.ok) { dialog, _ -> dialog.dismiss() }
+                .show()
+            return
+        }
+
+        PojavApplication.sExecutorService.execute {
+            try {
+                MultiRTUtils.removeRuntimeNamed(runtime.name)
+                Tools.runOnUiThread {
+                    // Update summary if the deleted one was default
+                    if (LauncherPreferences.PREF_DEFAULT_RUNTIME == runtime.name) {
+                        val remaining = MultiRTUtils.getRuntimes()
+                        if (remaining.isNotEmpty()) {
+                            val newDefault = remaining[0].name
+                            LauncherPreferences.DEFAULT_PREF.edit().putString("defaultRuntime", newDefault).apply()
+                            LauncherPreferences.loadPreferences(context)
+                        }
+                    }
+                    // We can't easily trigger a recompose of the dialog items without a state holder or ViewModel
+                    // But LauncherPreferenceFragment listens to shared pref changes
+                }
+            } catch (e: Exception) {
+                Tools.runOnUiThread { Tools.showError(context, e) }
+            }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        LauncherPreferences.DEFAULT_PREF?.registerOnSharedPreferenceChangeListener(this)
+    }
+
+    override fun onPause() {
+        LauncherPreferences.DEFAULT_PREF?.unregisterOnSharedPreferenceChangeListener(this)
+        super.onPause()
+    }
+
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
+        LauncherPreferences.loadPreferences(context)
     }
 }

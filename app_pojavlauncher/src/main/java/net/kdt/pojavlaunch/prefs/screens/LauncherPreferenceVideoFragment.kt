@@ -1,93 +1,48 @@
-package net.kdt.pojavlaunch.prefs.screens;
+package net.kdt.pojavlaunch.prefs.screens
 
-import android.app.Activity;
-import android.content.SharedPreferences;
-import android.os.Build;
-import android.os.Bundle;
-import androidx.preference.ListPreference;
-import androidx.preference.SwitchPreference;
-import androidx.preference.SwitchPreferenceCompat;
+import android.content.SharedPreferences
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.compose.ui.platform.ComposeView
+import androidx.fragment.app.Fragment
+import net.kdt.pojavlaunch.plugins.LibraryPlugin
+import net.kdt.pojavlaunch.prefs.LauncherPreferences
+import net.kdt.pojavlaunch.screens.settings.VideoSettingsScreen
+import net.kdt.pojavlaunch.screens.theme.PojavTheme
 
-import net.ashmeet.hyperlauncher.R;
+class LauncherPreferenceVideoFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListener {
 
-import net.kdt.pojavlaunch.Architecture;
-import net.kdt.pojavlaunch.plugins.LibraryPlugin;
-import net.kdt.pojavlaunch.prefs.CustomSeekBarPreference;
-import net.kdt.pojavlaunch.prefs.LauncherPreferences;
-import net.kdt.pojavlaunch.utils.RendererCompatUtil;
-
-/**
- * Fragment for any settings video related
- */
-public class LauncherPreferenceVideoFragment extends LauncherPreferenceFragment {
-    @Override
-    public void onCreatePreferences(Bundle b, String str) {
-        addPreferencesFromResource(R.xml.pref_video);
-        int resolution = (int) (LauncherPreferences.PREF_SCALE_FACTOR * 100);
-
-        CustomSeekBarPreference resolutionSeekbar = requirePreference("resolutionRatio",
-                CustomSeekBarPreference.class);
-        resolutionSeekbar.setSuffix(" %");
-
-        // #724 bug fix
-        if (resolution < 25) {
-            resolutionSeekbar.setValue(100);
-        } else {
-            resolutionSeekbar.setValue(resolution);
-        }
-
-        // Sustained performance is only available since Nougat
-        SwitchPreference sustainedPerfSwitch = requirePreference("sustainedPerformance",
-                SwitchPreference.class);
-        sustainedPerfSwitch.setVisible(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N);
-        sustainedPerfSwitch.setChecked(LauncherPreferences.PREF_SUSTAINED_PERFORMANCE);
-
-        requirePreference("alternate_surface", SwitchPreferenceCompat.class).setChecked(LauncherPreferences.PREF_USE_ALTERNATE_SURFACE);
-        requirePreference("force_vsync", SwitchPreferenceCompat.class).setChecked(LauncherPreferences.PREF_FORCE_VSYNC);
-
-        // Show ANGLE switch only if AnglePlugin is available
-        LibraryPlugin angle = LibraryPlugin.discoverPlugin(getContext(), LibraryPlugin.ID_ANGLE_PLUGIN);
-        SwitchPreferenceCompat angleSwitch = requirePreference("use_angle", SwitchPreferenceCompat.class);
-        angleSwitch.setVisible(angle != null);
-        angleSwitch.setChecked(LauncherPreferences.PREF_USE_ANGLE);
-
-        // Same but for ZINK plugin
-        SwitchPreference legacyZink = requirePreference("zinkForceLegacy", SwitchPreference.class);
-        legacyZink.setChecked(LauncherPreferences.PREF_ZINK_FORCE_LEGACY);
-        if(!Architecture.isx86Device()) {
-            LibraryPlugin zink = LibraryPlugin.discoverPlugin(getContext(), LibraryPlugin.ID_ZINK_PLUGIN);
-            legacyZink.setVisible(zink != null);
-        }
-        else {
-            legacyZink.setVisible(false);
-        }
-
-        ListPreference rendererListPreference = requirePreference("renderer",
-                ListPreference.class);
-        RendererCompatUtil.RenderersList renderersList = RendererCompatUtil.getCompatibleRenderers(getContext());
-        rendererListPreference.setEntries(renderersList.rendererDisplayNames);
-        rendererListPreference.setEntryValues(renderersList.rendererIds.toArray(new String[0]));
-
-        computeVisibility();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        Activity activity = getActivity();
-        if(activity != null) {
-            requirePreference("ignoreNotch").setVisible(LauncherPreferences.hasNotch(activity));
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        val isAngleAvailable = LibraryPlugin.discoverPlugin(requireContext(), LibraryPlugin.ID_ANGLE_PLUGIN) != null
+        return ComposeView(requireContext()).apply {
+            setContent {
+                PojavTheme {
+                    VideoSettingsScreen(
+                        onBack = { requireActivity().onBackPressedDispatcher.onBackPressed() },
+                        isAngleAvailable = isAngleAvailable
+                    )
+                }
+            }
         }
     }
 
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences p, String s) {
-        super.onSharedPreferenceChanged(p, s);
-        computeVisibility();
+    override fun onResume() {
+        super.onResume()
+        LauncherPreferences.DEFAULT_PREF?.registerOnSharedPreferenceChangeListener(this)
     }
 
-    private void computeVisibility(){
-        requirePreference("force_vsync", SwitchPreferenceCompat.class)
-                .setVisible(LauncherPreferences.PREF_USE_ALTERNATE_SURFACE);
+    override fun onPause() {
+        LauncherPreferences.DEFAULT_PREF?.unregisterOnSharedPreferenceChangeListener(this)
+        super.onPause()
+    }
+
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
+        LauncherPreferences.loadPreferences(context)
     }
 }

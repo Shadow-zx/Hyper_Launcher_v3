@@ -7,18 +7,57 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
-import androidx.compose.foundation.*
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.Send
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.rounded.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.Build
+import androidx.compose.material.icons.rounded.Info
+import androidx.compose.material.icons.rounded.Search
+import androidx.compose.material.icons.rounded.Share
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -86,7 +125,7 @@ fun rememberDrawablePainter(drawable: Drawable?): Painter {
 }
 
 @Composable
-fun rememberSkinHead2D(account: Account?): State<Bitmap?> {
+fun rememberSkinHead(account: Account?): State<Bitmap?> {
     val context = LocalContext.current
     return produceState<Bitmap?>(initialValue = null, account) {
         if (account == null) {
@@ -96,7 +135,7 @@ fun rememberSkinHead2D(account: Account?): State<Bitmap?> {
         
         withContext(Dispatchers.IO) {
             var bitmap = account.skinFace
-            if (bitmap == null && account.isLocal) {
+            if (bitmap == null) {
                 try {
                     val steveSkin = BitmapFactory.decodeStream(context.assets.open("steve.png"))
                     bitmap = SkinHeadRenderer().render2D(100, steveSkin)
@@ -154,11 +193,7 @@ fun MainMenuFragmentCompose(
 
         val accountListener = object : ExtraListener<Any> {
             override fun onValueSet(key: String, value: Any): Boolean {
-                val newAccount = Accounts.getCurrent()
-                if (newAccount?.profileId != currentAccount?.profileId || 
-                    newAccount?.username != currentAccount?.username) {
-                    currentAccount = newAccount
-                }
+                currentAccount = Accounts.getCurrent()
                 return false
             }
         }
@@ -170,7 +205,7 @@ fun MainMenuFragmentCompose(
         }
     }
 
-    val skinHead by rememberSkinHead2D(currentAccount)
+    val skinHead by rememberSkinHead(currentAccount)
 
     val instanceIcon = remember(selectedInstance) {
         if (!isPreview && selectedInstance != null)
@@ -209,8 +244,10 @@ fun MainMenuFragmentCompose(
                 if (!hideActionButtons) {
                     Column(
                         modifier = Modifier
-                            .weight(0.66f)
                             .fillMaxHeight()
+                            //don't change this value, otherwise it will fuck up the layout
+                            .widthIn(max = 500.dp)
+                            .padding(end = 8.dp)
                             .verticalScroll(rememberScrollState()),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
@@ -270,7 +307,7 @@ fun MainMenuFragmentCompose(
 
                 Surface(
                     modifier = Modifier
-                        .weight(0.34f)
+                        .weight(1f)
                         .fillMaxHeight(),
                     shape = RoundedCornerShape(32.dp),
                     color = if (hasBackground) MaterialTheme.colorScheme.surface.copy(alpha = backgroundTransparency)

@@ -1,20 +1,48 @@
-package net.kdt.pojavlaunch.prefs.screens;
+package net.kdt.pojavlaunch.prefs.screens
 
-import android.os.Bundle;
+import android.content.SharedPreferences
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.compose.ui.platform.ComposeView
+import androidx.fragment.app.Fragment
+import net.kdt.pojavlaunch.prefs.LauncherPreferences
+import net.kdt.pojavlaunch.screens.settings.ExperimentalSettingsScreen
+import net.kdt.pojavlaunch.screens.theme.PojavTheme
+import net.kdt.pojavlaunch.utils.GLInfoUtils
 
-import androidx.preference.SwitchPreference;
+class LauncherPreferenceExperimentalFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListener {
 
-import net.kdt.pojavlaunch.utils.GLInfoUtils;
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        val hasFreedreno = GLInfoUtils.getGlInfo().isAdreno
+        return ComposeView(requireContext()).apply {
+            setContent {
+                PojavTheme {
+                    ExperimentalSettingsScreen(
+                        onBack = { requireActivity().onBackPressed() },
+                        isFreedrenoAvailable = hasFreedreno
+                    )
+                }
+            }
+        }
+    }
 
-import net.ashmeet.hyperlauncher.R;
+    override fun onResume() {
+        super.onResume()
+        LauncherPreferences.DEFAULT_PREF?.registerOnSharedPreferenceChangeListener(this)
+    }
 
-public class LauncherPreferenceExperimentalFragment extends LauncherPreferenceFragment {
+    override fun onPause() {
+        LauncherPreferences.DEFAULT_PREF?.unregisterOnSharedPreferenceChangeListener(this)
+        super.onPause()
+    }
 
-    @Override
-    public void onCreatePreferences(Bundle b, String str) {
-        addPreferencesFromResource(R.xml.pref_experimental);
-        SwitchPreference pref = requirePreference("freedrenoSysmem", SwitchPreference.class);
-        boolean hasFreedreno = GLInfoUtils.getGlInfo().isAdreno();
-        pref.setVisible(hasFreedreno);
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
+        LauncherPreferences.loadPreferences(context)
     }
 }

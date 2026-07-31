@@ -1,18 +1,41 @@
 package net.kdt.pojavlaunch.screens.components
 
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -97,6 +120,7 @@ fun AccountSpinnerCompose(
                     if (selectedIndex >= 0 && selectedIndex < accounts.size) {
                         refreshAccount(accounts[selectedIndex])
                     }
+                    ExtraCore.setValue(ExtraConstants.REFRESH_ACCOUNT_SPINNER, true)
                 }
             } catch (e: IOException) {
                 e.printStackTrace()
@@ -296,8 +320,8 @@ fun AccountSpinnerCompose(
 fun AccountItemContent(account: Account) {
     val context = LocalContext.current
     val headBitmap = remember(account) {
-        var bitmap = account.skinFace
-        if (bitmap == null && account.isLocal) {
+        var bitmap = account.skinFace3D
+        if (bitmap == null) {
             try {
                 val steveSkin = BitmapFactory.decodeStream(context.assets.open("steve.png"))
                 bitmap = SkinHeadRenderer().render(100, steveSkin)
@@ -309,17 +333,36 @@ fun AccountItemContent(account: Account) {
         bitmap?.asImageBitmap()
     }
     
-    if (headBitmap != null) {
-        Image(
-            bitmap = headBitmap,
-            contentDescription = null,
-            modifier = Modifier
-                .size(32.dp)
-                .clip(RoundedCornerShape(4.dp)),
-            contentScale = ContentScale.FillBounds
-        )
-    } else {
-        Box(modifier = Modifier.size(32.dp).background(Color.Gray, RoundedCornerShape(4.dp)))
+    Box(modifier = Modifier.size(32.dp)) {
+        if (headBitmap != null) {
+            Image(
+                bitmap = headBitmap,
+                contentDescription = null,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clip(RoundedCornerShape(4.dp)),
+                contentScale = ContentScale.FillBounds
+            )
+        } else {
+            Box(modifier = Modifier.fillMaxSize().background(Color.Gray, RoundedCornerShape(4.dp)))
+        }
+
+        if (account.authType != AuthType.LOCAL && account.authType.iconResource != 0) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .offset(x = 2.dp, y = 2.dp)
+                    .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(4.dp))
+                    .padding(2.dp)
+            ) {
+                Icon(
+                    painter = painterResource(id = account.authType.iconResource),
+                    contentDescription = null,
+                    modifier = Modifier.size(10.dp),
+                    tint = Color.Unspecified
+                )
+            }
+        }
     }
     
     Spacer(modifier = Modifier.width(16.dp))

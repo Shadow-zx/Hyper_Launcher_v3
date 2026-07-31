@@ -1,5 +1,7 @@
 package net.kdt.pojavlaunch.screens.components
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -30,6 +32,7 @@ import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,6 +41,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -51,12 +55,13 @@ import net.kdt.pojavlaunch.instances.InstanceIconProvider
 
 @Composable
 fun InstanceListItem(
+    modifier: Modifier = Modifier,
     instance: DisplayInstance,
     isSelected: Boolean,
     onClick: () -> Unit,
     onEdit: () -> Unit,
     onRename: () -> Unit,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
 ) {
     val context = LocalContext.current
     val icon = remember(instance) {
@@ -64,12 +69,23 @@ fun InstanceListItem(
     }
 
     val displayName = if (instance.name.isNullOrBlank()) "UNNAMED" else instance.name
-    var menuExpanded by remember { mutableStateOf(false) }
+    var menuExpanded by remember { mutableStateOf(value = false) }
+
+    val animatedAlpha = remember { Animatable(0f) }
+    LaunchedEffect(Unit) {
+        animatedAlpha.animateTo(
+            targetValue = 1f,
+            animationSpec = tween(durationMillis = 400)
+        )
+    }
 
     Surface(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .height(72.dp)
+            .graphicsLayer {
+                alpha = animatedAlpha.value
+            }
             .clickable(
                 onClick = onClick,
                 indication = null,
@@ -96,8 +112,7 @@ fun InstanceListItem(
             Box(
                 modifier = Modifier
                     .size(48.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(MaterialTheme.colorScheme.surface),
+                    .clip(RoundedCornerShape(12.dp)),
                 contentAlignment = Alignment.Center
             ) {
                 Image(

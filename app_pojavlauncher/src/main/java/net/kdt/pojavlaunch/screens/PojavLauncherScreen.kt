@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import androidx.compose.ui.zIndex
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -38,6 +39,7 @@ fun PojavLauncherScreen(
                     .fillMaxWidth()
                     .height(56.dp)
                     .background(MaterialTheme.colorScheme.surface)
+                    .zIndex(1f)
             ) {
                 AccountSpinnerCompose(
                     modifier = Modifier.fillMaxSize()

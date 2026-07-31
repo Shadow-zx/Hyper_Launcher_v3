@@ -55,6 +55,11 @@
     <string name="preference_screen_transition_none">None</string>
     <string name="preference_screen_transition_fade">Fade</string>
     <string name="preference_screen_transition_bounce">Bounce</string>
+    <string name="preference_app_theme_title">App theme</string>
+    <string name="preference_app_theme_summary">Select the visual theme for the launcher</string>
+    <string name="preference_app_theme_system">Follow system</string>
+    <string name="preference_app_theme_light">Light</string>
+    <string name="preference_app_theme_dark">Dark</string>
 
 
     <string name="mcl_setting_title_use_surface_view">Use alternate surface rendering</string>
