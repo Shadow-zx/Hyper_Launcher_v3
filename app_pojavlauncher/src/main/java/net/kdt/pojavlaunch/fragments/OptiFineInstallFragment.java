@@ -1,22 +1,22 @@
 package net.kdt.pojavlaunch.fragments;
 
 import android.content.Context;
-import android.view.LayoutInflater;
-import android.widget.ExpandableListAdapter;
 
 import com.kdt.mcgui.ProgressLayout;
 
 import net.ashmeet.hyperlauncher.R;
-
 import net.kdt.pojavlaunch.instances.InstanceInstaller;
 import net.kdt.pojavlaunch.instances.Instances;
 import net.kdt.pojavlaunch.modloaders.ModloaderListenerProxy;
 import net.kdt.pojavlaunch.modloaders.OptiFineDownloadTask;
 import net.kdt.pojavlaunch.modloaders.OptiFineUtils;
-import net.kdt.pojavlaunch.modloaders.OptiFineVersionListAdapter;
+import net.kdt.pojavlaunch.screens.layouts.ModloaderVersionGroup;
+import net.kdt.pojavlaunch.screens.layouts.ModloaderVersionItem;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class OptiFineInstallFragment extends ModVersionListFragment<OptiFineUtils.OptiFineVersions> {
     public static final String TAG = "OptiFineInstallFragment";
@@ -38,8 +38,16 @@ public class OptiFineInstallFragment extends ModVersionListFragment<OptiFineUtil
     }
 
     @Override
-    public ExpandableListAdapter createAdapter(OptiFineUtils.OptiFineVersions versionList, LayoutInflater layoutInflater) {
-        return new OptiFineVersionListAdapter(versionList, layoutInflater);
+    public List<ModloaderVersionGroup<Object>> mapToGroups(OptiFineUtils.OptiFineVersions versionList) {
+        List<ModloaderVersionGroup<Object>> groups = new ArrayList<>();
+        for (int i = 0; i < versionList.gameVersions.size(); i++) {
+            List<ModloaderVersionItem<Object>> items = new ArrayList<>();
+            for (OptiFineUtils.OptiFineVersion v : versionList.optifineVersions.get(i)) {
+                items.add(new ModloaderVersionItem<>(v.versionName, v));
+            }
+            groups.add(new ModloaderVersionGroup<>(versionList.gameVersions.get(i), items));
+        }
+        return groups;
     }
 
     private void createInstance(OptiFineUtils.OptiFineVersion version, ModloaderListenerProxy listenerProxy) {

@@ -1,17 +1,18 @@
 package net.kdt.pojavlaunch.fragments;
 
 import android.content.Context;
-import android.view.LayoutInflater;
-import android.widget.ExpandableListAdapter;
 
 import net.ashmeet.hyperlauncher.R;
 import net.kdt.pojavlaunch.modloaders.BTADownloadTask;
 import net.kdt.pojavlaunch.modloaders.BTAUtils;
-import net.kdt.pojavlaunch.modloaders.BTAVersionListAdapter;
 import net.kdt.pojavlaunch.modloaders.ModloaderListenerProxy;
+import net.kdt.pojavlaunch.screens.layouts.ModloaderVersionGroup;
+import net.kdt.pojavlaunch.screens.layouts.ModloaderVersionItem;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class BTAInstallFragment extends ModVersionListFragment<BTAUtils.BTAVersionList> {
     public static final String TAG = "BTAInstallFragment";
@@ -36,8 +37,26 @@ public class BTAInstallFragment extends ModVersionListFragment<BTAUtils.BTAVersi
     }
 
     @Override
-    public ExpandableListAdapter createAdapter(BTAUtils.BTAVersionList versionList, LayoutInflater layoutInflater) {
-        return new BTAVersionListAdapter(versionList, layoutInflater);
+    public List<ModloaderVersionGroup<Object>> mapToGroups(BTAUtils.BTAVersionList versionList) {
+        List<ModloaderVersionGroup<Object>> groups = new ArrayList<>();
+        if(!versionList.testedVersions.isEmpty()) {
+            groups.add(createGroup(R.string.bta_installer_available_versions, versionList.testedVersions));
+        }
+        if(!versionList.untestedVersions.isEmpty()) {
+            groups.add(createGroup(R.string.bta_installer_untested_versions, versionList.untestedVersions));
+        }
+        if(!versionList.nightlyVersions.isEmpty()) {
+            groups.add(createGroup(R.string.bta_installer_nightly_versions, versionList.nightlyVersions));
+        }
+        return groups;
+    }
+
+    private ModloaderVersionGroup<Object> createGroup(int titleRes, List<BTAUtils.BTAVersion> versions) {
+        List<ModloaderVersionItem<Object>> items = new ArrayList<>();
+        for (BTAUtils.BTAVersion version : versions) {
+            items.add(new ModloaderVersionItem<>(version.versionName, version));
+        }
+        return new ModloaderVersionGroup<>(getString(titleRes), items);
     }
 
     @Override

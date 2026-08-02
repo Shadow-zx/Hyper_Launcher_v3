@@ -1,19 +1,20 @@
 package net.kdt.pojavlaunch.fragments;
 
 import android.content.Context;
-import android.view.LayoutInflater;
-import android.widget.ExpandableListAdapter;
 
 import com.kdt.mcgui.ProgressLayout;
 
 import net.kdt.pojavlaunch.instances.InstanceInstaller;
 import net.kdt.pojavlaunch.instances.Instances;
 import net.kdt.pojavlaunch.modloaders.ForgelikeUtils;
-import net.kdt.pojavlaunch.modloaders.ForgelikeVersionListAdapter;
 import net.kdt.pojavlaunch.modloaders.ModloaderListenerProxy;
+import net.kdt.pojavlaunch.screens.layouts.ModloaderVersionGroup;
+import net.kdt.pojavlaunch.screens.layouts.ModloaderVersionItem;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public abstract class ForgelikeInstallFragment extends ModVersionListFragment<List<String>> {
@@ -29,13 +30,47 @@ public abstract class ForgelikeInstallFragment extends ModVersionListFragment<Li
     }
 
     @Override
-    public Runnable createDownloadTask(Object selectedVersion, ModloaderListenerProxy listenerProxy) {
-        return ()->createInstance((String) selectedVersion, listenerProxy);
+    public List<ModloaderVersionGroup<Object>> mapToGroups(List<String> forgeVersions) {
+        List<String> gameVersions = new ArrayList<>();
+        List<List<String>> loaderVersions = new ArrayList<>();
+        
+        for(String version : forgeVersions) {
+            if(mUtils.shouldSkipVersion(version)) continue;
+            String gameVersion = mUtils.processVersionString(version);
+            List<String> versionList;
+            int gameVersionIndex = gameVersions.indexOf(gameVersion);
+            if(gameVersionIndex != -1) {
+                versionList = loaderVersions.get(gameVersionIndex);
+            } else {
+                versionList = new ArrayList<>();
+                gameVersions.add(gameVersion);
+                loaderVersions.add(versionList);
+            }
+            versionList.add(version);
+        }
+
+        if(mUtils.isVersionOrderInversed()) {
+            for (List<String> versionList : loaderVersions) {
+                Collections.reverse(versionList);
+            }
+            Collections.reverse(loaderVersions);
+            Collections.reverse(gameVersions);
+        }
+
+        List<ModloaderVersionGroup<Object>> groups = new ArrayList<>();
+        for (int i = 0; i < gameVersions.size(); i++) {
+            List<ModloaderVersionItem<Object>> items = new ArrayList<>();
+            for (String v : loaderVersions.get(i)) {
+                items.add(new ModloaderVersionItem<>(v, v));
+            }
+            groups.add(new ModloaderVersionGroup<>(gameVersions.get(i), items));
+        }
+        return groups;
     }
 
     @Override
-    public ExpandableListAdapter createAdapter(List<String> versionList, LayoutInflater layoutInflater) {
-        return new ForgelikeVersionListAdapter(versionList, layoutInflater, mUtils);
+    public Runnable createDownloadTask(Object selectedVersion, ModloaderListenerProxy listenerProxy) {
+        return ()->createInstance((String) selectedVersion, listenerProxy);
     }
 
     @Override

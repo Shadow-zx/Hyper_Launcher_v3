@@ -24,6 +24,7 @@ public class InstanceIconProvider {
     private static final Map<Integer, Drawable> sIconCache = new HashMap<>();
     private static final Map<String, Drawable> sStaticIconCache = new HashMap<>();
     private static final Map<String, Integer> sStaticIcons = new HashMap<>();
+    private static int sLastUiMode = -1;
 
     static {
         sStaticIcons.put("default", R.drawable.ic_hyper_full);
@@ -40,6 +41,7 @@ public class InstanceIconProvider {
      * @return an icon drawable
      */
     public static @NonNull Drawable fetchIcon(Resources resources, @NonNull DisplayInstance instance) {
+        checkUiMode(resources);
         int identityHashCode = System.identityHashCode(instance);
 
         Drawable cachedIcon = sIconCache.get(identityHashCode);
@@ -58,6 +60,15 @@ public class InstanceIconProvider {
      */
     public static void dropIcon(@NonNull Instance key) {
         sIconCache.remove(System.identityHashCode(key));
+    }
+
+    private static void checkUiMode(Resources resources) {
+        int currentUiMode = resources.getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+        if (sLastUiMode != currentUiMode) {
+            sStaticIconCache.clear();
+            sIconCache.clear();
+            sLastUiMode = currentUiMode;
+        }
     }
 
     private static Drawable fetchInstanceFileIcon(Resources resources, int identityHash, File iconLocation) {
