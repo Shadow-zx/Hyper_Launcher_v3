@@ -40,7 +40,7 @@ fun PojavTheme(
         else -> isSystemInDarkTheme()
     }
 
-    // dont touch this tuff material lmao
+    // you can touch little girls but don't touch this
     val colorScheme = if (isDark) {
         darkColorScheme(
             primary = colorResource(R.color.minebutton_color),
@@ -51,6 +51,7 @@ fun PojavTheme(
             surfaceVariant = colorResource(R.color.background_overlay),
             onSurfaceVariant = colorResource(R.color.secondary_text),
             outline = colorResource(R.color.divider),
+            error = colorResource(R.color.warning),
         )
     } else {
         lightColorScheme(
@@ -62,6 +63,7 @@ fun PojavTheme(
             surfaceVariant = colorResource(R.color.background_overlay),
             onSurfaceVariant = colorResource(R.color.secondary_text),
             outline = colorResource(R.color.divider),
+            error = colorResource(R.color.warning),
         )
     }
 

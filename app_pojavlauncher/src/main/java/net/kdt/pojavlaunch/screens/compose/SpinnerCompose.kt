@@ -1,4 +1,4 @@
-package net.kdt.pojavlaunch.screens.components
+package net.kdt.pojavlaunch.screens.compose
 
 import android.graphics.BitmapFactory
 import androidx.compose.foundation.Image
@@ -99,8 +99,7 @@ fun AccountSpinnerCompose(
 
     val refreshAccount: (Account) -> Unit = { account ->
         net.kdt.pojavlaunch.progresskeeper.ProgressKeeper.waitUntilDone {
-            val refreshAccount = account.reload()
-            if (refreshAccount == null) return@waitUntilDone
+            val refreshAccount = account.reload() ?: return@waitUntilDone
             val authType = refreshAccount.authType
             if (authType.requiresLogin() && System.currentTimeMillis() > refreshAccount.expiresAt) {
                 isAuthenticating = true
@@ -287,7 +286,6 @@ fun AccountSpinnerCompose(
                             }
                             IconButton(onClick = {
                                 expanded = false
-                                // Show delete dialog logic
                                 MaterialAlertDialogBuilder(context)
                                     .setMessage(R.string.warning_remove_account)
                                     .setPositiveButton(android.R.string.cancel, null)
@@ -300,7 +298,7 @@ fun AccountSpinnerCompose(
                                 Icon(
                                     Icons.Default.Delete,
                                     contentDescription = "Delete",
-                                    tint = Color(0xFFFF5252)
+                                    tint = MaterialTheme.colorScheme.error
                                 )
                             }
                         }

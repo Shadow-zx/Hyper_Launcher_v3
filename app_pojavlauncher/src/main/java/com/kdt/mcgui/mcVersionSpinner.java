@@ -83,15 +83,6 @@ public class mcVersionSpinner extends ExtendedTextView {
         mProfileAdapter.applySelectionIndex(mSelectedIndex);
     }
 
-    public void openProfileEditor(FragmentActivity fragmentActivity) {
-        Object currentSelection = mProfileAdapter.getItem(mSelectedIndex);
-        if(currentSelection instanceof InstanceAdapterExtra) {
-            performExtraAction((InstanceAdapterExtra) currentSelection);
-        }else{
-            Tools.swapFragment(fragmentActivity, InstanceEditorFragment.class, InstanceEditorFragment.TAG, null);
-        }
-    }
-
     private void applyInstances(Instances instances) {
         mProfileAdapter.applyInstances(instances);
         setSelection(instances.selectedIndex);

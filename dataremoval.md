@@ -1,5 +1,5 @@
-# Remove MojoLauncher account data
-MojoLauncher uses two types of accounts:
+# Remove HyperLauncher account data
+HyperLauncher uses two types of accounts:
 - Local accounts
 - Microsoft accounts
 <br>

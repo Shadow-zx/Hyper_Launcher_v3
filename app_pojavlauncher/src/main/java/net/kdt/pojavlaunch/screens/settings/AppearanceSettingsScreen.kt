@@ -2,8 +2,6 @@ package net.kdt.pojavlaunch.screens.settings
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Animation
 import androidx.compose.material.icons.filled.Palette
@@ -12,18 +10,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.edit
 import net.ashmeet.hyperlauncher.R
 import net.kdt.pojavlaunch.prefs.LauncherPreferences
-import net.kdt.pojavlaunch.screens.settings.preferences.CardPosition
-import net.kdt.pojavlaunch.screens.settings.preferences.PreferenceCategory
+import net.kdt.pojavlaunch.screens.settings.layouts.CardPosition
 import net.kdt.pojavlaunch.screens.settings.preferences.SettingsActionItem
-import net.kdt.pojavlaunch.screens.settings.preferences.SettingsCard
-import net.kdt.pojavlaunch.screens.settings.preferences.SettingsScreenWrapper
+import net.kdt.pojavlaunch.screens.settings.layouts.SettingsCard
+import net.kdt.pojavlaunch.screens.settings.layouts.SettingsScreenWrapper
 import net.kdt.pojavlaunch.screens.settings.preferences.SingleChoiceDialog
 
 @Composable
@@ -58,10 +54,9 @@ fun AppearanceSettingsScreen(
 
     SettingsScreenWrapper(
         title = stringResource(R.string.preference_appearance_title),
-        onBack = onBack
+        onBack = onBack,
+        addTopGap = true
     ) {
-        PreferenceCategory(title = stringResource(R.string.preference_category_appearance))
-
         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
             SettingsCard(position = CardPosition.TOP, useSurface = true) {
                 SettingsActionItem(
@@ -82,7 +77,6 @@ fun AppearanceSettingsScreen(
             }
         }
         
-        Spacer(modifier = Modifier.size(24.dp))
     }
 
     if (showThemeDialog) {

@@ -28,7 +28,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import net.ashmeet.hyperlauncher.R
@@ -122,13 +121,13 @@ fun RuntimeSelectionDialog(
                                 Text(
                                     text = stringResource(R.string.multirt_runtime_corrupt),
                                     style = MaterialTheme.typography.bodyMedium,
-                                    color = Color.Red
+                                    color = MaterialTheme.colorScheme.error
                                 )
                             }
                         }
                         if (isDeleting) {
                             IconButton(onClick = { onRuntimeDelete(runtime) }) {
-                                Icon(Icons.Default.Delete, contentDescription = null, tint = Color.Red)
+                                Icon(Icons.Default.Delete, contentDescription = null, tint = MaterialTheme.colorScheme.error)
                             }
                         } else if (isDefault) {
                             Icon(

@@ -91,10 +91,6 @@ public class AccountSpinner extends AppCompatSpinner implements LoginListener, A
         return false;
     };
 
-    public AccountSpinner(@NonNull Context context, int mode) {
-        super(context, mode);
-        init();
-    }
 
     public AccountSpinner(@NonNull Context context) {
         super(context);
@@ -110,17 +106,6 @@ public class AccountSpinner extends AppCompatSpinner implements LoginListener, A
         super(context, attrs, defStyleAttr);
         init();
     }
-
-    public AccountSpinner(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr, int mode) {
-        super(context, attrs, defStyleAttr, mode);
-        init();
-    }
-
-    public AccountSpinner(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr, int mode, Resources.Theme popupTheme) {
-        super(context, attrs, defStyleAttr, mode, popupTheme);
-        init();
-    }
-
 
 
     private void init() {

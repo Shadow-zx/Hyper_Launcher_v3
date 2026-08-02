@@ -1,13 +1,7 @@
-package net.kdt.pojavlaunch.screens
+package net.kdt.pojavlaunch.screens.layouts
 
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,26 +13,25 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.rounded.ArrowBack
-import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Refresh
-import androidx.compose.material.icons.rounded.Search
+import androidx.compose.material.icons.rounded.Warning
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -48,15 +41,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import net.kdt.pojavlaunch.PojavApplication
 import net.kdt.pojavlaunch.instances.DisplayInstance
 import net.kdt.pojavlaunch.instances.Instances
-import net.kdt.pojavlaunch.screens.components.InstanceListItem
+import net.kdt.pojavlaunch.screens.components.InstanceNavigationRail
+import net.kdt.pojavlaunch.screens.compose.InstanceListItem
 
 @Composable
 fun InstanceSelectionScreen(
@@ -75,7 +67,7 @@ fun InstanceSelectionScreen(
 
     val loadInstances = {
         isLoading = true
-        net.kdt.pojavlaunch.PojavApplication.sExecutorService.execute {
+        PojavApplication.sExecutorService.execute {
             try {
                 val loaded = Instances.loadDisplay()
                 instances = loaded.list
@@ -159,6 +151,35 @@ fun InstanceSelectionScreen(
                         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                             CircularProgressIndicator()
                         }
+                    } else if (filteredInstances.isEmpty()) {
+                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Icon(
+                                    imageVector = Icons.Rounded.Warning,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(64.dp),
+                                    tint = MaterialTheme.colorScheme.error.copy(alpha = 0.5f)
+                                )
+                                Spacer(modifier = Modifier.height(16.dp))
+                                Text(
+                                    text = "No instances found",
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                Spacer(modifier = Modifier.height(24.dp))
+                                TextButton(
+                                    onClick = { loadInstances() },
+                                    shape = RoundedCornerShape(12.dp),
+                                    colors = ButtonDefaults.textButtonColors(
+                                        containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
+                                    )
+                                ) {
+                                    Icon(Icons.Rounded.Refresh, contentDescription = null, modifier = Modifier.size(20.dp))
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text("Refresh")
+                                }
+                            }
+                        }
                     } else {
                         val lazyListState = rememberLazyListState()
                         LazyColumn(
@@ -173,7 +194,7 @@ fun InstanceSelectionScreen(
                             ) { instance ->
                                 val actualIndex = instances.indexOf(instance)
                                 val isSelected = actualIndex == selectedIndex
-                                
+
                                 InstanceListItem(
                                     modifier = Modifier
                                         .animateItem(
@@ -200,92 +221,6 @@ fun InstanceSelectionScreen(
     }
 }
 
-@Composable
-fun InstanceNavigationRail(
-    onCreateNew: () -> Unit,
-    onRefresh: () -> Unit,
-    onImportModpack: () -> Unit,
-    onBack: () -> Unit
-) {
-    NavigationRail(
-        containerColor = Color.Transparent,
-        modifier = Modifier.fillMaxHeight(),
-        header = {
-            SidebarRailButton(
-                icon = Icons.AutoMirrored.Rounded.ArrowBack,
-                label = "Back",
-                onClick = onBack
-            )
-        }
-    ) {
-        Spacer(modifier = Modifier.weight(1f))
-        
-        SidebarRailButton(
-            icon = Icons.Rounded.Add,
-            label = "New",
-            onClick = onCreateNew,
-            containerColor = MaterialTheme.colorScheme.primary,
-            contentColor = MaterialTheme.colorScheme.onPrimary
-        )
-        
-        Spacer(modifier = Modifier.height(16.dp))
-
-        SidebarRailButton(
-            icon = Icons.Rounded.Refresh,
-            label = "Refresh",
-            onClick = onRefresh
-        )
-        
-        Spacer(modifier = Modifier.height(16.dp))
-
-        SidebarRailButton(
-            icon = Icons.Rounded.Search,
-            label = "Import",
-            onClick = onImportModpack
-        )
-        
-        Spacer(modifier = Modifier.height(24.dp))
-    }
-}
-
-@Composable
-fun SidebarRailButton(
-    icon: ImageVector,
-    label: String,
-    onClick: () -> Unit,
-    containerColor: Color = Color.Transparent,
-    contentColor: Color = MaterialTheme.colorScheme.onSurface
-) {
-    val interactionSource = remember { MutableInteractionSource() }
-    val isPressed by interactionSource.collectIsPressedAsState()
-    val scale by animateFloatAsState(
-        targetValue = if (isPressed) 0.85f else 1f,
-        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
-        label = "scale"
-    )
-
-    IconButton(
-        onClick = onClick,
-        interactionSource = interactionSource,
-        modifier = Modifier
-            .size(56.dp)
-            .scale(scale)
-            .clip(RoundedCornerShape(20.dp))
-            .background(containerColor)
-            .clickable(
-                onClick = onClick,
-                indication = null,
-                interactionSource = interactionSource
-            )
-    ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = label,
-            tint = contentColor,
-            modifier = Modifier.size(28.dp)
-        )
-    }
-}
 
 private fun isVanilla(versionId: String?): Boolean {
     if (versionId == null) return true
@@ -297,3 +232,4 @@ private fun isVanilla(versionId: String?): Boolean {
            !lower.contains("neoforge") &&
            !lower.contains("bta")
 }
+

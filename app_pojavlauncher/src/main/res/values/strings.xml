@@ -107,6 +107,11 @@
     <string name="global_select">Select</string>
     <string name="global_retry">Retry</string>
     <string name="global_default">Default</string>
+    <string name="global_mods">Mods</string>
+    <string name="global_modpacks">Modpacks</string>
+    <string name="global_resourcepacks">Resource</string>
+    <string name="global_shaders">Shaders</string>
+    <string name="installer_search_hint">Search Modrinth...</string>
 
     <!-- MainActivity: strings -->
     <string name="mcn_exit_title">Application/Game exited with code %d, check latestlog.txt for more details.</string>
@@ -187,7 +192,7 @@
     <string name="mcl_disable_swap_hand_subtitle">Disables double tapping on the hotbar item to swap it in the second hand.</string>
     <string name="mcl_setting_title_mousespeed">Mouse Speed</string>
     <string name="mcl_setting_subtitle_mousespeed">Changes the speed of the virtual mouse.</string>
-    <string name="customctrl_passthru">Mouse pass-thru</string>
+    <string name="customctrl_passthru">Mouse pass-through</string>
     <string name="customctrl_swipeable">Swipeable</string>
     <string name="customctrl_forward_lock">Forward lock</string>
     <string name="customctrl_absolute_tracking">Absolute finger tracking</string>

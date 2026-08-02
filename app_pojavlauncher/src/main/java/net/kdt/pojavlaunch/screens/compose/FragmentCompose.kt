@@ -1,4 +1,4 @@
-package net.kdt.pojavlaunch.screens.components
+package net.kdt.pojavlaunch.screens.compose
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -95,34 +95,9 @@ import net.kdt.pojavlaunch.instances.Instance
 import net.kdt.pojavlaunch.instances.InstanceIconProvider
 import net.kdt.pojavlaunch.instances.Instances
 import net.kdt.pojavlaunch.screens.theme.PojavTheme
+import net.kdt.pojavlaunch.screens.utils.rememberDrawablePainter
 import java.io.IOException
 
-@Composable
-fun rememberDrawablePainter(drawable: Drawable?): Painter {
-    return remember(drawable) {
-        if (drawable == null) {
-            object : Painter() {
-                override val intrinsicSize: Size get() = Size.Unspecified
-                override fun DrawScope.onDraw() {}
-            }
-        } else {
-            object : Painter() {
-                override val intrinsicSize: Size
-                    get() = Size(
-                        drawable.intrinsicWidth.toFloat(),
-                        drawable.intrinsicHeight.toFloat()
-                    )
-
-                override fun DrawScope.onDraw() {
-                    drawIntoCanvas { canvas ->
-                        drawable.setBounds(0, 0, size.width.toInt(), size.height.toInt())
-                        drawable.draw(canvas.nativeCanvas)
-                    }
-                }
-            }
-        }
-    }
-}
 
 @Composable
 fun rememberSkinHead(account: Account?): State<Bitmap?> {

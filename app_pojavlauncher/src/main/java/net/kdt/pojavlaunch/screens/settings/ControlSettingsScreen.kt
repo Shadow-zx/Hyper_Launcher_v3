@@ -29,13 +29,13 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.edit
 import net.ashmeet.hyperlauncher.R
 import net.kdt.pojavlaunch.prefs.LauncherPreferences
-import net.kdt.pojavlaunch.screens.settings.preferences.CardPosition
+import net.kdt.pojavlaunch.screens.settings.layouts.CardPosition
 import net.kdt.pojavlaunch.screens.settings.preferences.PreferenceCategory
 import net.kdt.pojavlaunch.screens.settings.preferences.SettingsActionItem
-import net.kdt.pojavlaunch.screens.settings.preferences.SettingsCard
-import net.kdt.pojavlaunch.screens.settings.preferences.SettingsScreenWrapper
+import net.kdt.pojavlaunch.screens.settings.layouts.SettingsCard
+import net.kdt.pojavlaunch.screens.settings.layouts.SettingsScreenWrapper
+import net.kdt.pojavlaunch.screens.settings.preferences.SettingsSliderItem
 import net.kdt.pojavlaunch.screens.settings.preferences.SettingsSwitchItem
-import net.kdt.pojavlaunch.screens.settings.preferences.SliderPreference
 
 @Composable
 fun ControlSettingsScreen(
@@ -65,18 +65,19 @@ fun ControlSettingsScreen(
 
     SettingsScreenWrapper(
         title = stringResource(R.string.preference_control_title),
-        onBack = onBack
+        onBack = onBack,
+        addTopGap = true
     ) {
-        SettingsCard(position = CardPosition.SINGLE, useSurface = true) {
-            SettingsActionItem(
-                title = stringResource(R.string.preference_edit_controls_title),
-                summary = stringResource(R.string.preference_edit_controls_summary),
-                icon = Icons.Default.Edit,
-                onClick = onNavigateToCustomControls
-            )
+        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            SettingsCard(position = CardPosition.SINGLE, useSurface = true) {
+                SettingsActionItem(
+                    title = stringResource(R.string.preference_edit_controls_title),
+                    summary = stringResource(R.string.preference_edit_controls_summary),
+                    icon = Icons.Default.Edit,
+                    onClick = onNavigateToCustomControls
+                )
+            }
         }
-
-        PreferenceCategory(title = stringResource(R.string.preference_category_gestures))
 
         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
             SettingsCard(position = CardPosition.TOP, useSurface = true) {
@@ -108,7 +109,7 @@ fun ControlSettingsScreen(
             }
 
             SettingsCard(position = CardPosition.BOTTOM, useSurface = true) {
-                SliderPreference(
+                SettingsSliderItem(
                     title = stringResource(R.string.mcl_setting_title_longpresstrigger),
                     summary = stringResource(R.string.mcl_setting_subtitle_longpresstrigger),
                     icon = Icons.Default.TouchApp,
@@ -127,7 +128,7 @@ fun ControlSettingsScreen(
 
         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
             SettingsCard(position = CardPosition.TOP, useSurface = true) {
-                SliderPreference(
+                SettingsSliderItem(
                     title = stringResource(R.string.mcl_setting_title_buttonscale),
                     summary = stringResource(R.string.mcl_setting_subtitle_buttonscale),
                     icon = Icons.Default.SettingsOverscan,
@@ -160,7 +161,7 @@ fun ControlSettingsScreen(
 
         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
             SettingsCard(position = CardPosition.TOP, useSurface = true) {
-                SliderPreference(
+                SettingsSliderItem(
                     title = stringResource(R.string.mcl_setting_title_mousescale),
                     summary = stringResource(R.string.mcl_setting_subtitle_mousescale),
                     icon = Icons.Default.Mouse,
@@ -175,7 +176,7 @@ fun ControlSettingsScreen(
             }
 
             SettingsCard(position = CardPosition.MIDDLE, useSurface = true) {
-                SliderPreference(
+                SettingsSliderItem(
                     title = stringResource(R.string.mcl_setting_title_mousespeed),
                     summary = stringResource(R.string.mcl_setting_subtitle_mousespeed),
                     icon = Icons.Default.Speed,
@@ -223,7 +224,7 @@ fun ControlSettingsScreen(
                 }
 
                 SettingsCard(position = CardPosition.MIDDLE, useSurface = true) {
-                    SliderPreference(
+                    SettingsSliderItem(
                         title = stringResource(R.string.preference_gyro_sensitivity_title),
                         summary = stringResource(R.string.preference_gyro_sensitivity_description),
                         enabled = enableGyro,
@@ -239,7 +240,7 @@ fun ControlSettingsScreen(
                 }
 
                 SettingsCard(position = CardPosition.MIDDLE, useSurface = true) {
-                    SliderPreference(
+                    SettingsSliderItem(
                         title = stringResource(R.string.preference_gyro_sample_rate_title),
                         summary = stringResource(R.string.preference_gyro_sample_rate_description),
                         enabled = enableGyro,
@@ -323,7 +324,7 @@ fun ControlSettingsScreen(
             }
 
             SettingsCard(position = CardPosition.BOTTOM, useSurface = true) {
-                SliderPreference(
+                SettingsSliderItem(
                     title = stringResource(R.string.preference_deadzone_scale_title),
                     summary = stringResource(R.string.preference_deadzone_scale_description),
                     icon = Icons.Default.ControlCamera,

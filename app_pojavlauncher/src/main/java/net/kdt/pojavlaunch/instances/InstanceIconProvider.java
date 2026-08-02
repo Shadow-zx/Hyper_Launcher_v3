@@ -1,13 +1,16 @@
 package net.kdt.pojavlaunch.instances;
 
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.res.ResourcesCompat;
+import androidx.core.graphics.drawable.DrawableCompat;
 
 import net.ashmeet.hyperlauncher.R;
 
@@ -89,7 +92,15 @@ public class InstanceIconProvider {
     private static Drawable getStaticIcon(Resources resources, @NonNull String icon) {
         int staticIconResource = getStaticIconResource(icon);
         if(staticIconResource == -1) return null;
-        return ResourcesCompat.getDrawable(resources, staticIconResource, null);
+        Drawable drawable = ResourcesCompat.getDrawable(resources, staticIconResource, null);
+        if (drawable != null && FALLBACK_ICON_NAME.equals(icon)) {
+            int nightModeFlags = resources.getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+            if (nightModeFlags != Configuration.UI_MODE_NIGHT_YES) {
+                drawable = drawable.mutate();
+                DrawableCompat.setTint(drawable, Color.BLACK);
+            }
+        }
+        return drawable;
     }
 
     private static int getStaticIconResource(String icon) {

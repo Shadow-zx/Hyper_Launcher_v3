@@ -1,4 +1,4 @@
-package net.kdt.pojavlaunch.screens.settings.preferences
+package net.kdt.pojavlaunch.screens.settings.layouts
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

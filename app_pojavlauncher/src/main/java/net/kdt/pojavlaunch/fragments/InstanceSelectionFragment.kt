@@ -15,7 +15,7 @@ import net.kdt.pojavlaunch.PojavApplication
 import net.kdt.pojavlaunch.Tools
 import net.kdt.pojavlaunch.instances.Instance
 import net.kdt.pojavlaunch.instances.Instances
-import net.kdt.pojavlaunch.screens.InstanceSelectionScreen
+import net.kdt.pojavlaunch.screens.layouts.InstanceSelectionScreen
 import net.kdt.pojavlaunch.screens.theme.PojavTheme
 
 class InstanceSelectionFragment : Fragment() {
@@ -41,8 +41,8 @@ class InstanceSelectionFragment : Fragment() {
                         onImportModpack = {
                             Tools.swapFragment(
                                 requireActivity(),
-                                SearchModFragment::class.java,
-                                SearchModFragment.TAG,
+                                ContentInstallerFragment::class.java,
+                                ContentInstallerFragment.TAG,
                                 null
                             )
                         },

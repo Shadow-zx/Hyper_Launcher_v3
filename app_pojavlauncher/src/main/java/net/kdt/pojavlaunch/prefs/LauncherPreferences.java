@@ -2,18 +2,21 @@ package net.kdt.pojavlaunch.prefs;
 
 import static android.os.Build.VERSION.SDK_INT;
 import static net.kdt.pojavlaunch.Architecture.is32BitsDevice;
-import android.content.*;
+
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.util.DisplayMetrics;
 import android.util.Log;
+
 import androidx.appcompat.app.AppCompatDelegate;
-import net.kdt.pojavlaunch.*;
+
+import net.ashmeet.hyperlauncher.R;
+import net.kdt.pojavlaunch.Tools;
 import net.kdt.pojavlaunch.multirt.MultiRTUtils;
 import net.kdt.pojavlaunch.utils.JREUtils;
 
 import java.io.IOException;
-
-import net.ashmeet.hyperlauncher.R;
 
 public class LauncherPreferences {
     public static final String PREF_KEY_CURRENT_INSTANCE = "currentInstance";
@@ -74,6 +77,7 @@ public class LauncherPreferences {
     public static boolean PREF_ALSOFT_FORCE_OPENSL = false;
     public static String PREF_SCREEN_TRANSITION = "none";
     public static String PREF_THEME = "system";
+    public static int PREF_LAST_CONTENT_SOURCE = 0; // 0 for Modrinth, 1 for CurseForge
 
 
     public static void loadPreferences(Context ctx) {
@@ -125,6 +129,7 @@ public class LauncherPreferences {
         PREF_ALSOFT_FORCE_OPENSL = DEFAULT_PREF.getBoolean("alsoftForceOpenSL", false);
         PREF_SCREEN_TRANSITION = DEFAULT_PREF.getString("screen_transition", "none");
         PREF_THEME = DEFAULT_PREF.getString("app_theme", "system");
+        PREF_LAST_CONTENT_SOURCE = DEFAULT_PREF.getInt("last_content_source", 0);
         updateNightMode();
 
         String argLwjglLibname = "-Dorg.lwjgl.opengl.libname=";

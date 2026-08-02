@@ -1,4 +1,4 @@
-package net.kdt.pojavlaunch.screens.components
+package net.kdt.pojavlaunch.screens.compose
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
@@ -41,7 +41,8 @@ fun ProgressLayoutCompose(
     val observedKeys = listOf(
         "unpack_runtime", "download_minecraft", "download_verlist",
         "authenticate", "install_modpack", "extract_components",
-        "extract_single_files", "instance_install", "data_migration"
+        "extract_single_files", "instance_install", "data_migration",
+        "copy_files", "download_content"
     )
 
     DisposableEffect(Unit) {

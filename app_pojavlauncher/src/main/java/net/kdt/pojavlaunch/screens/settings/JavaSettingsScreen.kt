@@ -22,14 +22,13 @@ import net.ashmeet.hyperlauncher.R
 import net.kdt.pojavlaunch.multirt.MultiRTUtils
 import net.kdt.pojavlaunch.multirt.Runtime
 import net.kdt.pojavlaunch.prefs.LauncherPreferences
-import net.kdt.pojavlaunch.screens.settings.preferences.CardPosition
-import net.kdt.pojavlaunch.screens.settings.preferences.PreferenceCategory
+import net.kdt.pojavlaunch.screens.settings.layouts.CardPosition
 import net.kdt.pojavlaunch.screens.settings.preferences.RuntimeSelectionDialog
 import net.kdt.pojavlaunch.screens.settings.preferences.SettingsActionItem
-import net.kdt.pojavlaunch.screens.settings.preferences.SettingsCard
-import net.kdt.pojavlaunch.screens.settings.preferences.SettingsScreenWrapper
+import net.kdt.pojavlaunch.screens.settings.layouts.SettingsCard
+import net.kdt.pojavlaunch.screens.settings.layouts.SettingsScreenWrapper
 import net.kdt.pojavlaunch.screens.settings.preferences.SettingsSwitchItem
-import net.kdt.pojavlaunch.screens.settings.preferences.SliderPreference
+import net.kdt.pojavlaunch.screens.settings.preferences.SettingsSliderItem
 import net.kdt.pojavlaunch.screens.settings.preferences.TextInputDialog
 
 @Composable
@@ -51,10 +50,9 @@ fun JavaSettingsScreen(
 
     SettingsScreenWrapper(
         title = stringResource(R.string.preference_java_title),
-        onBack = onBack
+        onBack = onBack,
+        addTopGap = true
     ) {
-        PreferenceCategory(title = stringResource(R.string.preference_category_java_tweaks))
-
         val currentRuntime = remember(defaultRuntimeName) {
             if (defaultRuntimeName.isNotEmpty()) {
                 MultiRTUtils.read(defaultRuntimeName)
@@ -87,7 +85,7 @@ fun JavaSettingsScreen(
             }
 
             SettingsCard(position = CardPosition.MIDDLE, useSurface = true) {
-                SliderPreference(
+                SettingsSliderItem(
                     title = stringResource(R.string.mcl_memory_allocation),
                     summary = stringResource(R.string.mcl_memory_allocation_subtitle),
                     icon = Icons.Default.Memory,

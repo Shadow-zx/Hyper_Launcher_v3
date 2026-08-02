@@ -21,11 +21,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import net.ashmeet.hyperlauncher.R
 import net.kdt.pojavlaunch.prefs.LauncherPreferences
-import net.kdt.pojavlaunch.screens.settings.preferences.CardPosition
+import net.kdt.pojavlaunch.screens.settings.layouts.CardPosition
 import net.kdt.pojavlaunch.screens.settings.preferences.PreferenceCategory
 import net.kdt.pojavlaunch.screens.settings.preferences.SettingsActionItem
-import net.kdt.pojavlaunch.screens.settings.preferences.SettingsCard
-import net.kdt.pojavlaunch.screens.settings.preferences.SettingsScreenWrapper
+import net.kdt.pojavlaunch.screens.settings.layouts.SettingsCard
+import net.kdt.pojavlaunch.screens.settings.layouts.SettingsScreenWrapper
 import net.kdt.pojavlaunch.screens.settings.preferences.SettingsSwitchItem
 
 @Composable
@@ -47,8 +47,6 @@ fun MainSettingsScreen(
         title = stringResource(R.string.mcl_options),
         onBack = null
     ) {
-        PreferenceCategory(title = stringResource(R.string.preference_category_main_categories))
-
         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
             SettingsCard(position = CardPosition.TOP, useSurface = true) {
                 SettingsActionItem(

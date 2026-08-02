@@ -1,10 +1,7 @@
 package net.kdt.pojavlaunch.screens.settings
-
 import android.os.Build
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Architecture
 import androidx.compose.material.icons.filled.AspectRatio
@@ -21,7 +18,6 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.res.stringResource
@@ -29,14 +25,13 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.edit
 import net.ashmeet.hyperlauncher.R
 import net.kdt.pojavlaunch.prefs.LauncherPreferences
-import net.kdt.pojavlaunch.screens.settings.preferences.CardPosition
-import net.kdt.pojavlaunch.screens.settings.preferences.PreferenceCategory
+import net.kdt.pojavlaunch.screens.settings.layouts.CardPosition
 import net.kdt.pojavlaunch.screens.settings.preferences.SettingsActionItem
-import net.kdt.pojavlaunch.screens.settings.preferences.SettingsCard
-import net.kdt.pojavlaunch.screens.settings.preferences.SettingsScreenWrapper
+import net.kdt.pojavlaunch.screens.settings.layouts.SettingsCard
+import net.kdt.pojavlaunch.screens.settings.layouts.SettingsScreenWrapper
+import net.kdt.pojavlaunch.screens.settings.preferences.SettingsSliderItem
 import net.kdt.pojavlaunch.screens.settings.preferences.SettingsSwitchItem
 import net.kdt.pojavlaunch.screens.settings.preferences.SingleChoiceDialog
-import net.kdt.pojavlaunch.screens.settings.preferences.SliderPreference
 import net.kdt.pojavlaunch.utils.RendererCompatUtil
 
 @Composable
@@ -59,10 +54,9 @@ fun VideoSettingsScreen(
 
     SettingsScreenWrapper(
         title = stringResource(R.string.preference_category_video),
-        onBack = onBack
+        onBack = onBack,
+        addTopGap = true
     ) {
-        PreferenceCategory(title = stringResource(R.string.preference_category_video))
-
         val compatibleRenderers = remember(context) { RendererCompatUtil.getCompatibleRenderers(context) }
         val rendererDisplayName = remember(renderer, compatibleRenderers) {
             val index = compatibleRenderers.rendererIds.indexOf(renderer)
@@ -109,7 +103,7 @@ fun VideoSettingsScreen(
             }
 
             SettingsCard(position = CardPosition.BOTTOM, useSurface = true) {
-                SliderPreference(
+                SettingsSliderItem(
                     title = stringResource(R.string.mcl_setting_title_resolution_scaler),
                     summary = stringResource(R.string.mcl_setting_subtitle_resolution_scaler),
                     icon = Icons.Default.Monitor,
@@ -124,7 +118,6 @@ fun VideoSettingsScreen(
             }
         }
 
-        Spacer(modifier = Modifier.size(16.dp))
 
         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
             SettingsCard(position = CardPosition.TOP, useSurface = true) {
@@ -176,7 +169,6 @@ fun VideoSettingsScreen(
 
         val isZinkUsed = renderer.contains("zink")
         if (isZinkUsed || isAngleAvailable) {
-            Spacer(modifier = Modifier.size(16.dp))
 
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 if (isZinkUsed) {

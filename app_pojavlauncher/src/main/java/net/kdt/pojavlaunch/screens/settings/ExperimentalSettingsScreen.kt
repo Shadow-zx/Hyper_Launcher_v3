@@ -16,10 +16,9 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import net.ashmeet.hyperlauncher.R
 import net.kdt.pojavlaunch.prefs.LauncherPreferences
-import net.kdt.pojavlaunch.screens.settings.preferences.CardPosition
-import net.kdt.pojavlaunch.screens.settings.preferences.PreferenceCategory
-import net.kdt.pojavlaunch.screens.settings.preferences.SettingsCard
-import net.kdt.pojavlaunch.screens.settings.preferences.SettingsScreenWrapper
+import net.kdt.pojavlaunch.screens.settings.layouts.CardPosition
+import net.kdt.pojavlaunch.screens.settings.layouts.SettingsCard
+import net.kdt.pojavlaunch.screens.settings.layouts.SettingsScreenWrapper
 import net.kdt.pojavlaunch.screens.settings.preferences.SettingsSwitchItem
 
 @Composable
@@ -35,12 +34,13 @@ fun ExperimentalSettingsScreen(
 
     SettingsScreenWrapper(
         title = stringResource(R.string.preference_experimental_title),
-        onBack = onBack
+        onBack = onBack,
+        addTopGap = true
     ) {
-        PreferenceCategory(title = stringResource(R.string.preference_category_experimental_settings))
-
         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            SettingsCard(position = CardPosition.TOP, useSurface = true) {
+            val items = mutableListOf<@Composable () -> Unit>()
+            
+            items.add {
                 SettingsSwitchItem(
                     title = stringResource(R.string.preference_shader_dump_title),
                     summary = stringResource(R.string.preference_shader_dump_description),
@@ -55,8 +55,7 @@ fun ExperimentalSettingsScreen(
                 )
             }
 
-            val bigCorePos = if (isFreedrenoAvailable) CardPosition.MIDDLE else CardPosition.BOTTOM
-            SettingsCard(position = bigCorePos, useSurface = true) {
+            items.add {
                 SettingsSwitchItem(
                     title = stringResource(R.string.preference_force_big_core_title),
                     summary = stringResource(R.string.preference_force_big_core_desc),
@@ -72,7 +71,7 @@ fun ExperimentalSettingsScreen(
             }
 
             if (isFreedrenoAvailable) {
-                SettingsCard(position = CardPosition.MIDDLE, useSurface = true) {
+                items.add {
                     SettingsSwitchItem(
                         title = stringResource(R.string.preference_sysmem_title),
                         summary = stringResource(R.string.preference_sysmem_summary),
@@ -88,7 +87,7 @@ fun ExperimentalSettingsScreen(
                 }
             }
 
-            SettingsCard(position = if (isFreedrenoAvailable) CardPosition.BOTTOM else CardPosition.SINGLE, useSurface = true) {
+            items.add {
                 SettingsSwitchItem(
                     title = stringResource(R.string.preference_alsoft_opensl_title),
                     summary = stringResource(R.string.preference_alsoft_opensl_summary),
@@ -101,6 +100,18 @@ fun ExperimentalSettingsScreen(
                         LauncherPreferences.loadPreferences(context)
                     }
                 )
+            }
+
+            items.forEachIndexed { index, content ->
+                val position = when {
+                    items.size == 1 -> CardPosition.SINGLE
+                    index == 0 -> CardPosition.TOP
+                    index == items.size - 1 -> CardPosition.BOTTOM
+                    else -> CardPosition.MIDDLE
+                }
+                SettingsCard(position = position, useSurface = true) {
+                    content()
+                }
             }
         }
     }

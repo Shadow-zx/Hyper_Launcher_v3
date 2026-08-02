@@ -1,4 +1,4 @@
-package net.kdt.pojavlaunch.screens.components
+package net.kdt.pojavlaunch.screens.compose
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
@@ -40,7 +40,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -52,6 +51,7 @@ import androidx.compose.ui.unit.sp
 import net.ashmeet.hyperlauncher.R
 import net.kdt.pojavlaunch.instances.DisplayInstance
 import net.kdt.pojavlaunch.instances.InstanceIconProvider
+import net.kdt.pojavlaunch.screens.utils.rememberDrawablePainter
 
 @Composable
 fun InstanceListItem(
@@ -209,12 +209,12 @@ fun InstanceListItem(
                                     imageVector = Icons.Rounded.Delete,
                                     contentDescription = null,
                                     modifier = Modifier.size(20.dp),
-                                    tint = Color(0xFFFF5252)
+                                    tint = MaterialTheme.colorScheme.error
                                 )
                                 Spacer(modifier = Modifier.width(12.dp))
                                 Text(
                                     text = stringResource(id = R.string.global_delete),
-                                    color = Color(0xFFFF5252)
+                                    color = MaterialTheme.colorScheme.error
                                 )
                             }
                         },

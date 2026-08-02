@@ -1,12 +1,9 @@
 package com.kdt.mcgui;
 
 import android.content.Context;
-import android.graphics.BlendMode;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.widget.ProgressBar;
 
@@ -25,11 +22,6 @@ public class TextProgressBar extends ProgressBar {
         super(context, attrs, android.R.attr.progressBarStyleHorizontal);
         init();
     }
-    public TextProgressBar(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-        super(context, attrs, android.R.attr.progressBarStyleHorizontal, defStyleRes);
-        init();
-    }
-
     private Paint mTextPaint;
     private String mText = "";
 
@@ -46,8 +38,8 @@ public class TextProgressBar extends ProgressBar {
     protected synchronized void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         mTextPaint.setTextSize((float) ((getHeight()- getPaddingBottom() - getPaddingTop()) * 0.55));
-        int xPos = (int) Math.max(Math.min((getProgress() * getWidth() / getMax()) + mTextPadding, getWidth() - mTextPaint.measureText(mText) - mTextPadding) , mTextPadding);
-        int yPos = (int) ((getHeight() / 2) - ((mTextPaint.descent() + mTextPaint.ascent()) / 2)) ;
+        int xPos = (int) Math.max(Math.min(((float) (getProgress() * getWidth()) / getMax()) + mTextPadding, getWidth() - mTextPaint.measureText(mText) - mTextPadding) , mTextPadding);
+        int yPos = (int) (((float) getHeight() / 2) - ((mTextPaint.descent() + mTextPaint.ascent()) / 2)) ;
 
         canvas.drawText(mText, xPos, yPos, mTextPaint);
     }

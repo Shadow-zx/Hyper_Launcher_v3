@@ -1,15 +1,20 @@
 package com.kdt.pickafile;
 
-import androidx.appcompat.app.*;
-import android.content.*;
-import android.util.*;
-import android.widget.*;
+import android.content.Context;
+import android.os.Environment;
+import android.util.AttributeSet;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.Toast;
 
-import com.ipaulpro.afilechooser.*;
-import java.io.*;
-import java.util.*;
-import net.kdt.pojavlaunch.*;
-import android.os.*;
+import androidx.appcompat.app.AlertDialog;
+
+import com.ipaulpro.afilechooser.FileListAdapter;
+
+import net.kdt.pojavlaunch.Tools;
+
+import java.io.File;
+import java.util.Arrays;
 
 public class FileListView extends LinearLayout
 {
@@ -28,18 +33,8 @@ public class FileListView extends LinearLayout
     private boolean showFiles = true;
     private boolean showFolders = true;
 
-    public FileListView(AlertDialog build) {
-        this(build.getContext(), null, new String[0]);
-        dialogToTitleListener(build);
-    }
-
     public FileListView(AlertDialog build, String fileSuffix) {
         this(build.getContext(), null, new String[]{fileSuffix});
-        dialogToTitleListener(build);
-    }
-
-    public FileListView(AlertDialog build, String[] fileSuffixes){
-        this(build.getContext(), null, fileSuffixes);
         dialogToTitleListener(build);
     }
 

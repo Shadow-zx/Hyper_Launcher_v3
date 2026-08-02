@@ -17,7 +17,7 @@ import net.kdt.pojavlaunch.extra.ExtraConstants
 import net.kdt.pojavlaunch.extra.ExtraCore
 import net.kdt.pojavlaunch.instances.Instances
 import net.kdt.pojavlaunch.progresskeeper.ProgressKeeper
-import net.kdt.pojavlaunch.screens.components.MainMenuFragmentCompose
+import net.kdt.pojavlaunch.screens.compose.MainMenuFragmentCompose
 import net.kdt.pojavlaunch.screens.theme.PojavTheme
 import net.kdt.pojavlaunch.utils.FileUtils
 

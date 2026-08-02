@@ -1,0 +1,374 @@
+package net.kdt.pojavlaunch.fragments
+
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.*
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.edit
+import androidx.fragment.app.Fragment
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import net.ashmeet.hyperlauncher.R
+import net.kdt.pojavlaunch.Tools
+import net.kdt.pojavlaunch.instances.Instance
+import net.kdt.pojavlaunch.instances.Instances
+import net.kdt.pojavlaunch.prefs.LauncherPreferences
+import net.kdt.pojavlaunch.modloaders.modpacks.api.CommonApi
+import net.kdt.pojavlaunch.modloaders.modpacks.api.CurseForgeService
+import net.kdt.pojavlaunch.modloaders.modpacks.api.ModrinthService
+import net.kdt.pojavlaunch.modloaders.modpacks.api.ModrinthApi
+import net.kdt.pojavlaunch.modloaders.modpacks.api.CurseforgeApi
+import net.kdt.pojavlaunch.modloaders.modpacks.models.ModItem
+import net.kdt.pojavlaunch.progresskeeper.ProgressKeeper
+import net.kdt.pojavlaunch.screens.layouts.ContentInstallerScreen
+import net.kdt.pojavlaunch.screens.contentinstaller.models.ContentInstallerType
+import net.kdt.pojavlaunch.screens.contentinstaller.models.ContentSource
+import net.kdt.pojavlaunch.screens.contentinstaller.models.ModrinthProject
+import net.kdt.pojavlaunch.screens.contentinstaller.models.ModrinthVersion
+import net.kdt.pojavlaunch.screens.theme.PojavTheme
+import java.io.File
+import java.io.IOException
+import java.net.URL
+
+class ContentInstallerFragment : Fragment() {
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        return ComposeView(requireContext()).apply {
+            setContent {
+                PojavTheme {
+                    val scope = rememberCoroutineScope()
+                    val context = LocalContext.current
+                    
+                    LaunchedEffect(Unit) {
+                        CurseForgeService.init(context.getString(R.string.curseforge_api_key))
+                    }
+
+                    var projects by remember { mutableStateOf<List<ModrinthProject>>(emptyList()) }
+                    var isLoading by remember { mutableStateOf(false) }
+                    var viewingProject by remember { mutableStateOf<ModrinthProject?>(null) }
+                    var selectedType by remember { mutableStateOf(ContentInstallerType.MODS) }
+                    var selectedSource by remember { 
+                        mutableStateOf(if (LauncherPreferences.PREF_LAST_CONTENT_SOURCE == 1) ContentSource.CURSEFORGE else ContentSource.MODRINTH) 
+                    }
+                    var projectVersions by remember { mutableStateOf<List<ModrinthVersion>>(emptyList()) }
+                    var selectedProjectMCVersion by remember { mutableStateOf<String?>(null) }
+                    var searchQuery by remember { mutableStateOf("") }
+
+                    val instance = remember { Instances.loadSelectedInstance() }
+                    val instanceVersion = remember(instance) {
+                        instance?.let { 
+                            if (it.versionId == "latest_release" || it.versionId == "latest_snapshot") {
+                                return@let null
+                            }
+
+                            val v = try {
+                                Tools.getVersionInfo(it.versionId)
+                            } catch (e: Exception) {
+                                null
+                            }
+                            if (v != null && v.inheritsFrom != null) return@let v.inheritsFrom
+                            
+                            val id = it.versionId
+                            if (id.contains("-")) {
+                                val lastPart = id.substringAfterLast("-")
+                                if (lastPart.contains(".") && lastPart.any { it.isDigit() }) {
+                                    return@let lastPart
+                                }
+                            }
+                            
+                            val regex = Regex("""1\.\d+(\.\d+)?|\d+w\d+[a-z]""")
+                            regex.findAll(id).lastOrNull()?.value ?: id
+                        }
+                    }
+                    
+                    var selectedVersion by remember { mutableStateOf<String?>(null) }
+                    var selectedLoader by remember { mutableStateOf<String?>(null) }
+                    
+                    val instanceLoader = remember(instance) {
+                        instance?.let {
+                            val vId = it.versionId.lowercase()
+                            if (vId.contains("fabric")) "fabric" 
+                            else if (vId.contains("forge")) "forge" 
+                            else if (vId.contains("quilt")) "quilt"
+                            else if (vId.contains("neoforge")) "neoforge"
+                            else null
+                        }
+                    }
+
+                    var refreshTrigger by remember { mutableIntStateOf(0) }
+                    LaunchedEffect(selectedType, selectedVersion, selectedLoader, searchQuery, selectedSource, refreshTrigger) {
+                        if (searchQuery.isNotEmpty() && refreshTrigger == 0) {
+                            kotlinx.coroutines.delay(500) // Debounce typing
+                        }
+                        
+                        isLoading = true
+                        val results = if (selectedSource == ContentSource.MODRINTH) {
+                            ModrinthService.search(searchQuery, selectedType, selectedVersion ?: instanceVersion, selectedLoader ?: instanceLoader)
+                        } else {
+                            CurseForgeService.search(searchQuery, selectedType, selectedVersion ?: instanceVersion, selectedLoader ?: instanceLoader)
+                        }
+                        projects = results
+                        isLoading = false
+                        
+                        results.forEach { project ->
+                            if (!project.iconUrl.isNullOrEmpty()) {
+                                scope.launch(Dispatchers.IO) {
+                                    val bitmap = if (selectedSource == ContentSource.MODRINTH) {
+                                        ModrinthService.loadIcon(project.iconUrl)
+                                    } else {
+                                        CurseForgeService.loadIcon(project.iconUrl)
+                                    }
+                                    withContext(Dispatchers.Main) {
+                                        projects = projects.map { 
+                                            if (it.id == project.id) it.copy(iconBitmap = bitmap) else it 
+                                        }
+                                        if (viewingProject?.id == project.id) {
+                                            viewingProject = viewingProject?.copy(iconBitmap = bitmap)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    val availableProjectMCVersions = remember(projectVersions) {
+                        projectVersions.flatMap { it.gameVersions }.distinct().sortedDescending()
+                    }
+
+                    ContentInstallerScreen(
+                        onBack = { Tools.removeCurrentFragment(requireActivity()) },
+                        onSearch = { query, type, version, loader, source ->
+                            if (selectedType != type || selectedSource != source) {
+                                projects = emptyList()
+                            }
+                            
+                            if (selectedSource != source) {
+                                LauncherPreferences.DEFAULT_PREF.edit {
+                                    putInt("last_content_source", if (source == ContentSource.CURSEFORGE) 1 else 0)
+                                }
+                                LauncherPreferences.PREF_LAST_CONTENT_SOURCE = if (source == ContentSource.CURSEFORGE) 1 else 0
+                            }
+
+                            searchQuery = query
+                            selectedType = type
+                            selectedVersion = version
+                            selectedLoader = loader
+                            selectedSource = source
+                        },
+                        onProjectClick = { project ->
+                            viewingProject = project
+                            projectVersions = emptyList()
+                            selectedProjectMCVersion = null
+                            isLoading = true
+                            scope.launch(Dispatchers.IO) {
+                                try {
+                                    val detailsDeferred = async {
+                                        if (selectedSource == ContentSource.MODRINTH) {
+                                            ModrinthService.getProjectDetails(project.id)
+                                        } else {
+                                            CurseForgeService.getProjectDetails(project.id)
+                                        }
+                                    }
+                                    
+                                    val versionsDeferred = async {
+                                        if (selectedSource == ContentSource.MODRINTH) {
+                                            ModrinthService.getProjectVersions(project.id)
+                                        } else {
+                                            CurseForgeService.getProjectVersions(project.id)
+                                        }
+                                    }
+                                    
+                                    val details = detailsDeferred.await()
+                                    val versions = versionsDeferred.await()
+                                    
+                                    withContext(Dispatchers.Main) {
+                                        viewingProject = viewingProject?.copy(
+                                            fullDescription = details?.fullDescription,
+                                            gallery = details?.gallery ?: emptyList()
+                                        )
+                                        projectVersions = versions
+                                        isLoading = false
+                                    }
+                                } catch (e: Exception) {
+                                    withContext(Dispatchers.Main) {
+                                        isLoading = false
+                                    }
+                                }
+                            }
+                        },
+                        onVersionClick = { version ->
+                            if (instance == null) {
+                                Toast.makeText(requireContext(), "No instance selected", Toast.LENGTH_SHORT).show()
+                                return@ContentInstallerScreen
+                            }
+                            scope.launch(Dispatchers.IO) {
+                                val progressKey = "download_content"
+                                if (selectedType == ContentInstallerType.MODPACKS) {
+                                    try {
+                                        val modpackApi = if (selectedSource == ContentSource.MODRINTH) {
+                                            ModrinthApi()
+                                        } else {
+                                            CurseforgeApi(getString(R.string.curseforge_api_key))
+                                        }
+                                        
+                                        val modItem = ModItem(
+                                            if (selectedSource == ContentSource.MODRINTH) CommonApi.PACK_MODRINTH.toInt() else CommonApi.PACK_CURSEFORGE.toInt(),
+                                            true,
+                                            viewingProject?.id,
+                                            viewingProject?.title,
+                                            viewingProject?.description,
+                                            viewingProject?.iconUrl
+                                        )
+                                        val modDetail = modpackApi.getModDetails(modItem)
+                                        val selectedVersionIndex = modDetail.versionUrls.indexOfFirst { 
+                                            it == version.downloadUrl || it.contains(version.id) 
+                                        }
+                                        
+                                        if (selectedVersionIndex != -1) {
+                                            withContext(Dispatchers.Main) {
+                                                modpackApi.handleModpackInstallation(requireContext(), modDetail, selectedVersionIndex)
+                                            }
+                                        } else {
+                                            performDirectDownload(version, instance, selectedType, progressKey)
+                                        }
+                                    } catch (e: Exception) {
+                                        withContext(Dispatchers.Main) {
+                                            Toast.makeText(requireContext(), "Modpack install failed: ${e.message}", Toast.LENGTH_LONG).show()
+                                        }
+                                    }
+                                } else {
+                                    performDirectDownload(version, instance, selectedType, progressKey)
+                                }
+                            }
+                        },
+                        projects = projects,
+                        isLoading = isLoading,
+                        selectedVersion = selectedVersion,
+                        selectedLoader = selectedLoader,
+                        selectedSource = selectedSource,
+                        instanceVersion = instanceVersion,
+                        instanceLoader = instanceLoader,
+                        viewingProject = viewingProject,
+                        selectedType = selectedType,
+                        projectVersions = projectVersions,
+                        availableProjectMCVersions = availableProjectMCVersions,
+                        selectedProjectMCVersion = selectedProjectMCVersion,
+                        onProjectMCVersionClick = { selectedProjectMCVersion = it.ifEmpty { null } },
+                        onBackToProjects = { 
+                            viewingProject = null
+                            projectVersions = emptyList()
+                            selectedProjectMCVersion = null
+                        },
+                        onRefresh = { refreshTrigger++ },
+                        onImportModpack = {
+                            importLauncher.launch("*/*")
+                        }
+                    )
+                }
+            }
+        }
+    }
+
+    private suspend fun performDirectDownload(version: ModrinthVersion, instance: Instance, type: ContentInstallerType, progressKey: String) {
+        try {
+            val destFolder = when (type) {
+                ContentInstallerType.MODS -> File(instance.gameDirectory, "mods")
+                ContentInstallerType.RESOURCEPACKS -> File(instance.gameDirectory, "resourcepacks")
+                ContentInstallerType.SHADERS -> File(instance.gameDirectory, "shaderpacks")
+                else -> File(instance.gameDirectory, "downloads")
+            }
+            destFolder.mkdirs()
+            val fileName = version.downloadUrl.substringAfterLast("/")
+            val destFile = File(destFolder, fileName)
+
+            ProgressKeeper.submitProgress(progressKey, 0, -1, "Downloading $fileName...")
+
+            withContext(Dispatchers.IO) {
+                val url = URL(version.downloadUrl)
+                val connection = url.openConnection()
+                connection.connect()
+                val totalSize = connection.contentLength.toLong()
+                
+                connection.getInputStream().use { input ->
+                    destFile.outputStream().use { output ->
+                        var bytesCopied = 0L
+                        val buffer = ByteArray(8192)
+                        var bytes = input.read(buffer)
+                        while (bytes >= 0) {
+                            output.write(buffer, 0, bytes)
+                            bytesCopied += bytes
+                            if (totalSize > 0) {
+                                val progress = ((bytesCopied * 100) / totalSize).toInt()
+                                ProgressKeeper.submitProgress(progressKey, progress, -1, "Downloading $fileName...")
+                            }
+                            bytes = input.read(buffer)
+                        }
+                    }
+                }
+            }
+
+            ProgressKeeper.submitProgress(progressKey, -1, -1)
+            withContext(Dispatchers.Main) {
+                Toast.makeText(requireContext(), "Installed ${version.name}", Toast.LENGTH_SHORT).show()
+            }
+        } catch (e: Exception) {
+            ProgressKeeper.submitProgress(progressKey, -1, -1)
+            withContext(Dispatchers.Main) {
+                Toast.makeText(requireContext(), "Failed to install: ${e.message}", Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
+    private val importLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        if (uri == null) return@registerForActivityResult
+        val context = requireContext()
+        val contentResolver = context.contentResolver
+        net.kdt.pojavlaunch.PojavApplication.sExecutorService.execute {
+            performLocalInstall(uri, context, contentResolver)
+        }
+    }
+
+    private fun performLocalInstall(uri: android.net.Uri, context: android.content.Context, contentResolver: android.content.ContentResolver) {
+        val fileName = Tools.getFileName(context, uri) ?: return
+        val outFile = File(Tools.DIR_CACHE, "$fileName.cf")
+        val progressKey = "install_modpack"
+        ProgressKeeper.submitProgress(progressKey, 0, -1, "Caching modpack...")
+        try {
+            contentResolver.openInputStream(uri)?.use { input ->
+                outFile.outputStream().use { output ->
+                    input.copyTo(output)
+                }
+            } ?: return
+        } catch (e: IOException) {
+            Tools.showErrorRemote("Error", e)
+            ProgressKeeper.submitProgress(progressKey, -1, -1)
+            return
+        }
+
+        try {
+            val modpackApi: net.kdt.pojavlaunch.modloaders.modpacks.api.ModpackApi =
+                CommonApi(getString(R.string.curseforge_api_key))
+            modpackApi.installLocalModpack(fileName, outFile, null)
+        } catch (e: IOException) {
+            Tools.showErrorRemote("Error", e)
+        } finally {
+            outFile.delete()
+            ProgressKeeper.submitProgress(progressKey, -1, -1)
+        }
+    }
+
+    companion object {
+        const val TAG = "ContentInstallerFragment"
+    }
+}

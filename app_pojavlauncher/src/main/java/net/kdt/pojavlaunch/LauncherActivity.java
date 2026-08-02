@@ -27,6 +27,8 @@ import net.kdt.pojavlaunch.authenticator.accounts.Accounts;
 import net.kdt.pojavlaunch.extra.ExtraConstants;
 import net.kdt.pojavlaunch.extra.ExtraCore;
 import net.kdt.pojavlaunch.extra.ExtraListener;
+import net.kdt.pojavlaunch.fragments.ContentInstallerFragment;
+import net.kdt.pojavlaunch.fragments.InstanceDirectoryFragment;
 import net.kdt.pojavlaunch.fragments.MainMenuFragment;
 import net.kdt.pojavlaunch.fragments.MicrosoftLoginFragment;
 import net.kdt.pojavlaunch.fragments.SelectAuthFragment;
@@ -40,7 +42,7 @@ import net.kdt.pojavlaunch.prefs.LauncherPreferences;
 import net.kdt.pojavlaunch.prefs.screens.LauncherPreferenceFragment;
 import net.kdt.pojavlaunch.progresskeeper.ProgressKeeper;
 import net.kdt.pojavlaunch.progresskeeper.TaskCountListener;
-import net.kdt.pojavlaunch.screens.LauncherComposeHelper;
+import net.kdt.pojavlaunch.screens.helper.LauncherComposeHelper;
 import net.kdt.pojavlaunch.services.ProgressServiceKeeper;
 import net.kdt.pojavlaunch.tasks.MoJsonExtras;
 import net.kdt.pojavlaunch.tasks.AsyncVersionList;
@@ -60,8 +62,10 @@ public class LauncherActivity extends BaseActivity implements PreferenceFragment
     private final FragmentManager.FragmentLifecycleCallbacks mFragmentCallbackListener = new FragmentManager.FragmentLifecycleCallbacks() {
         @Override
         public void onFragmentResumed(@NonNull FragmentManager fm, @NonNull Fragment f) {
-            LauncherComposeHelper.setSettingsIcon(f instanceof MainMenuFragment
+            boolean isMain = f instanceof MainMenuFragment;
+            LauncherComposeHelper.setSettingsIcon(isMain
                     ? R.drawable.ic_sharp_settings_24 : R.drawable.ic_px_home);
+            LauncherComposeHelper.setFileManagerVisible(isMain);
         }
     };
 
@@ -94,6 +98,26 @@ public class LauncherActivity extends BaseActivity implements PreferenceFragment
         } else{
             // The setting button doubles as a home button now
             Tools.backToMainMenu(this);
+        }
+    };
+
+    /* Listener for the instance directory button */
+    private final View.OnClickListener mInstanceDirectoryButtonListener = v -> {
+        FragmentManager manager = getSupportFragmentManager();
+        if(manager.isStateSaved()) return;
+        Fragment fragment = manager.findFragmentById(R.id.container_fragment);
+        if (fragment instanceof MainMenuFragment) {
+            Tools.swapFragment(this, InstanceDirectoryFragment.class, InstanceDirectoryFragment.TAG, null);
+        }
+    };
+
+    /* Listener for the content installer button */
+    private final View.OnClickListener mContentInstallerButtonListener = v -> {
+        FragmentManager manager = getSupportFragmentManager();
+        if(manager.isStateSaved()) return;
+        Fragment fragment = manager.findFragmentById(R.id.container_fragment);
+        if (fragment instanceof MainMenuFragment) {
+            Tools.swapFragment(this, ContentInstallerFragment.class, ContentInstallerFragment.TAG, null);
         }
     };
 
@@ -165,7 +189,12 @@ public class LauncherActivity extends BaseActivity implements PreferenceFragment
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        LauncherComposeHelper.setContent(this, () -> mSettingButtonListener.onClick(null), fragmentView -> {
+        LauncherComposeHelper.setContent(
+                this,
+                () -> mSettingButtonListener.onClick(null),
+                () -> mContentInstallerButtonListener.onClick(null),
+                () -> mInstanceDirectoryButtonListener.onClick(null),
+                fragmentView -> {
             FragmentManager fm = getSupportFragmentManager();
             Fragment f = fm.findFragmentById(R.id.container_fragment);
             if (f == null) {

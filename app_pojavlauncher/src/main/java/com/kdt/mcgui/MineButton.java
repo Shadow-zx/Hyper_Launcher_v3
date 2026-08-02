@@ -1,14 +1,16 @@
 package com.kdt.mcgui;
 
-import android.content.*;
-import android.graphics.*;
-import android.util.*;
+import android.content.Context;
+import android.util.AttributeSet;
+import android.util.TypedValue;
 
 import androidx.core.content.res.ResourcesCompat;
 
+import com.google.android.material.button.MaterialButton;
+
 import net.ashmeet.hyperlauncher.R;
 
-public class MineButton extends androidx.appcompat.widget.AppCompatButton {
+public class MineButton extends MaterialButton {
 	
 	public MineButton(Context ctx) {
 		this(ctx, null);
@@ -19,11 +21,18 @@ public class MineButton extends androidx.appcompat.widget.AppCompatButton {
 		init();
 	}
 
-	public void init() {
+	private void init() {
 		setTypeface(ResourcesCompat.getFont(getContext(), R.font.noto_sans_bold));
-		setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.mine_button_background, null));
+
+		setInsetTop(0);
+		setInsetBottom(0);
+
+		setBackgroundColor(ResourcesCompat.getColor(getResources(), R.color.minebutton_color, null));
+		setTextColor(ResourcesCompat.getColor(getResources(), R.color.minebutton_text_color, null));
+		setRippleColorResource(R.color.control_button_pressed_color);
 		setTextSize(TypedValue.COMPLEX_UNIT_PX, getResources().getDimensionPixelSize(R.dimen._13ssp));
-	    setTextColor(ResourcesCompat.getColor(getResources(), R.color.minebutton_text_color, null));
+		setElevation(0f);
+		setAllCaps(false);
 	}
 
 }
