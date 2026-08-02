@@ -497,7 +497,10 @@ fun ActionCard(
     }
 }
 
-@Preview(showBackground = true, device = "spec:width=1280dp,height=800dp,orientation=landscape")
+@Preview(
+    showBackground = true,
+    device = "spec:width=800dp,height=400dp,dpi=420",
+)
 @Composable
 fun MainMenuRevampPreview() {
     PojavTheme {

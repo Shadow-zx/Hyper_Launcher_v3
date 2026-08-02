@@ -22,6 +22,8 @@ import net.ashmeet.hyperlauncher.R
 import net.kdt.pojavlaunch.progresskeeper.ProgressKeeper
 import net.kdt.pojavlaunch.progresskeeper.ProgressListener
 import net.kdt.pojavlaunch.progresskeeper.TaskCountListener
+import androidx.compose.ui.tooling.preview.Preview
+import net.kdt.pojavlaunch.screens.theme.PojavTheme
 
 data class TaskProgressState(
     val key: String,
@@ -36,7 +38,6 @@ fun ProgressLayoutCompose(
     val context = LocalContext.current
     var taskCount by remember { mutableIntStateOf(ProgressKeeper.getTaskCount()) }
     val activeTasks = remember { mutableStateMapOf<String, TaskProgressState>() }
-    var expanded by remember { mutableStateOf(false) }
 
     val observedKeys = listOf(
         "unpack_runtime", "download_minecraft", "download_verlist",
@@ -81,11 +82,27 @@ fun ProgressLayoutCompose(
         }
     }
 
+    ProgressLayoutContent(
+        taskCount = taskCount,
+        activeTasks = activeTasks.values.toList(),
+        modifier = modifier
+    )
+}
+
+@Composable
+fun ProgressLayoutContent(
+    taskCount: Int,
+    activeTasks: List<TaskProgressState>,
+    modifier: Modifier = Modifier
+) {
+    var expanded by remember { mutableStateOf(false) }
+
     if (taskCount > 0) {
         Column(
             modifier = modifier
                 .fillMaxWidth()
                 .background(MaterialTheme.colorScheme.surface) // background_bottom_bar
+                .navigationBarsPadding()
         ) {
             Surface(
                 modifier = Modifier
@@ -119,7 +136,7 @@ fun ProgressLayoutCompose(
                         .heightIn(max = 200.dp)
                         .padding(horizontal = 16.dp, vertical = 8.dp)
                 ) {
-                    items(activeTasks.values.toList()) { task ->
+                    items(activeTasks) { task ->
                         TaskItem(task)
                         Spacer(modifier = Modifier.height(8.dp))
                     }
@@ -152,5 +169,19 @@ fun TaskItem(task: TaskProgressState) {
                 trackColor = MaterialTheme.colorScheme.outline,
             )
         }
+    }
+}
+
+@Preview
+@Composable
+fun ProgressLayoutPreview() {
+    PojavTheme {
+        ProgressLayoutContent(
+            taskCount = 2,
+            activeTasks = listOf(
+                TaskProgressState("download_minecraft", 50, "Downloading Minecraft..."),
+                TaskProgressState("install_modpack", -1, "Installing Modpack...")
+            )
+        )
     }
 }

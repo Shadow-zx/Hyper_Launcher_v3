@@ -39,28 +39,28 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
-
 import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import net.ashmeet.hyperlauncher.BuildConfig;
+import net.ashmeet.hyperlauncher.R;
 import net.kdt.pojavlaunch.instances.Instance;
 import net.kdt.pojavlaunch.lifecycle.ContextExecutor;
 import net.kdt.pojavlaunch.lifecycle.ContextExecutorTask;
-import net.kdt.pojavlaunch.utils.HashUtils;
-import net.kdt.pojavlaunch.utils.memory.MemoryHoleFinder;
-import net.kdt.pojavlaunch.utils.memory.SelfMapsParser;
 import net.kdt.pojavlaunch.multirt.MultiRTUtils;
 import net.kdt.pojavlaunch.prefs.LauncherPreferences;
 import net.kdt.pojavlaunch.utils.FileUtils;
 import net.kdt.pojavlaunch.utils.GLInfoUtils;
+import net.kdt.pojavlaunch.utils.HashUtils;
+import net.kdt.pojavlaunch.utils.memory.MemoryHoleFinder;
+import net.kdt.pojavlaunch.utils.memory.SelfMapsParser;
 import net.kdt.pojavlaunch.value.DependentLibrary;
 import net.kdt.pojavlaunch.value.LibraryArtifact;
 
@@ -83,9 +83,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-import net.ashmeet.hyperlauncher.BuildConfig;
-import net.ashmeet.hyperlauncher.R;
-
 @SuppressWarnings("IOStreamConstructor")
 public final class Tools {
     public static final String MAVEN_CENTRAL = "https://maven-central-eu.storage-download.googleapis.com/maven2/";
@@ -104,7 +101,7 @@ public final class Tools {
 
     // New since 3.3.1
     public static String DIR_ACCOUNT_NEW;
-    public static String DIR_GAME_HOME = Environment.getExternalStorageDirectory().getAbsolutePath() + "/games/PojavLauncher";
+    public static String DIR_GAME_HOME = (Environment.getExternalStorageDirectory() != null ? Environment.getExternalStorageDirectory().getAbsolutePath() : "/sdcard") + "/games/PojavLauncher";
     public static String DIR_GAME_NEW;
 
     // New since 2.4.2

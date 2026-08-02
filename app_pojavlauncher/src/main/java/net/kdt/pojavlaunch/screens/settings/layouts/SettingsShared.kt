@@ -26,7 +26,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import net.kdt.pojavlaunch.screens.theme.PojavTheme
 import kotlin.math.max
 
 @Composable
@@ -96,6 +98,26 @@ fun SettingsScreenWrapper(
                     }
                 }
             }
+        }
+    }
+}
+
+@Preview
+@Composable
+fun SettingsScreenWrapperPreview() {
+    PojavTheme {
+        SettingsScreenWrapper(
+            title = "Preview Title",
+            onBack = {}
+        ) {
+            Text(
+                text = "Content item 1",
+                color = MaterialTheme.colorScheme.onBackground
+            )
+            Text(
+                text = "Content item 2",
+                color = MaterialTheme.colorScheme.onBackground
+            )
         }
     }
 }

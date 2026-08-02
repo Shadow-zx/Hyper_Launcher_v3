@@ -81,9 +81,11 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.Dispatchers
@@ -94,6 +96,7 @@ import net.kdt.pojavlaunch.instances.Instances
 import net.kdt.pojavlaunch.progresskeeper.ProgressKeeper
 import net.kdt.pojavlaunch.screens.components.InstanceNavigationRail
 import net.kdt.pojavlaunch.screens.settings.preferences.TextInputDialog
+import net.kdt.pojavlaunch.screens.theme.PojavTheme
 import net.kdt.pojavlaunch.utils.ModMetadataReader
 import net.kdt.pojavlaunch.utils.WorldMetadataReader
 import java.io.File
@@ -103,6 +106,22 @@ import java.util.Locale
 
 @Composable
 fun InstanceDirectoryScreen(
+    onBack: () -> Unit
+) {
+    val isPreview = LocalInspectionMode.current
+    val instanceRoot = remember { 
+        if (isPreview) null else Instances.loadSelectedInstance()?.gameDirectory 
+    }
+
+    InstanceDirectoryContent(
+        instanceRoot = instanceRoot,
+        onBack = onBack
+    )
+}
+
+@Composable
+fun InstanceDirectoryContent(
+    instanceRoot: File?,
     onBack: () -> Unit
 ) {
     val context = LocalContext.current
@@ -174,8 +193,6 @@ fun InstanceDirectoryScreen(
             }
         }
     }
-
-    val instanceRoot = remember { Instances.loadSelectedInstance()?.gameDirectory }
 
     LaunchedEffect(selectedTab) {
         val root = instanceRoot ?: return@LaunchedEffect
@@ -451,12 +468,7 @@ fun InstanceDirectoryScreen(
                                         Text("Refresh")
                                     }
                                     
-                                    if (searchQuery.isEmpty()) {
-                                        Spacer(modifier = Modifier.height(8.dp))
-                                        TextButton(onClick = { sidebarMenuExpanded = true }) {
-                                            Text("Add something")
-                                        }
-                                    }
+
                                 }
                             }
                         } else {
@@ -732,6 +744,34 @@ fun FileListItem(
                     )
                 }
             }
+        }
+    }
+}
+
+@Preview(showBackground = true, widthDp = 800, heightDp = 400)
+@Composable
+fun InstanceDirectoryScreenPreview() {
+    PojavTheme {
+        InstanceDirectoryContent(
+            instanceRoot = null,
+            onBack = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, widthDp = 400)
+@Composable
+fun FileListItemPreview() {
+    PojavTheme {
+        Column(modifier = Modifier.padding(16.dp)) {
+            FileListItem(
+                file = File("example_mod.jar"),
+                onClick = {},
+                onDelete = {},
+                onRename = {},
+                onOpenInFiles = {},
+                onRefresh = {}
+            )
         }
     }
 }

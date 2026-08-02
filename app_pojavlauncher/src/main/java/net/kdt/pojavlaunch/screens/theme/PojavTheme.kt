@@ -11,6 +11,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.colorResource
 import net.ashmeet.hyperlauncher.R
 import net.kdt.pojavlaunch.prefs.LauncherPreferences
@@ -20,17 +21,22 @@ fun PojavTheme(
     darkTheme: Boolean? = null,
     content: @Composable () -> Unit
 ) {
-    var themePref by remember { mutableStateOf(LauncherPreferences.PREF_THEME) }
+    val isInPreview = LocalInspectionMode.current
+    var themePref by remember { 
+        mutableStateOf(if (isInPreview) "system" else LauncherPreferences.PREF_THEME) 
+    }
 
-    DisposableEffect(Unit) {
-        val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
-            if (key == "app_theme") {
-                themePref = LauncherPreferences.DEFAULT_PREF.getString("app_theme", "system") ?: "system"
+    if (!isInPreview) {
+        DisposableEffect(Unit) {
+            val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+                if (key == "app_theme") {
+                    themePref = LauncherPreferences.DEFAULT_PREF.getString("app_theme", "system") ?: "system"
+                }
             }
-        }
-        LauncherPreferences.DEFAULT_PREF.registerOnSharedPreferenceChangeListener(listener)
-        onDispose {
-            LauncherPreferences.DEFAULT_PREF.unregisterOnSharedPreferenceChangeListener(listener)
+            LauncherPreferences.DEFAULT_PREF.registerOnSharedPreferenceChangeListener(listener)
+            onDispose {
+                LauncherPreferences.DEFAULT_PREF.unregisterOnSharedPreferenceChangeListener(listener)
+            }
         }
     }
 

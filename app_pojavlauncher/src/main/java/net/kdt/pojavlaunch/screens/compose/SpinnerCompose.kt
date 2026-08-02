@@ -61,6 +61,8 @@ import net.kdt.pojavlaunch.extra.ExtraConstants
 import net.kdt.pojavlaunch.extra.ExtraCore
 import net.kdt.pojavlaunch.extra.ExtraListener
 import java.io.IOException
+import androidx.compose.ui.tooling.preview.Preview
+import net.kdt.pojavlaunch.screens.theme.PojavTheme
 
 @Composable
 fun AccountSpinnerCompose(
@@ -186,11 +188,55 @@ fun AccountSpinnerCompose(
 
     val selectedAccount = if (selectedIndex >= 0 && selectedIndex < accounts.size) accounts[selectedIndex] else null
 
+    AccountSpinnerUI(
+        selectedAccount = selectedAccount,
+        accounts = accounts,
+        expanded = expanded,
+        onExpandedChange = { expanded = it },
+        isAuthenticating = isAuthenticating,
+        loginProgress = loginProgress,
+        onAddAccountClick = {
+            expanded = false
+            ExtraCore.setValue(ExtraConstants.SELECT_AUTH_METHOD, true)
+        },
+        onAccountSelected = { account ->
+            expanded = false
+            Accounts.setCurrent(account)
+            reloadAccounts()
+        },
+        onAccountDelete = { account ->
+            expanded = false
+            MaterialAlertDialogBuilder(context)
+                .setMessage(R.string.warning_remove_account)
+                .setPositiveButton(android.R.string.cancel, null)
+                .setNeutralButton(R.string.global_delete) { _, _ ->
+                    Accounts.delete(account)
+                    reloadAccounts()
+                }
+                .show()
+        },
+        modifier = modifier
+    )
+}
+
+@Composable
+fun AccountSpinnerUI(
+    selectedAccount: Account?,
+    accounts: List<Account>,
+    expanded: Boolean,
+    onExpandedChange: (Boolean) -> Unit,
+    isAuthenticating: Boolean,
+    loginProgress: Float,
+    onAddAccountClick: () -> Unit,
+    onAccountSelected: (Account) -> Unit,
+    onAccountDelete: (Account) -> Unit,
+    modifier: Modifier = Modifier
+) {
     Box(modifier = modifier) {
         Surface(
             modifier = Modifier
                 .fillMaxSize()
-                .clickable { expanded = true },
+                .clickable { onExpandedChange(true) },
             color = MaterialTheme.colorScheme.surface,
             shape = RoundedCornerShape(0.dp)
         ) {
@@ -243,7 +289,7 @@ fun AccountSpinnerCompose(
 
         DropdownMenu(
             expanded = expanded,
-            onDismissRequest = { expanded = false },
+            onDismissRequest = { onExpandedChange(false) },
             modifier = Modifier
                 .width(300.dp)
                 .background(
@@ -267,13 +313,10 @@ fun AccountSpinnerCompose(
                         )
                     }
                 },
-                onClick = {
-                    expanded = false
-                    ExtraCore.setValue(ExtraConstants.SELECT_AUTH_METHOD, true)
-                }
+                onClick = onAddAccountClick
             )
 
-            accounts.forEachIndexed { index, account ->
+            accounts.forEach { account ->
                 DropdownMenuItem(
                     text = {
                         Row(
@@ -284,17 +327,7 @@ fun AccountSpinnerCompose(
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 AccountItemContent(account)
                             }
-                            IconButton(onClick = {
-                                expanded = false
-                                MaterialAlertDialogBuilder(context)
-                                    .setMessage(R.string.warning_remove_account)
-                                    .setPositiveButton(android.R.string.cancel, null)
-                                    .setNeutralButton(R.string.global_delete) { _, _ ->
-                                        Accounts.delete(account)
-                                        reloadAccounts()
-                                    }
-                                    .show()
-                            }) {
+                            IconButton(onClick = { onAccountDelete(account) }) {
                                 Icon(
                                     Icons.Default.Delete,
                                     contentDescription = "Delete",
@@ -303,11 +336,7 @@ fun AccountSpinnerCompose(
                             }
                         }
                     },
-                    onClick = {
-                        expanded = false
-                        Accounts.setCurrent(account)
-                        reloadAccounts()
-                    }
+                    onClick = { onAccountSelected(account) }
                 )
             }
         }
@@ -372,5 +401,60 @@ fun AccountItemContent(account: Account) {
             fontSize = 16.sp,
             fontWeight = FontWeight.Bold
         )
+    }
+}
+
+@Preview
+@Composable
+fun AccountSpinnerPreview() {
+    PojavTheme {
+        val account1 = remember {
+            Account::class.java.getDeclaredConstructor().apply { isAccessible = true }.newInstance().apply {
+                username = "Steve"
+                authType = AuthType.LOCAL
+            }
+        }
+        val account2 = remember {
+            Account::class.java.getDeclaredConstructor().apply { isAccessible = true }.newInstance().apply {
+                username = "MicrosoftUser"
+                authType = AuthType.MICROSOFT
+            }
+        }
+
+        var expanded by remember { mutableStateOf(false) }
+
+        Column(modifier = Modifier.padding(16.dp).fillMaxWidth()) {
+            Text("Selected:", color = MaterialTheme.colorScheme.onSurface)
+            Box(modifier = Modifier.height(64.dp).fillMaxWidth()) {
+                AccountSpinnerUI(
+                    selectedAccount = account1,
+                    accounts = listOf(account1, account2),
+                    expanded = expanded,
+                    onExpandedChange = { expanded = it },
+                    isAuthenticating = false,
+                    loginProgress = 0f,
+                    onAddAccountClick = {},
+                    onAccountSelected = {},
+                    onAccountDelete = {}
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text("Authenticating:", color = MaterialTheme.colorScheme.onSurface)
+            Box(modifier = Modifier.height(64.dp).fillMaxWidth()) {
+                AccountSpinnerUI(
+                    selectedAccount = account2,
+                    accounts = listOf(account1, account2),
+                    expanded = false,
+                    onExpandedChange = {},
+                    isAuthenticating = true,
+                    loginProgress = 0.5f,
+                    onAddAccountClick = {},
+                    onAccountSelected = {},
+                    onAccountDelete = {}
+                )
+            }
+        }
     }
 }

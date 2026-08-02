@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
-import androidx.compose.ui.zIndex
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Download
 import androidx.compose.material.icons.rounded.Folder
@@ -21,11 +20,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.zIndex
 import net.ashmeet.hyperlauncher.R
 import net.kdt.pojavlaunch.screens.compose.AccountSpinnerCompose
 import net.kdt.pojavlaunch.screens.compose.ProgressLayoutCompose
+import net.kdt.pojavlaunch.screens.theme.PojavTheme
 
 
 @Composable
@@ -41,7 +43,10 @@ fun PojavLauncherScreen(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
-        Column(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -109,5 +114,35 @@ fun PojavLauncherScreen(
             
             ProgressLayoutCompose()
         }
+    }
+}
+
+@Preview(showBackground = true, name = "File Manager Visible")
+@Composable
+fun PojavLauncherScreenPreview() {
+    PojavTheme {
+        PojavLauncherScreen(
+            settingsIconRes = R.drawable.ic_sharp_settings_24,
+            isFileManagerVisible = true,
+            onSettingsClick = {},
+            onContentInstallerClick = {},
+            onInstanceDirectoryClick = {},
+            onFragmentViewCreated = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "File Manager Hidden")
+@Composable
+fun PojavLauncherScreenHiddenPreview() {
+    PojavTheme {
+        PojavLauncherScreen(
+            settingsIconRes = R.drawable.ic_sharp_settings_24,
+            isFileManagerVisible = false,
+            onSettingsClick = {},
+            onContentInstallerClick = {},
+            onInstanceDirectoryClick = {},
+            onFragmentViewCreated = {}
+        )
     }
 }

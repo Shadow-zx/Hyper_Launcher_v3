@@ -75,13 +75,13 @@ fun SettingsCardPreview() {
         Column(
             modifier = Modifier
                 .padding(16.dp)
-                .background(MaterialTheme.colorScheme.background),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+                .background(MaterialTheme.colorScheme.surface),
+            verticalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             SettingsCard(position = CardPosition.TOP) {
                 Text("Top Card (Background)", modifier = Modifier.padding(16.dp))
             }
-            SettingsCard(position = CardPosition.MIDDLE, useSurface = true) {
+            SettingsCard(position = CardPosition.MIDDLE) {
                 Text("Middle Card (Surface)", modifier = Modifier.padding(16.dp))
             }
             SettingsCard(position = CardPosition.BOTTOM) {

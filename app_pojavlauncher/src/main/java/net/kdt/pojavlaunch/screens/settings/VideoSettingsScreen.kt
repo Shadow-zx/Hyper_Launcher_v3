@@ -93,7 +93,7 @@ fun VideoSettingsScreen(
                     summary = stringResource(R.string.mcl_setting_subtitle_fullscreen_ui),
                     icon = Icons.Default.Fullscreen,
                     checked = fullscreenLauncher,
-                    warningTooltip = "Using edge-to-edge display may cause layout issues on some devices or overlap with system navigation.",
+                    warningTooltip = "Disabling edge-to-edge display may cause layout issues on some devices",
                     onCheckedChange = {
                         fullscreenLauncher = it
                         LauncherPreferences.DEFAULT_PREF.edit { putBoolean("fullscreen_launcher", it) }

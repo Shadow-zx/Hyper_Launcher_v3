@@ -60,10 +60,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import net.kdt.pojavlaunch.screens.components.SidebarRailButton
+import net.kdt.pojavlaunch.screens.theme.PojavTheme
 import net.kdt.pojavlaunch.screens.contentinstaller.models.ContentInstallerType
 import net.kdt.pojavlaunch.screens.contentinstaller.models.ContentSource
 import net.kdt.pojavlaunch.screens.contentinstaller.models.ModrinthProject
@@ -448,6 +450,79 @@ private fun VersionList(
                 }
             }
         }
+    }
+}
+
+@Preview(showBackground = true, widthDp = 800, heightDp = 400)
+@Composable
+fun ContentInstallerScreenPreview() {
+    val sampleProject = ModrinthProject(
+        id = "1",
+        title = "Sample Mod",
+        description = "A sample mod for testing the installer screen.",
+        iconUrl = null,
+        fullDescription = "This is a detailed description of the sample mod."
+    )
+
+    PojavTheme {
+        ContentInstallerScreen(
+            onBack = {},
+            onSearch = { _, _, _, _, _ -> },
+            onProjectClick = {},
+            onVersionClick = {},
+            onRefresh = {},
+            onImportModpack = {},
+            projects = listOf(
+                sampleProject,
+                sampleProject.copy(id = "2", title = "Another Mod", description = "Description for the second mod.")
+            ),
+            isLoading = false,
+            selectedVersion = "1.20.1",
+            selectedLoader = "fabric",
+            instanceVersion = "1.20.1",
+            instanceLoader = "fabric"
+        )
+    }
+}
+
+@Preview(showBackground = true, widthDp = 800, heightDp = 400)
+@Composable
+fun ContentInstallerScreenDetailPreview() {
+    val sampleProject = ModrinthProject(
+        id = "1",
+        title = "Sample Mod",
+        description = "A sample mod for testing the installer screen.",
+        iconUrl = null,
+        fullDescription = "This is a detailed description of the sample mod."
+    )
+
+    val sampleVersion = ModrinthVersion(
+        id = "v1",
+        name = "1.0.0",
+        gameVersions = listOf("1.20.1"),
+        loaders = listOf("fabric"),
+        downloadUrl = "https://example.com"
+    )
+
+    PojavTheme {
+        ContentInstallerScreen(
+            onBack = {},
+            onSearch = { _, _, _, _, _ -> },
+            onProjectClick = {},
+            onVersionClick = {},
+            onRefresh = {},
+            onImportModpack = {},
+            projects = emptyList(),
+            isLoading = false,
+            selectedVersion = "1.20.1",
+            selectedLoader = "fabric",
+            instanceVersion = "1.20.1",
+            instanceLoader = "fabric",
+            viewingProject = sampleProject,
+            projectVersions = listOf(sampleVersion),
+            availableProjectMCVersions = listOf("1.20.1", "1.19.2"),
+            selectedProjectMCVersion = "1.20.1"
+        )
     }
 }
 

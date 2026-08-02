@@ -6,6 +6,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -43,14 +44,18 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.tooling.preview.Preview
+import com.google.gson.Gson
 import net.ashmeet.hyperlauncher.R
 import net.kdt.pojavlaunch.instances.DisplayInstance
 import net.kdt.pojavlaunch.instances.InstanceIconProvider
+import net.kdt.pojavlaunch.screens.theme.PojavTheme
 import net.kdt.pojavlaunch.screens.utils.rememberDrawablePainter
 
 @Composable
@@ -71,12 +76,15 @@ fun InstanceListItem(
     val displayName = if (instance.name.isNullOrBlank()) "UNNAMED" else instance.name
     var menuExpanded by remember { mutableStateOf(value = false) }
 
-    val animatedAlpha = remember { Animatable(0f) }
+    val isInPreview = LocalInspectionMode.current
+    val animatedAlpha = remember { Animatable(if (isInPreview) 1f else 0f) }
     LaunchedEffect(Unit) {
-        animatedAlpha.animateTo(
-            targetValue = 1f,
-            animationSpec = tween(durationMillis = 400)
-        )
+        if (!isInPreview) {
+            animatedAlpha.animateTo(
+                targetValue = 1f,
+                animationSpec = tween(durationMillis = 400)
+            )
+        }
     }
 
     Surface(
@@ -225,6 +233,46 @@ fun InstanceListItem(
                     )
                 }
             }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun InstanceListItemPreview() {
+    InstanceListItemPreviewContent(darkTheme = false)
+}
+
+@Composable
+private fun InstanceListItemPreviewContent(darkTheme: Boolean) {
+    val dummyInstance = Gson().fromJson(
+        """{"name": "Fabric Instance", "versionId": "1.20.1", "icon": "fabric"}""",
+        DisplayInstance::class.java
+    )
+    PojavTheme(darkTheme = darkTheme) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.background)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            InstanceListItem(
+                instance = dummyInstance,
+                isSelected = true,
+                onClick = {},
+                onEdit = {},
+                onRename = {},
+                onDelete = {}
+            )
+            InstanceListItem(
+                instance = dummyInstance,
+                isSelected = false,
+                onClick = {},
+                onEdit = {},
+                onRename = {},
+                onDelete = {}
+            )
         }
     }
 }

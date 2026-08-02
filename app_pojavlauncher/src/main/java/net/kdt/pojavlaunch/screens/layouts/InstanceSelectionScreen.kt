@@ -43,12 +43,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.google.gson.Gson
 import net.kdt.pojavlaunch.PojavApplication
 import net.kdt.pojavlaunch.instances.DisplayInstance
 import net.kdt.pojavlaunch.instances.Instances
 import net.kdt.pojavlaunch.screens.components.InstanceNavigationRail
 import net.kdt.pojavlaunch.screens.compose.InstanceListItem
+import net.kdt.pojavlaunch.screens.theme.PojavTheme
 
 @Composable
 fun InstanceSelectionScreen(
@@ -62,7 +65,6 @@ fun InstanceSelectionScreen(
     var instances by remember { mutableStateOf<List<DisplayInstance>>(emptyList()) }
     var selectedIndex by remember { mutableIntStateOf(-1) }
     var isLoading by remember { mutableStateOf(true) }
-    var selectedTab by remember { mutableIntStateOf(0) } 
     var refreshKey by remember { mutableIntStateOf(0) }
 
     val loadInstances = {
@@ -84,6 +86,40 @@ fun InstanceSelectionScreen(
         loadInstances()
     }
 
+    InstanceSelectionContent(
+        instances = instances,
+        selectedIndex = selectedIndex,
+        isLoading = isLoading,
+        onRefresh = { loadInstances() },
+        onBack = onBack,
+        onCreateNew = onCreateNew,
+        onImportModpack = onImportModpack,
+        onEditInstance = onEditInstance,
+        onRenameInstance = { instance -> onRenameInstance(instance) { refreshKey++ } },
+        onDeleteInstance = { instance -> onDeleteInstance(instance) { refreshKey++ } },
+        onSelectInstance = { instance, index ->
+            Instances.setSelectedInstance(instance)
+            selectedIndex = index
+        }
+    )
+}
+
+@Composable
+private fun InstanceSelectionContent(
+    instances: List<DisplayInstance>,
+    selectedIndex: Int,
+    isLoading: Boolean,
+    onRefresh: () -> Unit,
+    onBack: () -> Unit,
+    onCreateNew: () -> Unit,
+    onImportModpack: () -> Unit,
+    onEditInstance: (DisplayInstance) -> Unit,
+    onRenameInstance: (DisplayInstance) -> Unit,
+    onDeleteInstance: (DisplayInstance) -> Unit,
+    onSelectInstance: (DisplayInstance, Int) -> Unit
+) {
+    var selectedTab by remember { mutableIntStateOf(0) }
+
     val filteredInstances = remember(instances, selectedTab) {
         when (selectedTab) {
             1 -> instances.filter { isVanilla(it.versionId) }
@@ -99,7 +135,7 @@ fun InstanceSelectionScreen(
         Row(modifier = Modifier.fillMaxSize()) {
             InstanceNavigationRail(
                 onCreateNew = onCreateNew,
-                onRefresh = { loadInstances() },
+                onRefresh = onRefresh,
                 onImportModpack = onImportModpack,
                 onBack = onBack
             )
@@ -168,7 +204,7 @@ fun InstanceSelectionScreen(
                                 )
                                 Spacer(modifier = Modifier.height(24.dp))
                                 TextButton(
-                                    onClick = { loadInstances() },
+                                    onClick = onRefresh,
                                     shape = RoundedCornerShape(12.dp),
                                     colors = ButtonDefaults.textButtonColors(
                                         containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
@@ -200,17 +236,16 @@ fun InstanceSelectionScreen(
                                         .animateItem(
                                             fadeInSpec = tween(300),
                                             fadeOutSpec = tween(300),
-                                            placementSpec = tween(300) // Standard tween instead of bouncy spring
+                                            placementSpec = tween(300)
                                         ),
                                     instance = instance,
                                     isSelected = isSelected,
                                     onClick = {
-                                        Instances.setSelectedInstance(instance)
-                                        selectedIndex = actualIndex
+                                        onSelectInstance(instance, actualIndex)
                                     },
                                     onEdit = { onEditInstance(instance) },
-                                    onRename = { onRenameInstance(instance) { refreshKey++ } },
-                                    onDelete = { onDeleteInstance(instance) { refreshKey++ } }
+                                    onRename = { onRenameInstance(instance) },
+                                    onDelete = { onDeleteInstance(instance) }
                                 )
                             }
                         }
@@ -231,5 +266,32 @@ private fun isVanilla(versionId: String?): Boolean {
            !lower.contains("optifine") &&
            !lower.contains("neoforge") &&
            !lower.contains("bta")
+}
+
+@Preview(showBackground = true, device = "spec:width=800dp,height=400dp,orientation=landscape")
+@Composable
+fun InstanceSelectionScreenPreview() {
+    val gson = Gson()
+    val instances = listOf(
+        gson.fromJson("""{"name": "1.20.1 Vanilla", "versionId": "1.20.1", "icon": "default"}""", DisplayInstance::class.java),
+        gson.fromJson("""{"name": "Fabric Modpack", "versionId": "1.19.2-fabric", "icon": "fabric"}""", DisplayInstance::class.java),
+        gson.fromJson("""{"name": "Forge World", "versionId": "1.16.5-forge", "icon": "forge"}""", DisplayInstance::class.java)
+    ).onEach { it.mInstanceRoot = java.io.File("/tmp/${it.name}") }
+
+    PojavTheme {
+        InstanceSelectionContent(
+            instances = instances,
+            selectedIndex = 0,
+            isLoading = false,
+            onRefresh = {},
+            onBack = {},
+            onCreateNew = {},
+            onImportModpack = {},
+            onEditInstance = {},
+            onRenameInstance = {},
+            onDeleteInstance = {},
+            onSelectInstance = { _, _ -> }
+        )
+    }
 }
 
