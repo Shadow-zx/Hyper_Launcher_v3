@@ -1,8 +1,8 @@
 package net.kdt.pojavlaunch.screens.compose
 
+import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.drawable.Drawable
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -62,14 +63,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
-import androidx.compose.ui.graphics.nativeCanvas
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -94,6 +90,7 @@ import net.kdt.pojavlaunch.instances.DisplayInstance
 import net.kdt.pojavlaunch.instances.Instance
 import net.kdt.pojavlaunch.instances.InstanceIconProvider
 import net.kdt.pojavlaunch.instances.Instances
+import net.kdt.pojavlaunch.prefs.LauncherPreferences
 import net.kdt.pojavlaunch.screens.theme.PojavTheme
 import net.kdt.pojavlaunch.screens.utils.rememberDrawablePainter
 import java.io.IOException
@@ -141,7 +138,21 @@ fun MainMenuFragmentCompose(
     val isPreview = LocalInspectionMode.current
     val hasBackground = false
     val backgroundTransparency = 1f
-    val hideActionButtons = false
+    var hideActionButtons by remember { mutableStateOf(LauncherPreferences.PREF_HIDE_SIDEBAR) }
+
+    if (!isPreview) {
+        DisposableEffect(Unit) {
+            val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+                if (key == "hide_sidebar") {
+                    hideActionButtons = LauncherPreferences.DEFAULT_PREF.getBoolean("hide_sidebar", false)
+                }
+            }
+            LauncherPreferences.DEFAULT_PREF.registerOnSharedPreferenceChangeListener(listener)
+            onDispose {
+                LauncherPreferences.DEFAULT_PREF.unregisterOnSharedPreferenceChangeListener(listener)
+            }
+        }
+    }
 
     var selectedInstance by remember {
         mutableStateOf<Instance?>(
@@ -214,12 +225,12 @@ fun MainMenuFragmentCompose(
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
 
+                val rightSidebarWidth = 260.dp
                 if (!hideActionButtons) {
                     Column(
                         modifier = Modifier
                             .fillMaxHeight()
-                            //don't change this value, otherwise it will fuck up the layout
-                            .widthIn(max = 500.dp)
+                            .weight(1f)
                             .padding(end = 8.dp)
                             .verticalScroll(rememberScrollState()),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -275,12 +286,12 @@ fun MainMenuFragmentCompose(
                         )
                     }
                 } else {
-                    Spacer(modifier = Modifier.weight(0.66f))
+                    Spacer(modifier = Modifier.weight(1f))
                 }
 
                 Surface(
                     modifier = Modifier
-                        .weight(1f)
+                        .width(rightSidebarWidth)
                         .fillMaxHeight(),
                     shape = RoundedCornerShape(32.dp),
                     color = if (hasBackground) MaterialTheme.colorScheme.surface.copy(alpha = backgroundTransparency)

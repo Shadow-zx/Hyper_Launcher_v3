@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import net.kdt.pojavlaunch.Tools
-import net.kdt.pojavlaunch.screens.layouts.InstanceDirectoryScreen
+import net.kdt.pojavlaunch.screens.layouts.instances.InstanceDirectoryScreen
 import net.kdt.pojavlaunch.screens.theme.PojavTheme
 
 class InstanceDirectoryFragment : Fragment() {

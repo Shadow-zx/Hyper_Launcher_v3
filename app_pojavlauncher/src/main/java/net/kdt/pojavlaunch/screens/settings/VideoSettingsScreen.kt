@@ -113,7 +113,8 @@ fun VideoSettingsScreen(
                         resolutionRatio = it
                         LauncherPreferences.DEFAULT_PREF.edit { putInt("resolutionRatio", it.toInt()) }
                         LauncherPreferences.loadPreferences(context)
-                    }
+                    },
+                    valueSuffix = "%"
                 )
             }
         }

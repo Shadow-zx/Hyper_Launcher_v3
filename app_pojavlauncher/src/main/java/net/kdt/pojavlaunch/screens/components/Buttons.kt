@@ -11,6 +11,7 @@ import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -24,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -39,13 +41,14 @@ fun MineButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    height: Dp = 62.dp
+    height: Dp = 62.dp,
+    shape: Shape = CircleShape
 ) {
     val noto_sans_bold = FontFamily(Font(R.font.noto_sans_bold))
     Button(
         onClick = onClick,
         modifier = modifier.height(height),
-        shape = RoundedCornerShape(12.dp),
+        shape = shape,
         colors = ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colorScheme.primary,
             contentColor = MaterialTheme.colorScheme.onPrimary

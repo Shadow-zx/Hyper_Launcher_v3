@@ -237,6 +237,7 @@ dependent name of printable keys with @ref glfwGetKeyName.
 
 ```c
 const char* key_name = glfwGetKeyName(GLFW_KEY_W, 0);
+
 show_tutorial_hint("Press %s to move forward", key_name);
 ```
 

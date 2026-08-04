@@ -21,7 +21,7 @@ import net.kdt.pojavlaunch.modloaders.FabriclikeUtils
 import net.kdt.pojavlaunch.modloaders.ModloaderDownloadListener
 import net.kdt.pojavlaunch.modloaders.ModloaderListenerProxy
 import net.kdt.pojavlaunch.progresskeeper.ProgressKeeper
-import net.kdt.pojavlaunch.screens.layouts.FabriclikeInstallScreen
+import net.kdt.pojavlaunch.screens.layouts.modloader.fabric.FabriclikeInstallScreen
 import net.kdt.pojavlaunch.screens.theme.PojavTheme
 import java.io.File
 import java.io.IOException

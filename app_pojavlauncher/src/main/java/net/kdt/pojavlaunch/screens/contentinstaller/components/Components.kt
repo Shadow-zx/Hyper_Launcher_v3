@@ -1,4 +1,4 @@
-package net.kdt.pojavlaunch.screens.contentinstaller
+package net.kdt.pojavlaunch.screens.contentinstaller.components
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
@@ -64,6 +64,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
@@ -246,7 +247,7 @@ fun SubVersionItemView(
 }
 
 @Composable
-fun ProjectIcon(project: ModrinthProject, size: androidx.compose.ui.unit.Dp = 56.dp) {
+fun ProjectIcon(project: ModrinthProject, size: Dp = 56.dp) {
     Box(
         modifier = Modifier
             .size(size)

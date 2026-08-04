@@ -1,4 +1,4 @@
-package net.kdt.pojavlaunch.screens.layouts
+package net.kdt.pojavlaunch.screens.layouts.modloader
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
@@ -81,12 +81,16 @@ fun <T> ModloaderInstallScreen(
                 color = MaterialTheme.colorScheme.outline
             )
 
-            Box(modifier = Modifier.weight(1f)) {
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
                 if (isLoading && versionGroups.isEmpty()) {
-                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                    CircularProgressIndicator()
                 } else if (loadError != null && versionGroups.isEmpty()) {
                     Column(
-                        modifier = Modifier.align(Alignment.Center),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(

@@ -1,4 +1,4 @@
-package net.kdt.pojavlaunch.screens.layouts
+package net.kdt.pojavlaunch.screens.contentinstaller
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.Spring
@@ -70,11 +70,11 @@ import net.kdt.pojavlaunch.screens.contentinstaller.models.ContentInstallerType
 import net.kdt.pojavlaunch.screens.contentinstaller.models.ContentSource
 import net.kdt.pojavlaunch.screens.contentinstaller.models.ModrinthProject
 import net.kdt.pojavlaunch.screens.contentinstaller.models.ModrinthVersion
-import net.kdt.pojavlaunch.screens.contentinstaller.ProjectDetailsSidebar
-import net.kdt.pojavlaunch.screens.contentinstaller.ProjectItemView
-import net.kdt.pojavlaunch.screens.contentinstaller.SearchFiltersSidebar
-import net.kdt.pojavlaunch.screens.contentinstaller.SubVersionItemView
-import net.kdt.pojavlaunch.screens.contentinstaller.VersionItemView
+import net.kdt.pojavlaunch.screens.contentinstaller.components.ProjectDetailsSidebar
+import net.kdt.pojavlaunch.screens.contentinstaller.components.ProjectItemView
+import net.kdt.pojavlaunch.screens.contentinstaller.components.SearchFiltersSidebar
+import net.kdt.pojavlaunch.screens.contentinstaller.components.SubVersionItemView
+import net.kdt.pojavlaunch.screens.contentinstaller.components.VersionItemView
 
 @Composable
 fun ContentInstallerScreen(

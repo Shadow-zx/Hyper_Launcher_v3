@@ -1,4 +1,4 @@
-package net.kdt.pojavlaunch.screens.layouts
+package net.kdt.pojavlaunch.screens.layouts.modloader.fabric
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*

@@ -119,7 +119,8 @@ fun ControlSettingsScreen(
                         longPressTrigger = it
                         LauncherPreferences.DEFAULT_PREF.edit { putInt("timeLongPressTrigger", it.toInt()) }
                         LauncherPreferences.loadPreferences(context)
-                    }
+                    },
+                    valueSuffix = "ms"
                 )
             }
         }
@@ -138,7 +139,8 @@ fun ControlSettingsScreen(
                         buttonScale = it
                         LauncherPreferences.DEFAULT_PREF.edit { putInt("buttonscale", it.toInt()) }
                         LauncherPreferences.loadPreferences(context)
-                    }
+                    },
+                    valueSuffix = "%"
                 )
             }
 
@@ -171,7 +173,8 @@ fun ControlSettingsScreen(
                         mouseScale = it
                         LauncherPreferences.DEFAULT_PREF.edit { putInt("mousescale", it.toInt()) }
                         LauncherPreferences.loadPreferences(context)
-                    }
+                    },
+                    valueSuffix = "%"
                 )
             }
 
@@ -186,7 +189,8 @@ fun ControlSettingsScreen(
                         mouseSpeed = it
                         LauncherPreferences.DEFAULT_PREF.edit { putInt("mousespeed", it.toInt()) }
                         LauncherPreferences.loadPreferences(context)
-                    }
+                    },
+                    valueSuffix = "%"
                 )
             }
 
@@ -235,7 +239,8 @@ fun ControlSettingsScreen(
                             gyroSensitivity = it
                             LauncherPreferences.DEFAULT_PREF.edit { putInt("gyroSensitivity", it.toInt()) }
                             LauncherPreferences.loadPreferences(context)
-                        }
+                        },
+                        valueSuffix = "%"
                     )
                 }
 
@@ -251,7 +256,8 @@ fun ControlSettingsScreen(
                             gyroSampleRate = it
                             LauncherPreferences.DEFAULT_PREF.edit { putInt("gyroSampleRate", it.toInt()) }
                             LauncherPreferences.loadPreferences(context)
-                        }
+                        },
+                        valueSuffix = "Hz"
                     )
                 }
 
@@ -334,7 +340,8 @@ fun ControlSettingsScreen(
                         deadzoneScale = it
                         LauncherPreferences.DEFAULT_PREF.edit { putInt("gamepad_deadzone_scale", it.toInt()) }
                         LauncherPreferences.loadPreferences(context)
-                    }
+                    },
+                    valueSuffix = "%"
                 )
             }
         }

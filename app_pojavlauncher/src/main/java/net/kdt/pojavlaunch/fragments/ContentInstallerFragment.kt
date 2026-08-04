@@ -27,7 +27,7 @@ import net.kdt.pojavlaunch.modloaders.modpacks.api.ModrinthApi
 import net.kdt.pojavlaunch.modloaders.modpacks.api.CurseforgeApi
 import net.kdt.pojavlaunch.modloaders.modpacks.models.ModItem
 import net.kdt.pojavlaunch.progresskeeper.ProgressKeeper
-import net.kdt.pojavlaunch.screens.layouts.ContentInstallerScreen
+import net.kdt.pojavlaunch.screens.contentinstaller.ContentInstallerScreen
 import net.kdt.pojavlaunch.screens.contentinstaller.models.ContentInstallerType
 import net.kdt.pojavlaunch.screens.contentinstaller.models.ContentSource
 import net.kdt.pojavlaunch.screens.contentinstaller.models.ModrinthProject
@@ -55,7 +55,8 @@ class ContentInstallerFragment : Fragment() {
                     }
 
                     var projects by remember { mutableStateOf<List<ModrinthProject>>(emptyList()) }
-                    var isLoading by remember { mutableStateOf(false) }
+                    var isSearching by remember { mutableStateOf(false) }
+                    var isProjectLoading by remember { mutableStateOf(false) }
                     var viewingProject by remember { mutableStateOf<ModrinthProject?>(null) }
                     var selectedType by remember { mutableStateOf(ContentInstallerType.MODS) }
                     var selectedSource by remember { 
@@ -112,14 +113,14 @@ class ContentInstallerFragment : Fragment() {
                             kotlinx.coroutines.delay(500) // Debounce typing
                         }
                         
-                        isLoading = true
+                        isSearching = true
                         val results = if (selectedSource == ContentSource.MODRINTH) {
                             ModrinthService.search(searchQuery, selectedType, selectedVersion ?: instanceVersion, selectedLoader ?: instanceLoader)
                         } else {
                             CurseForgeService.search(searchQuery, selectedType, selectedVersion ?: instanceVersion, selectedLoader ?: instanceLoader)
                         }
                         projects = results
-                        isLoading = false
+                        isSearching = false
                         
                         results.forEach { project ->
                             if (!project.iconUrl.isNullOrEmpty()) {
@@ -138,6 +139,53 @@ class ContentInstallerFragment : Fragment() {
                                         }
                                     }
                                 }
+                            }
+                        }
+                    }
+
+                    LaunchedEffect(viewingProject?.id) {
+                        val projectId = viewingProject?.id ?: run {
+                            projectVersions = emptyList()
+                            selectedProjectMCVersion = null
+                            isProjectLoading = false
+                            return@LaunchedEffect
+                        }
+
+                        projectVersions = emptyList()
+                        selectedProjectMCVersion = null
+                        isProjectLoading = true
+                        
+                        try {
+                            val detailsDeferred = async(Dispatchers.IO) {
+                                if (selectedSource == ContentSource.MODRINTH) {
+                                    ModrinthService.getProjectDetails(projectId)
+                                } else {
+                                    CurseForgeService.getProjectDetails(projectId)
+                                }
+                            }
+                            
+                            val versionsDeferred = async(Dispatchers.IO) {
+                                if (selectedSource == ContentSource.MODRINTH) {
+                                    ModrinthService.getProjectVersions(projectId)
+                                } else {
+                                    CurseForgeService.getProjectVersions(projectId)
+                                }
+                            }
+                            
+                            val details = detailsDeferred.await()
+                            val versions = versionsDeferred.await()
+                            
+                            withContext(Dispatchers.Main) {
+                                viewingProject = viewingProject?.copy(
+                                    fullDescription = details?.fullDescription,
+                                    gallery = details?.gallery ?: emptyList()
+                                )
+                                projectVersions = versions
+                                isProjectLoading = false
+                            }
+                        } catch (e: Exception) {
+                            withContext(Dispatchers.Main) {
+                                isProjectLoading = false
                             }
                         }
                     }
@@ -168,44 +216,6 @@ class ContentInstallerFragment : Fragment() {
                         },
                         onProjectClick = { project ->
                             viewingProject = project
-                            projectVersions = emptyList()
-                            selectedProjectMCVersion = null
-                            isLoading = true
-                            scope.launch(Dispatchers.IO) {
-                                try {
-                                    val detailsDeferred = async {
-                                        if (selectedSource == ContentSource.MODRINTH) {
-                                            ModrinthService.getProjectDetails(project.id)
-                                        } else {
-                                            CurseForgeService.getProjectDetails(project.id)
-                                        }
-                                    }
-                                    
-                                    val versionsDeferred = async {
-                                        if (selectedSource == ContentSource.MODRINTH) {
-                                            ModrinthService.getProjectVersions(project.id)
-                                        } else {
-                                            CurseForgeService.getProjectVersions(project.id)
-                                        }
-                                    }
-                                    
-                                    val details = detailsDeferred.await()
-                                    val versions = versionsDeferred.await()
-                                    
-                                    withContext(Dispatchers.Main) {
-                                        viewingProject = viewingProject?.copy(
-                                            fullDescription = details?.fullDescription,
-                                            gallery = details?.gallery ?: emptyList()
-                                        )
-                                        projectVersions = versions
-                                        isLoading = false
-                                    }
-                                } catch (e: Exception) {
-                                    withContext(Dispatchers.Main) {
-                                        isLoading = false
-                                    }
-                                }
-                            }
                         },
                         onVersionClick = { version ->
                             if (instance == null) {
@@ -253,7 +263,7 @@ class ContentInstallerFragment : Fragment() {
                             }
                         },
                         projects = projects,
-                        isLoading = isLoading,
+                        isLoading = if (viewingProject != null) isProjectLoading else isSearching,
                         selectedVersion = selectedVersion,
                         selectedLoader = selectedLoader,
                         selectedSource = selectedSource,

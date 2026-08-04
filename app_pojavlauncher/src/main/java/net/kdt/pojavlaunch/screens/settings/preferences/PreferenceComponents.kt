@@ -168,7 +168,8 @@ fun SettingsSliderItem(
     warningTooltip: String? = null,
     value: Float,
     valueRange: ClosedFloatingPointRange<Float> = 0f..100f,
-    onValueChange: (Float) -> Unit
+    onValueChange: (Float) -> Unit,
+    valueSuffix: String? = null
 ) {
     Column(
         modifier = Modifier
@@ -216,7 +217,8 @@ fun SettingsSliderItem(
             onValueChange = onValueChange,
             valueRange = valueRange,
             toInt = true,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            suffix = valueSuffix
         )
     }
 }

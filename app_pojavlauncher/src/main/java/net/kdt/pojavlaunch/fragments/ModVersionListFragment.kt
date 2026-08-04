@@ -15,8 +15,8 @@ import net.kdt.pojavlaunch.extra.ExtraCore
 import net.kdt.pojavlaunch.modloaders.ModloaderDownloadListener
 import net.kdt.pojavlaunch.modloaders.ModloaderListenerProxy
 import net.kdt.pojavlaunch.progresskeeper.ProgressKeeper
-import net.kdt.pojavlaunch.screens.layouts.ModloaderInstallScreen
-import net.kdt.pojavlaunch.screens.layouts.ModloaderVersionGroup
+import net.kdt.pojavlaunch.screens.layouts.modloader.ModloaderInstallScreen
+import net.kdt.pojavlaunch.screens.layouts.modloader.ModloaderVersionGroup
 import net.kdt.pojavlaunch.screens.theme.PojavTheme
 import java.io.File
 import java.io.IOException

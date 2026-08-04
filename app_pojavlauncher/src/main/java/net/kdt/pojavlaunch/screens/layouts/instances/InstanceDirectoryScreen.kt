@@ -1,4 +1,4 @@
-package net.kdt.pojavlaunch.screens.layouts
+package net.kdt.pojavlaunch.screens.layouts.instances
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -92,6 +92,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.ashmeet.hyperlauncher.R
+import net.kdt.pojavlaunch.PojavApplication
+import net.kdt.pojavlaunch.Tools
 import net.kdt.pojavlaunch.instances.Instances
 import net.kdt.pojavlaunch.progresskeeper.ProgressKeeper
 import net.kdt.pojavlaunch.screens.components.InstanceNavigationRail
@@ -99,6 +101,7 @@ import net.kdt.pojavlaunch.screens.settings.preferences.TextInputDialog
 import net.kdt.pojavlaunch.screens.theme.PojavTheme
 import net.kdt.pojavlaunch.utils.ModMetadataReader
 import net.kdt.pojavlaunch.utils.WorldMetadataReader
+import org.apache.commons.io.FileUtils
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -140,7 +143,7 @@ fun InstanceDirectoryContent(
 
     val loadFiles = { dir: File ->
         isLoading = true
-        net.kdt.pojavlaunch.PojavApplication.sExecutorService.execute {
+        PojavApplication.sExecutorService.execute {
             try {
                 val list = dir.listFiles()?.toList()?.sortedWith(compareBy({ !it.isDirectory }, { it.name.lowercase() })) ?: emptyList()
                 files = list
@@ -157,10 +160,10 @@ fun InstanceDirectoryContent(
         contract = ActivityResultContracts.GetContent()
     ) { uri ->
         if (uri != null) {
-            val fileName = net.kdt.pojavlaunch.Tools.getFileName(context, uri)
+            val fileName = Tools.getFileName(context, uri)
             currentDir?.let { destDir ->
                 val destFile = File(destDir, fileName)
-                net.kdt.pojavlaunch.PojavApplication.sExecutorService.execute {
+                PojavApplication.sExecutorService.execute {
                     try {
                         val progressKey = "copy_files"
                         ProgressKeeper.submitProgress(progressKey, 0, -1, "Importing $fileName...")
@@ -253,10 +256,10 @@ fun InstanceDirectoryContent(
                 TextButton(
                     onClick = {
                         fileToDelete = null
-                        net.kdt.pojavlaunch.PojavApplication.sExecutorService.execute {
+                        PojavApplication.sExecutorService.execute {
                             if (target.isDirectory) {
                                 try {
-                                    org.apache.commons.io.FileUtils.deleteDirectory(target)
+                                    FileUtils.deleteDirectory(target)
                                 } catch (e: Exception) {
                                     e.printStackTrace()
                                 }
@@ -496,13 +499,13 @@ fun InstanceDirectoryContent(
                                                 searchQuery = ""
                                                 isSearchActive = false
                                             } else {
-                                                net.kdt.pojavlaunch.Tools.openPath(context, file, false)
+                                                Tools.openPath(context, file, false)
                                             }
                                         },
                                         onDelete = { fileToDelete = file },
                                         onRename = { fileToRename = file },
                                         onOpenInFiles = {
-                                            net.kdt.pojavlaunch.Tools.openPath(context, file, false)
+                                            Tools.openPath(context, file, false)
                                         },
                                         onRefresh = { currentDir?.let { loadFiles(it) } }
                                     )

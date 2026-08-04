@@ -1,12 +1,22 @@
 package net.kdt.pojavlaunch.screens.settings
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ViewSidebar
 import androidx.compose.material.icons.filled.Animation
 import androidx.compose.material.icons.filled.Palette
+import androidx.compose.material.icons.rounded.AddPhotoAlternate
+import androidx.compose.material.icons.rounded.AspectRatio
+import androidx.compose.material.icons.rounded.DragIndicator
+import androidx.compose.material.icons.rounded.Opacity
+import androidx.compose.material.icons.rounded.RadioButtonUnchecked
+import androidx.compose.material.icons.rounded.Restore
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -15,11 +25,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.edit
 import net.ashmeet.hyperlauncher.R
+import net.kdt.pojavlaunch.Tools
 import net.kdt.pojavlaunch.prefs.LauncherPreferences
 import net.kdt.pojavlaunch.screens.settings.layouts.CardPosition
 import net.kdt.pojavlaunch.screens.settings.preferences.SettingsActionItem
 import net.kdt.pojavlaunch.screens.settings.layouts.SettingsCard
 import net.kdt.pojavlaunch.screens.settings.layouts.SettingsScreenWrapper
+import net.kdt.pojavlaunch.screens.settings.preferences.PreferenceCategory
+import net.kdt.pojavlaunch.screens.settings.preferences.SettingsSliderItem
+import net.kdt.pojavlaunch.screens.settings.preferences.SettingsSwitchItem
 import net.kdt.pojavlaunch.screens.settings.preferences.SingleChoiceDialog
 
 @Composable
@@ -28,6 +42,16 @@ fun AppearanceSettingsScreen(
 ) {
     var screenTransition by remember { mutableStateOf(LauncherPreferences.PREF_SCREEN_TRANSITION) }
     var appTheme by remember { mutableStateOf(LauncherPreferences.PREF_THEME) }
+    var hideSidebar by remember { mutableStateOf(LauncherPreferences.PREF_HIDE_SIDEBAR) }
+    
+    var drawerSizePerc by remember { mutableFloatStateOf(LauncherPreferences.PREF_DRAWER_PULL_SIZE_PERC) }
+    
+    var drawerBgOpacity by remember { mutableFloatStateOf(LauncherPreferences.PREF_DRAWER_PULL_BG_OPACITY.toFloat()) }
+    var drawerIconOpacity by remember { mutableFloatStateOf(LauncherPreferences.PREF_DRAWER_PULL_ICON_OPACITY.toFloat()) }
+    var drawerHoldToMove by remember { mutableStateOf(LauncherPreferences.PREF_DRAWER_PULL_HOLD_TO_MOVE) }
+    var drawerBackground by remember { mutableStateOf(LauncherPreferences.PREF_DRAWER_PULL_BACKGROUND) }
+    var drawerIconPath by remember { mutableStateOf(LauncherPreferences.PREF_DRAWER_PULL_ICON_PATH) }
+    
     val context = LocalContext.current
     var showTransitionDialog by remember { mutableStateOf(false) }
     var showThemeDialog by remember { mutableStateOf(false) }
@@ -73,6 +97,126 @@ fun AppearanceSettingsScreen(
                     summary = transitionOptionNames[transitionOptions.indexOf(screenTransition).coerceAtLeast(0)],
                     icon = Icons.Default.Animation,
                     onClick = { showTransitionDialog = true }
+                )
+            }
+
+            PreferenceCategory(title = "Main Menu")
+            SettingsCard(position = CardPosition.SINGLE, useSurface = true) {
+                SettingsSwitchItem(
+                    title = "Hide sidebar",
+                    summary = "Hide action buttons on the left side of the main menu",
+                    icon = Icons.AutoMirrored.Rounded.ViewSidebar,
+                    checked = hideSidebar,
+                    onCheckedChange = {
+                        hideSidebar = it
+                        LauncherPreferences.DEFAULT_PREF.edit { putBoolean("hide_sidebar", it) }
+                        LauncherPreferences.PREF_HIDE_SIDEBAR = it
+                    }
+                )
+            }
+
+            PreferenceCategory(title = "Drawer Button")
+            SettingsCard(position = CardPosition.TOP, useSurface = true) {
+                SettingsSliderItem(
+                    title = "Size",
+                    icon = Icons.Rounded.AspectRatio,
+                    value = drawerSizePerc,
+                    valueRange = 10f..100f,
+                    onValueChange = {
+                        drawerSizePerc = it
+                        LauncherPreferences.DEFAULT_PREF.edit { putFloat("drawer_pull_size_perc", it) }
+                        LauncherPreferences.PREF_DRAWER_PULL_SIZE_PERC = it
+                    },
+                    valueSuffix = "%"
+                )
+            }
+            SettingsCard(position = CardPosition.MIDDLE, useSurface = true) {
+                SettingsSliderItem(
+                    title = "Background Opacity",
+                    icon = Icons.Rounded.Opacity,
+                    value = drawerBgOpacity,
+                    valueRange = 0f..100f,
+                    onValueChange = {
+                        drawerBgOpacity = it
+                        LauncherPreferences.DEFAULT_PREF.edit { putInt("drawer_pull_opacity", it.toInt()) }
+                        LauncherPreferences.PREF_DRAWER_PULL_BG_OPACITY = it.toInt()
+                    },
+                    valueSuffix = "%"
+                )
+            }
+            SettingsCard(position = CardPosition.MIDDLE, useSurface = true) {
+                SettingsSliderItem(
+                    title = "Icon Opacity",
+                    icon = Icons.Rounded.Opacity,
+                    value = drawerIconOpacity,
+                    valueRange = 0f..100f,
+                    onValueChange = {
+                        drawerIconOpacity = it
+                        LauncherPreferences.DEFAULT_PREF.edit { putInt("drawer_pull_icon_opacity", it.toInt()) }
+                        LauncherPreferences.PREF_DRAWER_PULL_ICON_OPACITY = it.toInt()
+                    },
+                    valueSuffix = "%"
+                )
+            }
+            SettingsCard(position = CardPosition.MIDDLE, useSurface = true) {
+                SettingsSwitchItem(
+                    title = "Hold to move",
+                    icon = Icons.Rounded.DragIndicator,
+                    checked = drawerHoldToMove,
+                    onCheckedChange = {
+                        drawerHoldToMove = it
+                        LauncherPreferences.DEFAULT_PREF.edit { putBoolean("drawer_pull_hold_to_move", it) }
+                        LauncherPreferences.PREF_DRAWER_PULL_HOLD_TO_MOVE = it
+                    }
+                )
+            }
+            SettingsCard(position = CardPosition.MIDDLE, useSurface = true) {
+                SettingsSwitchItem(
+                    title = "Show background",
+                    icon = Icons.Rounded.RadioButtonUnchecked,
+                    checked = drawerBackground,
+                    onCheckedChange = {
+                        drawerBackground = it
+                        LauncherPreferences.DEFAULT_PREF.edit { putBoolean("drawer_pull_background", it) }
+                        LauncherPreferences.PREF_DRAWER_PULL_BACKGROUND = it
+                    }
+                )
+            }
+
+            SettingsCard(position = CardPosition.MIDDLE, useSurface = true) {
+                val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+                    if (uri != null) {
+                        val destination = java.io.File(Tools.DIR_DATA, "custom_drawer_icon.png")
+                        try {
+                            context.contentResolver.openInputStream(uri)?.use { input ->
+                                java.io.FileOutputStream(destination).use { output ->
+                                    input.copyTo(output)
+                                }
+                            }
+                            LauncherPreferences.DEFAULT_PREF.edit { putString("drawer_pull_icon_path", destination.absolutePath) }
+                            LauncherPreferences.PREF_DRAWER_PULL_ICON_PATH = destination.absolutePath
+                            drawerIconPath = destination.absolutePath
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                    }
+                }
+                SettingsActionItem(
+                    title = "Change icon image",
+                    summary = if (drawerIconPath != null) "Custom icon active" else "Default icon active",
+                    icon = Icons.Rounded.AddPhotoAlternate,
+                    onClick = { launcher.launch("image/*") }
+                )
+            }
+            SettingsCard(position = CardPosition.BOTTOM, useSurface = true) {
+                SettingsActionItem(
+                    title = "Reset icon",
+                    icon = Icons.Rounded.Restore,
+                    onClick = {
+                        LauncherPreferences.DEFAULT_PREF.edit { remove("drawer_pull_icon_path") }
+                        LauncherPreferences.PREF_DRAWER_PULL_ICON_PATH = null
+                        drawerIconPath = null
+                    }
                 )
             }
         }

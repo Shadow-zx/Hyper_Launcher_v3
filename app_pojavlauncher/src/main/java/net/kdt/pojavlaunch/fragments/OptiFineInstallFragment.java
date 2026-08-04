@@ -10,8 +10,8 @@ import net.kdt.pojavlaunch.instances.Instances;
 import net.kdt.pojavlaunch.modloaders.ModloaderListenerProxy;
 import net.kdt.pojavlaunch.modloaders.OptiFineDownloadTask;
 import net.kdt.pojavlaunch.modloaders.OptiFineUtils;
-import net.kdt.pojavlaunch.screens.layouts.ModloaderVersionGroup;
-import net.kdt.pojavlaunch.screens.layouts.ModloaderVersionItem;
+import net.kdt.pojavlaunch.screens.layouts.modloader.ModloaderVersionGroup;
+import net.kdt.pojavlaunch.screens.layouts.modloader.ModloaderVersionItem;
 
 import java.io.File;
 import java.io.IOException;

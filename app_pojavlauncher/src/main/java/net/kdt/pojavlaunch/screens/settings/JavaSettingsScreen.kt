@@ -95,7 +95,8 @@ fun JavaSettingsScreen(
                         ramAllocation = it
                         LauncherPreferences.DEFAULT_PREF.edit { putInt("allocation", it.toInt()) }
                         LauncherPreferences.loadPreferences(context)
-                    }
+                    },
+                    valueSuffix = " MB"
                 )
             }
 

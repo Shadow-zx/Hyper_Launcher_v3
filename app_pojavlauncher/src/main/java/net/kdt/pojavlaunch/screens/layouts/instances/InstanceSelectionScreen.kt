@@ -1,4 +1,4 @@
-package net.kdt.pojavlaunch.screens.layouts
+package net.kdt.pojavlaunch.screens.layouts.instances
 
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -52,6 +52,7 @@ import net.kdt.pojavlaunch.instances.Instances
 import net.kdt.pojavlaunch.screens.components.InstanceNavigationRail
 import net.kdt.pojavlaunch.screens.compose.InstanceListItem
 import net.kdt.pojavlaunch.screens.theme.PojavTheme
+import java.io.File
 
 @Composable
 fun InstanceSelectionScreen(
@@ -276,7 +277,7 @@ fun InstanceSelectionScreenPreview() {
         gson.fromJson("""{"name": "1.20.1 Vanilla", "versionId": "1.20.1", "icon": "default"}""", DisplayInstance::class.java),
         gson.fromJson("""{"name": "Fabric Modpack", "versionId": "1.19.2-fabric", "icon": "fabric"}""", DisplayInstance::class.java),
         gson.fromJson("""{"name": "Forge World", "versionId": "1.16.5-forge", "icon": "forge"}""", DisplayInstance::class.java)
-    ).onEach { it.mInstanceRoot = java.io.File("/tmp/${it.name}") }
+    ).onEach { it.mInstanceRoot = File("/tmp/${it.name}") }
 
     PojavTheme {
         InstanceSelectionContent(

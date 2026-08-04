@@ -6,8 +6,8 @@ import net.ashmeet.hyperlauncher.R;
 import net.kdt.pojavlaunch.modloaders.BTADownloadTask;
 import net.kdt.pojavlaunch.modloaders.BTAUtils;
 import net.kdt.pojavlaunch.modloaders.ModloaderListenerProxy;
-import net.kdt.pojavlaunch.screens.layouts.ModloaderVersionGroup;
-import net.kdt.pojavlaunch.screens.layouts.ModloaderVersionItem;
+import net.kdt.pojavlaunch.screens.layouts.modloader.ModloaderVersionGroup;
+import net.kdt.pojavlaunch.screens.layouts.modloader.ModloaderVersionItem;
 
 import java.io.File;
 import java.io.IOException;

@@ -8,8 +8,8 @@ import net.kdt.pojavlaunch.instances.InstanceInstaller;
 import net.kdt.pojavlaunch.instances.Instances;
 import net.kdt.pojavlaunch.modloaders.ForgelikeUtils;
 import net.kdt.pojavlaunch.modloaders.ModloaderListenerProxy;
-import net.kdt.pojavlaunch.screens.layouts.ModloaderVersionGroup;
-import net.kdt.pojavlaunch.screens.layouts.ModloaderVersionItem;
+import net.kdt.pojavlaunch.screens.layouts.modloader.ModloaderVersionGroup;
+import net.kdt.pojavlaunch.screens.layouts.modloader.ModloaderVersionItem;
 
 import java.io.File;
 import java.io.IOException;
