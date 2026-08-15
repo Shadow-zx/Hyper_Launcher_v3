@@ -28,7 +28,6 @@ Hyper Launcher keeps MojoLauncher as its base but shifts focus toward three area
 - **Mod Management** — a more built-in workflow for installing, organizing, updating, and removing mods, aiming to reduce reliance on manually dropping jars into folders.
 - **New Renderers** — additional/experimental rendering backends alongside the existing GL4ES-based pipeline, giving more flexibility on compatibility vs. performance.
 
-*(Fill in specifics here as features land — e.g. which renderers are supported, screenshots of the theming system, etc.)*
 
 ## Getting Hyper Launcher
 
