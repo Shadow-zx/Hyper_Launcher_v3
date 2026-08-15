@@ -21,7 +21,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import net.kdt.pojavlaunch.Architecture;
 import net.ashmeet.hyperlauncher.R;
 import net.kdt.pojavlaunch.Tools;
-import net.kdt.pojavlaunch.prefs.LauncherPreferences;
+import com.ashmeet.hyperlauncher.prefs.LauncherPreferences;
 
 import java.io.IOException;
 import java.util.List;

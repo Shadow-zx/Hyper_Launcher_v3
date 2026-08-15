@@ -1,11 +1,11 @@
 package net.kdt.pojavlaunch;
 
 
+import static com.ashmeet.hyperlauncher.prefs.LauncherPreferences.PREF_ENABLE_GYRO;
+import static com.ashmeet.hyperlauncher.prefs.LauncherPreferences.PREF_SUSTAINED_PERFORMANCE;
+import static com.ashmeet.hyperlauncher.prefs.LauncherPreferences.PREF_USE_ALTERNATE_SURFACE;
+import static com.ashmeet.hyperlauncher.prefs.LauncherPreferences.PREF_VIRTUAL_MOUSE_START;
 import static net.kdt.pojavlaunch.Tools.dialogForceClose;
-import static net.kdt.pojavlaunch.prefs.LauncherPreferences.PREF_ENABLE_GYRO;
-import static net.kdt.pojavlaunch.prefs.LauncherPreferences.PREF_SUSTAINED_PERFORMANCE;
-import static net.kdt.pojavlaunch.prefs.LauncherPreferences.PREF_USE_ALTERNATE_SURFACE;
-import static net.kdt.pojavlaunch.prefs.LauncherPreferences.PREF_VIRTUAL_MOUSE_START;
 
 import android.app.Activity;
 import android.content.ComponentName;
@@ -27,19 +27,24 @@ import android.view.ViewPropertyAnimator;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.compose.ui.platform.ComposeView;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.ashmeet.hyperlauncher.helper.LauncherComposeHelper;
+import com.ashmeet.hyperlauncher.prefs.LauncherPreferences;
+import com.ashmeet.hyperlauncher.prefs.QuickSettingSideDialog;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.kdt.LoggerView;
 
+import net.ashmeet.hyperlauncher.R;
+import net.kdt.pojavlaunch.authenticator.accounts.Account;
 import net.kdt.pojavlaunch.authenticator.accounts.Accounts;
 import net.kdt.pojavlaunch.customcontrols.ControlButtonMenuListener;
 import net.kdt.pojavlaunch.customcontrols.ControlData;
@@ -55,13 +60,10 @@ import net.kdt.pojavlaunch.customcontrols.mouse.HotbarView;
 import net.kdt.pojavlaunch.instances.Instance;
 import net.kdt.pojavlaunch.instances.Instances;
 import net.kdt.pojavlaunch.lifecycle.ContextExecutor;
-import net.kdt.pojavlaunch.prefs.LauncherPreferences;
-import net.kdt.pojavlaunch.prefs.QuickSettingSideDialog;
 import net.kdt.pojavlaunch.services.GameService;
 import net.kdt.pojavlaunch.tasks.AsyncAssetManager;
 import net.kdt.pojavlaunch.utils.JREUtils;
 import net.kdt.pojavlaunch.utils.MCOptionUtils;
-import net.kdt.pojavlaunch.authenticator.accounts.Account;
 import net.kdt.pojavlaunch.utils.RendererCompatUtil;
 import net.kdt.pojavlaunch.utils.jre.GameRunner;
 
@@ -73,7 +75,7 @@ import java.util.Objects;
 import git.artdeell.dnbootstrap.glfw.AndroidClipboardProvider;
 import git.artdeell.dnbootstrap.glfw.GLFW;
 import git.artdeell.dnbootstrap.glfw.GLFWCursorView;
-import net.ashmeet.hyperlauncher.R;
+import kotlin.Unit;
 
 public class MainActivity extends BaseActivity implements ControlButtonMenuListener, EditorExitable, ServiceConnection {
     public static final String INTENT_LAUNCH_VERSION = "intent_version";
@@ -85,7 +87,7 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
     private GLFWCursorView cursor;
     private LoggerView loggerView;
     private DrawerLayout drawerLayout;
-    private ListView navDrawer;
+    private ComposeView navDrawer;
     private View mDrawerPullButton;
     private GyroControl mGyroControl = null;
     private ControlLayout mControlLayout;
@@ -245,8 +247,9 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
                 }
                 drawerLayout.closeDrawers();
             };
-            navDrawer.setAdapter(gameActionArrayAdapter);
-            navDrawer.setOnItemClickListener(gameActionClickListener);
+            setDrawerContent();
+            // navDrawer.setAdapter(gameActionArrayAdapter);
+            // navDrawer.setOnItemClickListener(gameActionClickListener);
             drawerLayout.closeDrawers();
 
             launcherGLView.setSurfaceReadyListener(() -> {
@@ -286,6 +289,20 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
         mControlLayout.post(()->{
             Tools.getDisplayMetrics(this);
             loadControls();
+        });
+    }
+
+    private void setDrawerContent() {
+        LauncherComposeHelper.setMainDrawerContent(navDrawer, isInEditor, false, position -> {
+            runOnUiThread(() -> {
+                if (isInEditor) {
+                    ingameControlsEditorListener.onItemClick(null, null, position, 0);
+                } else {
+                    gameActionClickListener.onItemClick(null, null, position, 0);
+                }
+                drawerLayout.closeDrawers();
+            });
+            return Unit.INSTANCE;
         });
     }
 
@@ -414,8 +431,9 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
         if(ingameControlsEditorListener == null || ingameControlsEditorArrayAdapter == null) return;
 
         mControlLayout.setModifiable(true);
-        navDrawer.setAdapter(ingameControlsEditorArrayAdapter);
-        navDrawer.setOnItemClickListener(ingameControlsEditorListener);
+        setDrawerContent();
+        // navDrawer.setAdapter(ingameControlsEditorArrayAdapter);
+        // navDrawer.setOnItemClickListener(ingameControlsEditorListener);
         mDrawerPullButton.setVisibility(View.VISIBLE);
         isInEditor = true;
     }
@@ -513,8 +531,9 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
             Tools.showError(this,e);
         }
 
-        navDrawer.setAdapter(gameActionArrayAdapter);
-        navDrawer.setOnItemClickListener(gameActionClickListener);
+        setDrawerContent();
+        // navDrawer.setAdapter(gameActionArrayAdapter);
+        // navDrawer.setOnItemClickListener(gameActionClickListener);
         isInEditor = false;
     }
 

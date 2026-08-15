@@ -1,6 +1,7 @@
 package net.kdt.pojavlaunch;
 
 import static android.content.res.Configuration.ORIENTATION_PORTRAIT;
+
 import android.Manifest;
 import android.app.NotificationManager;
 import android.content.Context;
@@ -22,34 +23,35 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
+
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
+import net.ashmeet.hyperlauncher.R;
 import net.kdt.pojavlaunch.authenticator.accounts.Accounts;
 import net.kdt.pojavlaunch.extra.ExtraConstants;
 import net.kdt.pojavlaunch.extra.ExtraCore;
 import net.kdt.pojavlaunch.extra.ExtraListener;
-import net.kdt.pojavlaunch.fragments.ContentInstallerFragment;
-import net.kdt.pojavlaunch.fragments.InstanceDirectoryFragment;
-import net.kdt.pojavlaunch.fragments.MainMenuFragment;
-import net.kdt.pojavlaunch.fragments.MicrosoftLoginFragment;
-import net.kdt.pojavlaunch.fragments.SelectAuthFragment;
+import com.ashmeet.hyperlauncher.fragments.AuthHostFragment;
+import com.ashmeet.hyperlauncher.fragments.ContentInstallerFragment;
+import com.ashmeet.hyperlauncher.fragments.InstanceDirectoryFragment;
+import com.ashmeet.hyperlauncher.fragments.MainMenuFragment;
+import com.ashmeet.hyperlauncher.fragments.MicrosoftLoginFragment;
 import net.kdt.pojavlaunch.instances.Instance;
 import net.kdt.pojavlaunch.instances.InstanceInstaller;
 import net.kdt.pojavlaunch.instances.Instances;
 import net.kdt.pojavlaunch.lifecycle.ContextAwareDoneListener;
 import net.kdt.pojavlaunch.lifecycle.ContextExecutor;
 import net.kdt.pojavlaunch.modloaders.modpacks.imagecache.IconCacheJanitor;
-import net.kdt.pojavlaunch.prefs.LauncherPreferences;
-import net.kdt.pojavlaunch.prefs.screens.LauncherPreferenceFragment;
+import com.ashmeet.hyperlauncher.prefs.LauncherPreferences;
+import com.ashmeet.hyperlauncher.prefs.screens.LauncherPreferenceFragment;
 import net.kdt.pojavlaunch.progresskeeper.ProgressKeeper;
 import net.kdt.pojavlaunch.progresskeeper.TaskCountListener;
-import net.kdt.pojavlaunch.screens.helper.LauncherComposeHelper;
+import com.ashmeet.hyperlauncher.helper.LauncherComposeHelper;
 import net.kdt.pojavlaunch.services.ProgressServiceKeeper;
-import net.kdt.pojavlaunch.tasks.MoJsonExtras;
 import net.kdt.pojavlaunch.tasks.AsyncVersionList;
 import net.kdt.pojavlaunch.tasks.MoJsonDownloader;
+import net.kdt.pojavlaunch.tasks.MoJsonExtras;
 import net.kdt.pojavlaunch.utils.NotificationUtils;
-
-import net.ashmeet.hyperlauncher.R;
 
 public class LauncherActivity extends BaseActivity implements PreferenceFragmentCompat.OnPreferenceStartFragmentCallback {
     public static final String SETTING_FRAGMENT_TAG = "SETTINGS_FRAGMENT";
@@ -84,7 +86,7 @@ public class LauncherActivity extends BaseActivity implements PreferenceFragment
         // Allow starting the add account only from the main menu, should it be moved to fragment itself ?
         if(!(fragment instanceof MainMenuFragment)) return false;
 
-        Tools.swapFragment(this, SelectAuthFragment.class, SelectAuthFragment.TAG, null);
+        Tools.swapFragment(this, AuthHostFragment.class, AuthHostFragment.TAG, null);
         return false;
     };
 

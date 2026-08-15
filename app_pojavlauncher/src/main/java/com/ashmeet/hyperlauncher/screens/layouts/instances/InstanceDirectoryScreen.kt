@@ -1,0 +1,780 @@
+package com.ashmeet.hyperlauncher.screens.layouts.instances
+
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.InsertDriveFile
+import androidx.compose.material.icons.rounded.Delete
+import androidx.compose.material.icons.rounded.Edit
+import androidx.compose.material.icons.rounded.Folder
+import androidx.compose.material.icons.rounded.FolderOpen
+import androidx.compose.material.icons.rounded.Refresh
+import androidx.compose.material.icons.rounded.MoreVert
+import androidx.compose.material.icons.rounded.Search
+import androidx.compose.material.icons.rounded.Warning
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.PlainTooltip
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
+import androidx.compose.material3.TabRowDefaults
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TooltipBox
+import androidx.compose.material3.TooltipDefaults
+import androidx.compose.material3.rememberTooltipState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.ashmeet.hyperlauncher.components.DefaultSwitch
+import com.ashmeet.hyperlauncher.components.InstanceNavigationRail
+import com.ashmeet.hyperlauncher.screens.layouts.settings.preferences.TextInputDialog
+import com.ashmeet.hyperlauncher.theme.PojavTheme
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import net.ashmeet.hyperlauncher.R
+import net.kdt.pojavlaunch.PojavApplication
+import net.kdt.pojavlaunch.Tools
+import net.kdt.pojavlaunch.instances.Instances
+import net.kdt.pojavlaunch.progresskeeper.ProgressKeeper
+import net.kdt.pojavlaunch.utils.ModMetadataReader
+import net.kdt.pojavlaunch.utils.WorldMetadataReader
+import org.apache.commons.io.FileUtils
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+
+@Composable
+fun InstanceDirectoryScreen(
+    onBack: () -> Unit
+) {
+    val isPreview = LocalInspectionMode.current
+    val instanceRoot = remember { 
+        if (isPreview) null else Instances.loadSelectedInstance()?.gameDirectory 
+    }
+
+    InstanceDirectoryContent(
+        instanceRoot = instanceRoot,
+        onBack = onBack
+    )
+}
+
+@Composable
+fun InstanceDirectoryContent(
+    instanceRoot: File?,
+    onBack: () -> Unit
+) {
+    val context = LocalContext.current
+    var files by remember { mutableStateOf<List<File>>(emptyList()) }
+    var currentDir by remember { mutableStateOf<File?>(null) }
+    var isLoading by remember { mutableStateOf(true) }
+    var selectedTab by remember { mutableIntStateOf(0) }
+
+    var showNewFolderDialog by remember { mutableStateOf(false) }
+    var sidebarMenuExpanded by remember { mutableStateOf(false) }
+    var fileToRename by remember { mutableStateOf<File?>(null) }
+    var fileToDelete by remember { mutableStateOf<File?>(null) }
+
+    var searchQuery by remember { mutableStateOf("") }
+    var isSearchActive by remember { mutableStateOf(false) }
+
+    val loadFiles = { dir: File ->
+        isLoading = true
+        PojavApplication.sExecutorService.execute {
+            try {
+                val list = dir.listFiles()?.toList()?.sortedWith(compareBy({ !it.isDirectory }, { it.name.lowercase() })) ?: emptyList()
+                files = list
+                currentDir = dir
+                isLoading = false
+            } catch (e: Exception) {
+                e.printStackTrace()
+                isLoading = false
+            }
+        }
+    }
+
+    val importFileLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri ->
+        if (uri != null) {
+            val fileName = Tools.getFileName(context, uri)
+            currentDir?.let { destDir ->
+                val destFile = File(destDir, fileName)
+                PojavApplication.sExecutorService.execute {
+                    try {
+                        val progressKey = "copy_files"
+                        ProgressKeeper.submitProgress(progressKey, 0, -1, "Importing $fileName...")
+
+                        context.contentResolver.openInputStream(uri)?.use { input ->
+                            destFile.outputStream().use { output ->
+                                val totalSize = context.contentResolver.openAssetFileDescriptor(uri, "r")?.use { it.length } ?: -1L
+                                var bytesCopied = 0L
+                                val buffer = ByteArray(8192)
+                                var bytes = input.read(buffer)
+                                while (bytes >= 0) {
+                                    output.write(buffer, 0, bytes)
+                                    bytesCopied += bytes
+                                    if (totalSize > 0) {
+                                        val progress = ((bytesCopied * 100) / totalSize).toInt()
+                                        ProgressKeeper.submitProgress(progressKey, progress, -1, "Importing $fileName...")
+                                    }
+                                    bytes = input.read(buffer)
+                                }
+                            }
+                        }
+
+                        ProgressKeeper.submitProgress(progressKey, -1, -1)
+                        loadFiles(destDir)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        ProgressKeeper.submitProgress("copy_files", -1, -1)
+                    }
+                }
+            }
+        }
+    }
+
+    LaunchedEffect(selectedTab) {
+        val root = instanceRoot ?: return@LaunchedEffect
+        when (selectedTab) {
+            0 -> loadFiles(root)
+            1 -> loadFiles(File(root, "mods"))
+            2 -> loadFiles(File(root, "saves"))
+            3 -> loadFiles(File(root, "resourcepacks"))
+        }
+        isSearchActive = false
+        searchQuery = ""
+    }
+
+    if (showNewFolderDialog) {
+        TextInputDialog(
+            title = "New Folder",
+            initialValue = "",
+            onConfirm = { name ->
+                showNewFolderDialog = false
+                if (name.isNotBlank()) {
+                    currentDir?.let {
+                        val newDir = File(it, name)
+                        if (newDir.mkdirs()) {
+                            loadFiles(it)
+                        }
+                    }
+                }
+            },
+            onDismiss = { showNewFolderDialog = false }
+        )
+    }
+
+    if (fileToRename != null) {
+        TextInputDialog(
+            title = "Rename",
+            initialValue = fileToRename?.name ?: "",
+            onConfirm = { newName ->
+                val target = fileToRename
+                fileToRename = null
+                if (newName.isNotBlank() && target != null) {
+                    val dest = File(target.parentFile, newName)
+                    if (target.renameTo(dest)) {
+                        currentDir?.let { loadFiles(it) }
+                    }
+                }
+            },
+            onDismiss = { fileToRename = null }
+        )
+    }
+
+    if (fileToDelete != null) {
+        val target = fileToDelete!!
+        AlertDialog(
+            onDismissRequest = { fileToDelete = null },
+            title = { Text("Delete ${if (target.isDirectory) "Folder" else "File"}?") },
+            text = { Text("Are you sure you want to delete \"${target.name}\"? This action cannot be undone.") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        fileToDelete = null
+                        PojavApplication.sExecutorService.execute {
+                            if (target.isDirectory) {
+                                try {
+                                    FileUtils.deleteDirectory(target)
+                                } catch (e: Exception) {
+                                    e.printStackTrace()
+                                }
+                            } else {
+                                target.delete()
+                            }
+                            currentDir?.let { loadFiles(it) }
+                        }
+                    }
+                ) {
+                    Text("Delete", color = MaterialTheme.colorScheme.error)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { fileToDelete = null }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+
+    val filteredFiles = remember(files, searchQuery) {
+        if (searchQuery.isBlank()) files
+        else files.filter { it.name.contains(searchQuery, ignoreCase = true) }
+    }
+
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.background
+    ) {
+        Row(modifier = Modifier.fillMaxSize()) {
+            Box {
+                InstanceNavigationRail(
+                    onCreateNew = { sidebarMenuExpanded = true },
+                    onRefresh = { currentDir?.let { loadFiles(it) } },
+                    onImportModpack = { isSearchActive = !isSearchActive }, // Toggle search
+                    onBack = {
+                        if (isSearchActive) {
+                            isSearchActive = false
+                            searchQuery = ""
+                        } else {
+                            val parent = currentDir?.parentFile
+                            if (currentDir == instanceRoot || parent == null || instanceRoot == null) {
+                                onBack()
+                            } else if (currentDir?.absolutePath?.startsWith(instanceRoot.absolutePath) == true) {
+                                loadFiles(parent)
+                            } else {
+                                onBack()
+                            }
+                        }
+                    }
+                )
+
+                DropdownMenu(
+                    expanded = sidebarMenuExpanded,
+                    onDismissRequest = { sidebarMenuExpanded = false },
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .padding(start = 72.dp, bottom = 80.dp)
+                ) {
+                    DropdownMenuItem(
+                        text = { Text("New Folder") },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Rounded.FolderOpen,
+                                contentDescription = null,
+                                modifier = Modifier.size(20.dp),
+                                tint = MaterialTheme.colorScheme.onSurface
+                            )
+                        },
+                        onClick = {
+                            sidebarMenuExpanded = false
+                            showNewFolderDialog = true
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Import File") },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Rounded.InsertDriveFile,
+                                contentDescription = null,
+                                modifier = Modifier.size(20.dp),
+                                tint = MaterialTheme.colorScheme.onSurface
+                            )
+                        },
+                        onClick = {
+                            sidebarMenuExpanded = false
+                            importFileLauncher.launch("*/*")
+                        }
+                    )
+                }
+            }
+
+            Surface(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight()
+                    .padding(top = 16.dp, bottom = 16.dp, end = 16.dp),
+                shape = RoundedCornerShape(32.dp),
+                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f),
+                tonalElevation = 2.dp
+            ) {
+                Column(modifier = Modifier.fillMaxSize()) {
+                    AnimatedContent(
+                        targetState = isSearchActive,
+                        transitionSpec = {
+                            (scaleIn(
+                                animationSpec = spring(
+                                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                                    stiffness = Spring.StiffnessLow
+                                ),
+                                initialScale = 0.9f
+                            ) + fadeIn()) togetherWith fadeOut(animationSpec = tween(200))
+                        },
+                        label = "search_transition"
+                    ) { active ->
+                        if (active) {
+                            OutlinedTextField(
+                                value = searchQuery,
+                                onValueChange = { searchQuery = it },
+                                textStyle = MaterialTheme.typography.bodyLarge.copy(lineHeight = 24.sp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                                placeholder = { Text("Search files...") },
+                                leadingIcon = { Icon(Icons.Rounded.Search, contentDescription = null) },
+                                singleLine = true,
+                                shape = RoundedCornerShape(16.dp),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedContainerColor = MaterialTheme.colorScheme.surface,
+                                    unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                    unfocusedBorderColor = Color.Transparent
+                                )
+                            )
+                        } else {
+                            TabRow(
+                                selectedTabIndex = selectedTab,
+                                containerColor = Color.Transparent,
+                                divider = {},
+                                indicator = { tabPositions ->
+                                    if (selectedTab < tabPositions.size) {
+                                        TabRowDefaults.SecondaryIndicator(
+                                            modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTab]),
+                                            height = 3.dp,
+                                            color = MaterialTheme.colorScheme.primary
+                                        )
+                                    }
+                                }
+                            ) {
+                                val tabs = listOf("All", "Mods", "Saves", "Packs")
+                                tabs.forEachIndexed { index, title ->
+                                    Tab(
+                                        selected = selectedTab == index,
+                                        onClick = { selectedTab = index },
+                                        interactionSource = remember { MutableInteractionSource() },
+                                        text = {
+                                            Text(
+                                                text = title,
+                                                fontWeight = if (selectedTab == index) FontWeight.Bold else FontWeight.Normal,
+                                                fontSize = 12.sp
+                                            )
+                                        }
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    AnimatedContent(
+                        targetState = isLoading to currentDir,
+                        transitionSpec = {
+                            fadeIn(animationSpec = tween(300)) togetherWith fadeOut(animationSpec = tween(300))
+                        },
+                        label = "content_transition",
+                        modifier = Modifier.weight(1f)
+                    ) { (loading, _) ->
+                        if (loading) {
+                            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                                CircularProgressIndicator()
+                            }
+                        } else if (filteredFiles.isEmpty()) {
+                            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    Icon(
+                                        imageVector = Icons.Rounded.Warning,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(64.dp),
+                                        tint = MaterialTheme.colorScheme.error.copy(alpha = 0.5f)
+                                    )
+                                    Spacer(modifier = Modifier.height(16.dp))
+                                    Text(
+                                        text = if (searchQuery.isNotEmpty()) "No results found" else "This folder is empty",
+                                        style = MaterialTheme.typography.bodyLarge,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                    
+                                    Spacer(modifier = Modifier.height(24.dp))
+                                    
+                                    TextButton(
+                                        onClick = { currentDir?.let { loadFiles(it) } },
+                                        shape = RoundedCornerShape(12.dp),
+                                        colors = ButtonDefaults.textButtonColors(
+                                            containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
+                                        )
+                                    ) {
+                                        Icon(Icons.Rounded.Refresh, contentDescription = null, modifier = Modifier.size(20.dp))
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Text("Refresh")
+                                    }
+                                    
+
+                                }
+                            }
+                        } else {
+                            val lazyListState = rememberLazyListState()
+                            LazyColumn(
+                                state = lazyListState,
+                                modifier = Modifier.fillMaxSize(),
+                                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                items(
+                                    items = filteredFiles,
+                                    key = { it.absolutePath }
+                                ) { file ->
+                                    FileListItem(
+                                        modifier = Modifier.animateItem(
+                                            fadeInSpec = tween(300),
+                                            fadeOutSpec = tween(300),
+                                            placementSpec = tween(300)
+                                        ),
+                                        file = file,
+                                        onClick = {
+                                            if (file.isDirectory) {
+                                                loadFiles(file)
+                                                searchQuery = ""
+                                                isSearchActive = false
+                                            } else {
+                                                Tools.openPath(context, file, false)
+                                            }
+                                        },
+                                        onDelete = { fileToDelete = file },
+                                        onRename = { fileToRename = file },
+                                        onOpenInFiles = {
+                                            Tools.openPath(context, file, false)
+                                        },
+                                        onRefresh = { currentDir?.let { loadFiles(it) } }
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun FileListItem(
+    modifier: Modifier = Modifier,
+    file: File,
+    onClick: () -> Unit,
+    onDelete: () -> Unit,
+    onRename: () -> Unit,
+    onOpenInFiles: () -> Unit,
+    onRefresh: () -> Unit
+) {
+    var menuExpanded by remember { mutableStateOf(false) }
+    val dateFormat = remember { SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()) }
+    val scope = rememberCoroutineScope()
+
+    var modMeta by remember { mutableStateOf<ModMetadataReader.ModMetadata?>(null) }
+    var worldMeta by remember { mutableStateOf<WorldMetadataReader.WorldMetadata?>(null) }
+
+    LaunchedEffect(file) {
+        withContext(Dispatchers.IO) {
+            val mMeta = ModMetadataReader.getMetadata(file)
+            val wMeta = WorldMetadataReader.getMetadata(file)
+            withContext(Dispatchers.Main) {
+                modMeta = mMeta
+                worldMeta = wMeta
+            }
+        }
+    }
+
+    val animatedAlpha = remember { Animatable(0f) }
+    LaunchedEffect(Unit) {
+        animatedAlpha.animateTo(
+            targetValue = 1f,
+            animationSpec = tween(durationMillis = 400)
+        )
+    }
+
+    Surface(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(72.dp)
+            .graphicsLayer {
+                alpha = animatedAlpha.value
+            }
+            .clickable(
+                onClick = onClick,
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() }
+            ),
+        shape = RoundedCornerShape(20.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
+        tonalElevation = 0.dp
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 12.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(48.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
+                contentAlignment = Alignment.Center
+            ) {
+                val iconBitmap = modMeta?.icon ?: worldMeta?.icon
+                if (iconBitmap != null) {
+                    Image(
+                        bitmap = iconBitmap.asImageBitmap(),
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
+                    Icon(
+                        imageVector = if (file.isDirectory) Icons.Rounded.Folder else Icons.AutoMirrored.Rounded.InsertDriveFile,
+                        contentDescription = null,
+                        modifier = Modifier.size(24.dp),
+                        tint = if (file.isDirectory) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.width(12.dp))
+
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = modMeta?.name ?: worldMeta?.worldName ?: file.name,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    fontSize = 15.sp,
+                    color = if (file.name.endsWith(".disabled")) MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f) else MaterialTheme.colorScheme.onSurface
+                )
+
+                val subtitle = when {
+                    worldMeta != null -> "${worldMeta?.gameMode} • ${dateFormat.format(Date(file.lastModified()))}"
+                    file.isDirectory -> "Directory"
+                    else -> "${file.length() / 1024} KB • ${dateFormat.format(Date(file.lastModified()))}"
+                }
+
+                Text(
+                    text = subtitle,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+
+            if (file.name == "hyper_instance.json") {
+                val tooltipState = rememberTooltipState()
+                TooltipBox(
+                    positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
+                    tooltip = { PlainTooltip { Text("Critical metadata file") } },
+                    state = tooltipState
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.Warning,
+                        contentDescription = "Metadata warning",
+                        tint = MaterialTheme.colorScheme.error,
+                        modifier = Modifier
+                            .padding(end = 4.dp)
+                            .size(24.dp)
+                            .clickable { scope.launch { tooltipState.show() } }
+                    )
+                }
+            }
+
+            if (file.isFile && (file.name.endsWith(".jar") || file.name.endsWith(".jar.disabled"))) {
+                val isEnabled = !file.name.endsWith(".disabled")
+                DefaultSwitch(
+                    checked = isEnabled,
+                    onCheckedChange = {
+                        val newFile = if (isEnabled) {
+                            File(file.parentFile, file.name + ".disabled")
+                        } else {
+                            File(file.parentFile, file.name.removeSuffix(".disabled"))
+                        }
+                        if (file.renameTo(newFile)) {
+                            onRefresh()
+                        }
+                    },
+                    modifier = Modifier.padding(end = 4.dp)
+                )
+            }
+
+            Box {
+                IconButton(onClick = { menuExpanded = true }) {
+                    Icon(
+                        imageVector = Icons.Rounded.MoreVert,
+                        contentDescription = "Options",
+                        modifier = Modifier.size(24.dp),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+
+                DropdownMenu(
+                    expanded = menuExpanded,
+                    onDismissRequest = { menuExpanded = false },
+                    modifier = Modifier
+                        .background(MaterialTheme.colorScheme.surface)
+                        .clip(RoundedCornerShape(12.dp))
+                ) {
+                    DropdownMenuItem(
+                        text = {
+                            Text(
+                                text = stringResource(id = R.string.global_edit),
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Rounded.Edit,
+                                contentDescription = null,
+                                modifier = Modifier.size(20.dp),
+                                tint = MaterialTheme.colorScheme.onSurface
+                            )
+                        },
+                        onClick = {
+                            menuExpanded = false
+                            onRename()
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = {
+                            Text(
+                                text = "Open in Files",
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Rounded.FolderOpen,
+                                contentDescription = null,
+                                modifier = Modifier.size(20.dp),
+                                tint = MaterialTheme.colorScheme.onSurface
+                            )
+                        },
+                        onClick = {
+                            menuExpanded = false
+                            onOpenInFiles()
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = {
+                            Text(
+                                text = stringResource(id = R.string.global_delete),
+                                color = MaterialTheme.colorScheme.error
+                            )
+                        },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Rounded.Delete,
+                                contentDescription = null,
+                                modifier = Modifier.size(20.dp),
+                                tint = MaterialTheme.colorScheme.error
+                            )
+                        },
+                        onClick = {
+                            menuExpanded = false
+                            onDelete()
+                        }
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true, widthDp = 800, heightDp = 400)
+@Composable
+fun InstanceDirectoryScreenPreview() {
+    PojavTheme {
+        InstanceDirectoryContent(
+            instanceRoot = null,
+            onBack = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, widthDp = 400)
+@Composable
+fun FileListItemPreview() {
+    PojavTheme {
+        Column(modifier = Modifier.padding(16.dp)) {
+            FileListItem(
+                file = File("example_mod.jar"),
+                onClick = {},
+                onDelete = {},
+                onRename = {},
+                onOpenInFiles = {},
+                onRefresh = {}
+            )
+        }
+    }
+}

@@ -2,7 +2,7 @@ package net.kdt.pojavlaunch.customcontrols.buttons;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
-import static net.kdt.pojavlaunch.prefs.LauncherPreferences.PREF_BUTTONSIZE;
+import static com.ashmeet.hyperlauncher.prefs.LauncherPreferences.PREF_BUTTONSIZE;
 
 import android.annotation.SuppressLint;
 import android.graphics.Bitmap;

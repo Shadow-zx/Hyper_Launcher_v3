@@ -9,6 +9,8 @@ import net.kdt.pojavlaunch.authenticator.AuthType;
 import net.kdt.pojavlaunch.utils.FileUtils;
 import net.kdt.pojavlaunch.utils.JSONUtils;
 
+import com.ashmeet.hyperlauncher.skin.SkinModelType;
+
 import java.io.*;
 import java.net.URL;
 
@@ -31,11 +33,14 @@ public class Account {
     public String refreshToken = "0";
     public String xuid;
     public long expiresAt;
+    public String skinPath;
+    public String capePath;
+    public SkinModelType skinModel;
     private transient Bitmap mFaceCache;
     private transient Bitmap mFaceCache3D;
     private transient boolean mIsUpdatingSkin = false;
 
-    protected Account() {}
+    public Account() {}
 
     public void updateSkinFace() {
         if (mIsUpdatingSkin) return;
@@ -111,9 +116,9 @@ public class Account {
      }
 
     public Bitmap getSkinFace(){
+        if(mFaceCache != null) return mFaceCache;
         if(isLocal()) return null;
         File skinFaceFile = getSkinFaceFile();
-        if(!skinFaceFile.exists()) return null;
         if(mFaceCache == null) {
             mFaceCache = BitmapFactory.decodeFile(skinFaceFile.getAbsolutePath());
         }

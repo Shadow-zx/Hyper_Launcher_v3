@@ -13,7 +13,7 @@ import androidx.activity.SystemBarStyle;
 import androidx.appcompat.app.*;
 import net.kdt.pojavlaunch.utils.*;
 
-import static net.kdt.pojavlaunch.prefs.LauncherPreferences.PREF_IGNORE_NOTCH;
+import static com.ashmeet.hyperlauncher.prefs.LauncherPreferences.PREF_IGNORE_NOTCH;
 
 public abstract class BaseActivity extends AppCompatActivity {
 

@@ -39,7 +39,7 @@ import net.kdt.pojavlaunch.customcontrols.buttons.ControlSubButton;
 import net.kdt.pojavlaunch.customcontrols.handleview.ActionRow;
 import net.kdt.pojavlaunch.customcontrols.handleview.ControlHandleView;
 import net.kdt.pojavlaunch.customcontrols.handleview.EditControlSideDialog;
-import net.kdt.pojavlaunch.prefs.LauncherPreferences;
+import com.ashmeet.hyperlauncher.prefs.LauncherPreferences;
 
 import java.io.File;
 import java.io.IOException;

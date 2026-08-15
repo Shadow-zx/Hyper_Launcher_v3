@@ -7,16 +7,21 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.ashmeet.hyperlauncher.prefs.LauncherPreferences;
+import com.ashmeet.hyperlauncher.skin.PlayerSkin;
+import com.ashmeet.hyperlauncher.skin.SkinManager;
+import com.ashmeet.hyperlauncher.skin.SkinManagerKt;
+
 import net.ashmeet.hyperlauncher.R;
 import net.kdt.pojavlaunch.Architecture;
 import net.kdt.pojavlaunch.JVersionList;
 import net.kdt.pojavlaunch.Tools;
+import net.kdt.pojavlaunch.authenticator.AuthType;
 import net.kdt.pojavlaunch.authenticator.accounts.Account;
 import net.kdt.pojavlaunch.instances.Instance;
 import net.kdt.pojavlaunch.lifecycle.LifecycleAwareAlertDialog;
 import net.kdt.pojavlaunch.multirt.MultiRTUtils;
 import net.kdt.pojavlaunch.multirt.Runtime;
-import net.kdt.pojavlaunch.prefs.LauncherPreferences;
 import net.kdt.pojavlaunch.utils.DateUtils;
 import net.kdt.pojavlaunch.utils.FileUtils;
 import net.kdt.pojavlaunch.utils.GLInfoUtils;
@@ -248,6 +253,31 @@ public class GameRunner {
         javaArgList.add("-Dorg.lwjgl.system.SharedLibraryExtractPath="+lwjglExtractDir.getAbsolutePath());
 
         addAuthlibInjectorArgs(javaArgList, account);
+        if (account.authType == AuthType.LOCAL) {
+            SkinManager skinManager = new SkinManager(SkinManagerKt.androidSkinAnalyzerFacade);
+            skinManager.startServer();
+
+            PlayerSkin playerSkin = null;
+            if (account.skinPath != null) {
+                File skinFile = new File(account.skinPath);
+                if (skinFile.exists()) {
+                    try {
+                        byte[] bytes = org.apache.commons.io.FileUtils.readFileToByteArray(skinFile);
+                        playerSkin = SkinManagerKt.androidSkinAnalyzerFacade.prepareSkin(bytes);
+                    } catch (Exception e) {
+                        Log.e("GameRunner", "Failed to load local skin", e);
+                    }
+                }
+            }
+
+            skinManager.getServer().addCharacter(
+                    account.username,
+                    account.profileId,
+                    playerSkin,
+                    null
+            );
+            javaArgList.add("-javaagent:" + Tools.DIR_DATA + "/authlib-injector/authlib-injector.jar=" + skinManager.getAuthlibUrl());
+        }
 
         javaArgList.addAll(getMoJsonJvmArgs(versionId));
 

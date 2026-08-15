@@ -5,11 +5,15 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Toast;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.compose.ui.platform.ComposeView;
 
+import com.ashmeet.hyperlauncher.helper.LauncherComposeHelper;
 import net.ashmeet.hyperlauncher.R;
+
+import java.io.File;
 
 public class FatalErrorActivity extends AppCompatActivity {
 
@@ -29,20 +33,42 @@ public class FatalErrorActivity extends AppCompatActivity {
 		String errHeader = storageAllow ?
 			"Crash stack trace saved to " + strSavePath + "." :
 			"Storage permission is required to save crash stack trace!";
-		
-		new AlertDialog.Builder(this)
-			.setTitle(R.string.error_fatal)
-			.setMessage(errHeader + "\n\n" + stackTrace)
-			.setPositiveButton(android.R.string.ok, (p1, p2) -> finish())
-			.setNegativeButton(R.string.global_restart, (p1, p2) -> startActivity(new Intent(FatalErrorActivity.this, LauncherActivity.class)))
-			.setNeutralButton(android.R.string.copy, (p1, p2) -> {
-				ClipboardManager mgr = (ClipboardManager) FatalErrorActivity.this.getSystemService(CLIPBOARD_SERVICE);
-				mgr.setPrimaryClip(ClipData.newPlainText("error", stackTrace));
 
-				finish();
-			})
-			.setCancelable(false)
-			.show();
+		String finalLogs = errHeader + "\n\n" + stackTrace;
+
+		ComposeView composeView = new ComposeView(this);
+		LauncherComposeHelper.setExitContent(
+				composeView,
+				getString(R.string.error_fatal),
+				finalLogs,
+				() -> {
+					// Sharing stack trace instead of log file here
+					Intent intent = new Intent(Intent.ACTION_SEND);
+					intent.setType("text/plain");
+					intent.putExtra(Intent.EXTRA_TEXT, finalLogs);
+					startActivity(Intent.createChooser(intent, getString(R.string.main_share_logs)));
+					return kotlin.Unit.INSTANCE;
+				},
+				() -> {
+					ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+					ClipData clip = ClipData.newPlainText("error", finalLogs);
+					clipboard.setPrimaryClip(clip);
+					Toast.makeText(this, "Error copied to clipboard", Toast.LENGTH_SHORT).show();
+					return kotlin.Unit.INSTANCE;
+				},
+				() -> {
+					startActivity(new Intent(FatalErrorActivity.this, LauncherActivity.class));
+					finish();
+					return kotlin.Unit.INSTANCE;
+				},
+				(path) -> {
+					if (strSavePath != null) {
+						Tools.openPath(this, new File(strSavePath), false);
+					}
+					return kotlin.Unit.INSTANCE;
+				}
+		);
+		setContentView(composeView);
 	}
 
 	public static void showError(Context ctx, String savePath, boolean storageAllow, Throwable th) {

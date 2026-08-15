@@ -12,7 +12,7 @@ import net.kdt.pojavlaunch.LauncherGLSurface;
 import net.kdt.pojavlaunch.Tools;
 
 import net.kdt.pojavlaunch.CallbackBridge;
-import net.kdt.pojavlaunch.prefs.LauncherPreferences;
+import com.ashmeet.hyperlauncher.prefs.LauncherPreferences;
 
 import git.artdeell.dnbootstrap.glfw.GLFW;
 

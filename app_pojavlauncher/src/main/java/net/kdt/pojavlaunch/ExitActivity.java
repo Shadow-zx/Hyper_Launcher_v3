@@ -3,17 +3,24 @@ package net.kdt.pojavlaunch;
 import static net.kdt.pojavlaunch.Tools.shareLog;
 
 import android.annotation.SuppressLint;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.Keep;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.compose.ui.platform.ComposeView;
 
+import com.ashmeet.hyperlauncher.helper.LauncherComposeHelper;
 import net.ashmeet.hyperlauncher.R;
+
+import java.io.File;
+import java.io.IOException;
 
 @Keep
 public class ExitActivity extends AppCompatActivity {
@@ -30,13 +37,33 @@ public class ExitActivity extends AppCompatActivity {
             isSignal = extras.getBoolean("isSignal", false);
         }
 
-        String message = isSignal ? getString(R.string.mcn_abort_title) : getString(R.string.mcn_exit_title, code);
+        String title = isSignal ? getString(R.string.mcn_abort_title) : getString(R.string.mcn_exit_title, code);
+        
+        String logs = "";
+        try {
+            logs = Tools.read(new File(Tools.DIR_GAME_HOME, "latestlog.txt"));
+        } catch (IOException e) {
+            logs = "Failed to read logs: " + e.getMessage();
+        }
 
-        new AlertDialog.Builder(this)
-                .setMessage(message)
-                .setPositiveButton(R.string.main_share_logs, (dialog, which) -> shareLog(this))
-                .setOnDismissListener(dialog -> ExitActivity.this.finish())
-                .show();
+        ComposeView composeView = new ComposeView(this);
+        String finalLogs = logs;
+        LauncherComposeHelper.setExitContent(
+                composeView,
+                title,
+                finalLogs,
+                () -> { shareLog(this); return kotlin.Unit.INSTANCE; },
+                () -> {
+                    ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                    ClipData clip = ClipData.newPlainText("logs", finalLogs);
+                    clipboard.setPrimaryClip(clip);
+                    Toast.makeText(this, "Logs copied to clipboard", Toast.LENGTH_SHORT).show();
+                    return kotlin.Unit.INSTANCE;
+                },
+                () -> { Tools.restartLauncherActivity(this); return kotlin.Unit.INSTANCE; },
+                (path) -> { Tools.openPath(this, new File(path), false); return kotlin.Unit.INSTANCE; }
+        );
+        setContentView(composeView);
     }
 
     @SuppressWarnings("unused") //used by native jre_launcher_new

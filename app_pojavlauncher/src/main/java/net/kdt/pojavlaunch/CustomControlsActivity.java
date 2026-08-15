@@ -6,30 +6,29 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.DocumentsContract;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
 
 import androidx.activity.result.ActivityResultLauncher;
+import androidx.compose.ui.platform.ComposeView;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.ashmeet.hyperlauncher.helper.LauncherComposeHelper;
+import com.ashmeet.hyperlauncher.prefs.LauncherPreferences;
 import com.google.gson.JsonSyntaxException;
 
+import net.ashmeet.hyperlauncher.R;
 import net.kdt.pojavlaunch.customcontrols.ControlData;
 import net.kdt.pojavlaunch.customcontrols.ControlDrawerData;
 import net.kdt.pojavlaunch.customcontrols.ControlJoystickData;
 import net.kdt.pojavlaunch.customcontrols.ControlLayout;
 import net.kdt.pojavlaunch.customcontrols.EditorExitable;
-import net.kdt.pojavlaunch.prefs.LauncherPreferences;
 import net.kdt.pojavlaunch.utils.CropperUtils;
 
 import java.io.IOException;
 
-import net.ashmeet.hyperlauncher.R;
-
 
 public class CustomControlsActivity extends BaseActivity implements EditorExitable, CropperUtils.CropperReceiver {
 	private DrawerLayout mDrawerLayout;
-	private ListView mDrawerNavigationView;
+	private ComposeView mDrawerNavigationView;
 	private ControlLayout mControlLayout;
 	private CropperUtils.CropperReceiver mCropperReceiver;
 	private ActivityResultLauncher<?> mCropperLauncher;
@@ -55,8 +54,7 @@ public class CustomControlsActivity extends BaseActivity implements EditorExitab
 		mPullDrawerButton.setOnClickListener(v -> mDrawerLayout.openDrawer(mDrawerNavigationView));
 		mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
 
-		mDrawerNavigationView.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1,getResources().getStringArray(R.array.menu_customcontrol_customactivity)));
-		mDrawerNavigationView.setOnItemClickListener((parent, view, position, id) -> {
+		LauncherComposeHelper.setMainDrawerContent(mDrawerNavigationView, true, true, position -> {
 			switch(position) {
 				case 0: mControlLayout.addControlButton(new ControlData("New")); break;
 				case 1: mControlLayout.addDrawer(new ControlDrawerData()); break;
@@ -83,6 +81,7 @@ public class CustomControlsActivity extends BaseActivity implements EditorExitab
 					break;
 			}
 			mDrawerLayout.closeDrawers();
+			return kotlin.Unit.INSTANCE;
 		});
 		mControlLayout.setModifiable(true);
 	}

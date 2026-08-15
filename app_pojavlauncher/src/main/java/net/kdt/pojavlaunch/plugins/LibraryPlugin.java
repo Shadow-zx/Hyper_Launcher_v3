@@ -6,8 +6,6 @@ import android.content.pm.PackageManager;
 import android.util.Log;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
 
 public class LibraryPlugin {
     private static final String TAG = "LibraryPlugin";

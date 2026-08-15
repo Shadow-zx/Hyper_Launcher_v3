@@ -5,7 +5,7 @@ import android.os.Looper;
 import android.view.MotionEvent;
 import android.view.View;
 
-import net.kdt.pojavlaunch.prefs.LauncherPreferences;
+import com.ashmeet.hyperlauncher.prefs.LauncherPreferences;
 
 public class InGameEventProcessor extends TouchEventProcessor {
     private final Handler mGestureHandler = new Handler(Looper.getMainLooper());

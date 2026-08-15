@@ -1,8 +1,8 @@
 package net.kdt.pojavlaunch.utils;
 
 
-import static net.kdt.pojavlaunch.prefs.LauncherPreferences.DEFAULT_PREF;
-import static net.kdt.pojavlaunch.prefs.LauncherPreferences.PREF_FORCE_ENGLISH;
+import static com.ashmeet.hyperlauncher.prefs.LauncherPreferences.DEFAULT_PREF;
+import static com.ashmeet.hyperlauncher.prefs.LauncherPreferences.PREF_FORCE_ENGLISH;
 
 import android.content.*;
 import android.content.res.*;

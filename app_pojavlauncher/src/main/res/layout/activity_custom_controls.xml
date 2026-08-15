@@ -10,8 +10,8 @@
 
 
 	<androidx.constraintlayout.widget.ConstraintLayout
-		android:layout_height="wrap_content"
-		android:layout_width="wrap_content">
+		android:layout_height="match_parent"
+		android:layout_width="match_parent">
 
 
 		<net.kdt.pojavlaunch.customcontrols.handleview.DrawerPullButton
@@ -41,13 +41,11 @@
 
 	</androidx.constraintlayout.widget.ConstraintLayout>
 
-	<ListView
+	<androidx.compose.ui.platform.ComposeView
 		android:id="@+id/customctrl_navigation_view"
-		android:layout_width="200dp"
+		android:layout_width="wrap_content"
 		android:layout_height="match_parent"
-		android:layout_gravity="right"
-		android:background="?attr/colorBackgroundFloating"
-		android:fitsSystemWindows="false" />
+		android:layout_gravity="right" />
 
 </androidx.drawerlayout.widget.DrawerLayout>
 

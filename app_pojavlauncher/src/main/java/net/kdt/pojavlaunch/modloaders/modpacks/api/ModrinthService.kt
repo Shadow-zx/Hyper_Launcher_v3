@@ -2,13 +2,13 @@ package net.kdt.pojavlaunch.modloaders.modpacks.api
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import com.ashmeet.hyperlauncher.screens.layouts.contentinstaller.models.ContentInstallerType
+import com.ashmeet.hyperlauncher.screens.layouts.contentinstaller.models.ModrinthProject
+import com.ashmeet.hyperlauncher.screens.layouts.contentinstaller.models.ModrinthVersion
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import net.kdt.pojavlaunch.screens.contentinstaller.models.ContentInstallerType
-import net.kdt.pojavlaunch.screens.contentinstaller.models.ModrinthProject
-import net.kdt.pojavlaunch.screens.contentinstaller.models.ModrinthVersion
 import java.net.URL
 
 object ModrinthService {

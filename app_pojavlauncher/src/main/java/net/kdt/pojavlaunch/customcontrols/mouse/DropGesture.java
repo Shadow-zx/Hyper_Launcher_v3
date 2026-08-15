@@ -4,7 +4,7 @@ package net.kdt.pojavlaunch.customcontrols.mouse;
 import android.os.Handler;
 
 import net.kdt.pojavlaunch.LwjglGlfwKeycode;
-import net.kdt.pojavlaunch.prefs.LauncherPreferences;
+import com.ashmeet.hyperlauncher.prefs.LauncherPreferences;
 
 import net.kdt.pojavlaunch.CallbackBridge;
 

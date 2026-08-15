@@ -1,14 +1,16 @@
 package net.kdt.pojavlaunch.utils;
 
-import static net.kdt.pojavlaunch.prefs.LauncherPreferences.PREF_DUMP_SHADERS;
-import static net.kdt.pojavlaunch.prefs.LauncherPreferences.PREF_VSYNC_IN_ZINK;
-import static net.kdt.pojavlaunch.prefs.LauncherPreferences.PREF_ZINK_PREFER_SYSTEM_DRIVER;
+import static com.ashmeet.hyperlauncher.prefs.LauncherPreferences.PREF_DUMP_SHADERS;
+import static com.ashmeet.hyperlauncher.prefs.LauncherPreferences.PREF_VSYNC_IN_ZINK;
+import static com.ashmeet.hyperlauncher.prefs.LauncherPreferences.PREF_ZINK_PREFER_SYSTEM_DRIVER;
 
 import android.content.*;
 import android.system.*;
 import android.util.*;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.ashmeet.hyperlauncher.prefs.LauncherPreferences;
 
 import java.io.*;
 import java.nio.ByteBuffer;
@@ -18,7 +20,6 @@ import net.kdt.pojavlaunch.extra.ExtraConstants;
 import net.kdt.pojavlaunch.extra.ExtraCore;
 import net.kdt.pojavlaunch.multirt.Runtime;
 import net.kdt.pojavlaunch.plugins.LibraryPlugin;
-import net.kdt.pojavlaunch.prefs.*;
 
 public class JREUtils {
     public static void redirectAndPrintJRELog() {
