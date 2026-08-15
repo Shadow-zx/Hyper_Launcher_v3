@@ -25,7 +25,7 @@
 
 ## About
 
-Hyper Launcher is a fast and customizable Minecraft: Java Edition launcher for Android, forked from [MojoLauncher](https://github.com/MojoLauncher/MojoLauncher) and ultimately based on [PojavLauncher](https://github.com/PojavLauncherTeam/PojavLauncher).
+Hyper Launcher 3 is a fast and customizable Minecraft: Java Edition launcher for Android, forked from [MojoLauncher](https://github.com/MojoLauncher/MojoLauncher) and ultimately based on [PojavLauncher](https://github.com/PojavLauncherTeam/PojavLauncher).
 
 It can run almost every version of Minecraft — from `rd-132211` to the latest snapshots (including Combat Test versions) — and supports modloaders such as [Forge](https://files.minecraftforge.net/), [Fabric](http://fabricmc.net/), NeoForge, and Quilt, as well as mods like [OptiFine](https://optifine.net).
 
@@ -47,7 +47,7 @@ Hyper Launcher is designed for:
 - Renderer selection support
 - Performance tuning options
 - Built-in modding tools
-- Mobile Glues plugin support
+- Mobile Glues support
 ---
 
 ## Supported Mod Loaders
@@ -89,16 +89,12 @@ Build the launcher (it will automatically download all required components):
 - [x] Instance system in favor of profiles
 - [x] Out-of-the-box 1.21.5 support
 - [x] mrpack/CurseForge zip import
-- [ ] Modern Material 3 expressive interface
-- [ ] Mod manager
+- [x] Modern Material 3 expressive interface
+- [x] Mod manager
 - [ ] Better controller support
 - [ ] Enhanced renderer compatibility
 - [ ] Download manager improvements
-- [ ] LTW: resolve issues with Create
-- [ ] LTW: enable compute shader/image extensions
-- [ ] LTW: switch to a color-renderable format for framebuffers
 - [ ] MMC-compatible instance import
-- [ ] Patch-on-dlopen for mod native libraries
 - [ ] Replace Holy-GL4ES 1.1.5 with KW (maybe? need to figure out requirements)
 
 ---
