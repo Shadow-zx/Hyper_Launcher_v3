@@ -12,6 +12,7 @@
     <!-- Resolution settings -->
     <TextView
         android:id="@+id/editResolution_textView"
+        style="@style/TextAppearance.Material3.TitleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/_5sdp"
@@ -36,6 +37,7 @@
 
     <TextView
         android:id="@+id/editResolution_textView_percent"
+        style="@style/TextAppearance.Material3.BodyMedium"
         android:layout_width="150dp"
         android:layout_height="0dp"
         android:gravity="end"
@@ -46,39 +48,40 @@
         app:layout_constraintTop_toTopOf="@id/editResolution_textView" />
 
     <!-- Gyroscope settings -->
-    <Switch
+    <com.google.android.material.materialswitch.MaterialSwitch
         android:id="@+id/checkboxGyro"
+        style="@style/TextAppearance.Material3.TitleSmall"
         android:layout_width="match_parent"
         android:layout_height="@dimen/_36sdp"
         android:text="@string/preference_enable_gyro_title"
 
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/editResolution_seekbar"
-        tools:ignore="UseSwitchCompatOrMaterialXml" />
+        app:layout_constraintTop_toBottomOf="@id/editResolution_seekbar" />
 
-    <Switch
+    <com.google.android.material.materialswitch.MaterialSwitch
         android:id="@+id/checkboxGyroX"
+        style="@style/TextAppearance.Material3.TitleSmall"
         android:layout_width="match_parent"
         android:layout_height="@dimen/_36sdp"
         android:text="@string/preference_gyro_invert_x_axis"
 
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/checkboxGyro"
-        tools:ignore="UseSwitchCompatOrMaterialXml" />
+        app:layout_constraintTop_toBottomOf="@id/checkboxGyro" />
 
-    <Switch
+    <com.google.android.material.materialswitch.MaterialSwitch
         android:id="@+id/checkboxGyroY"
+        style="@style/TextAppearance.Material3.TitleSmall"
         android:layout_width="match_parent"
         android:layout_height="@dimen/_36sdp"
         android:text="@string/preference_gyro_invert_y_axis"
 
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/checkboxGyroX"
-        tools:ignore="UseSwitchCompatOrMaterialXml" />
+        app:layout_constraintTop_toBottomOf="@id/checkboxGyroX" />
 
     <!-- Gyroscope sensitivity -->
     <TextView
         android:id="@+id/editGyro_textView"
+        style="@style/TextAppearance.Material3.TitleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/_5sdp"
@@ -105,6 +108,7 @@
 
     <TextView
         android:id="@+id/editGyro_textView_percent"
+        style="@style/TextAppearance.Material3.BodyMedium"
         android:layout_width="150dp"
         android:layout_height="0dp"
         android:gravity="end"
@@ -118,6 +122,7 @@
     <!-- Mouse settings -->
     <TextView
         android:id="@+id/editMouseSpeed_textView"
+        style="@style/TextAppearance.Material3.TitleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/_5sdp"
@@ -144,6 +149,7 @@
 
     <TextView
         android:id="@+id/editMouseSpeed_textView_percent"
+        style="@style/TextAppearance.Material3.BodyMedium"
         android:layout_width="150dp"
         android:layout_height="0dp"
         android:gravity="end"
@@ -154,19 +160,20 @@
         app:layout_constraintTop_toTopOf="@id/editMouseSpeed_textView" />
 
     <!-- Gesture toggle -->
-    <Switch
+    <com.google.android.material.materialswitch.MaterialSwitch
         android:id="@+id/checkboxGesture"
+        style="@style/TextAppearance.Material3.TitleSmall"
         android:layout_width="match_parent"
         android:layout_height="@dimen/_36sdp"
         android:text="@string/mcl_disable_gestures"
 
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/editMouseSpeed_seekbar"
-        tools:ignore="UseSwitchCompatOrMaterialXml" />
+        app:layout_constraintTop_toBottomOf="@id/editMouseSpeed_seekbar" />
 
     <!-- gesture settings -->
     <TextView
         android:id="@+id/editGestureDelay_textView"
+        style="@style/TextAppearance.Material3.TitleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/_5sdp"
@@ -193,6 +200,7 @@
 
     <TextView
         android:id="@+id/editGestureDelay_textView_percent"
+        style="@style/TextAppearance.Material3.BodyMedium"
         android:layout_width="150dp"
         android:layout_height="0dp"
         android:gravity="end"

@@ -10,7 +10,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
-import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.CallSuper;
@@ -20,8 +19,9 @@ import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.core.content.res.ResourcesCompat;
 
+import com.google.android.material.button.MaterialButton;
+
 import net.ashmeet.hyperlauncher.R;
-import net.kdt.pojavlaunch.Tools;
 
 /**
  * The base class for side dialog views
@@ -40,7 +40,7 @@ public abstract class SideDialogView {
     protected boolean mDisplaying = false;
 
     /* UI elements */
-    private Button mStartButton, mEndButton;
+    private MaterialButton mStartButton, mEndButton;
     private TextView mTitleTextview;
     private View mTitleDivider;
 
@@ -76,7 +76,7 @@ public abstract class SideDialogView {
         if (mDialogLayout != null) setButton(mEndButton, textId, listener);
     }
 
-    private void setButton(@NonNull Button button, @StringRes int textId, @Nullable View.OnClickListener listener) {
+    private void setButton(@NonNull MaterialButton button, @StringRes int textId, @Nullable View.OnClickListener listener) {
         button.setText(textId);
         button.setOnClickListener(listener);
         button.setVisibility(View.VISIBLE);
