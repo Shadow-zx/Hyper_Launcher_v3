@@ -3,8 +3,6 @@
 
 <p align="center">
   <img src="https://yt3.googleusercontent.com/RC9iOqHVK1Q6Cun4MsxPt1D0TNWVM-8dPgdlCekFq7werQ3Uxm7H0VUz4yqho1-zGBn4-JfU=s160-c-k-c0x00ffffff-no-rj" width="150" height="150" alt="Hyper Launcher logo"><br><br>
-  <a href="https://github.com/HyperLauncher/HyperLauncher/actions"><img src="https://github.com/HyperLauncher/HyperLauncher/workflows/Android%20CI/badge.svg" alt="Android CI"></a>
-  <a href="https://github.com/HyperLauncher/HyperLauncher"><img src="https://img.shields.io/github/commit-activity/m/HyperLauncher/HyperLauncher" alt="GitHub commit activity"></a>
   <a href="https://crowdin.com/project/pojavlauncher"><img src="https://badges.crowdin.net/pojavlauncher/localized.svg" alt="Crowdin"></a>
   <a href="https://discord.gg/VHdwQFsaGX"><img src="https://img.shields.io/discord/1365346109131722753.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2" alt="Discord"></a>
 </p>
