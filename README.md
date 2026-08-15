@@ -109,7 +109,7 @@ Build the launcher (it will automatically download all required components):
 
 ## License
 
-Hyper Launcher is licensed under [GNU LGPLv3](LICENSE).
+Hyper Launcher 3 is licensed under [GNU LGPLv3](LICENSE).
 
 ---
 
@@ -123,7 +123,7 @@ Any code change should be submitted as a pull request. The description should ex
 
 ## Credits & Third Party Components and Their Licenses (if available)
 
-Hyper Launcher is a fork of [MojoLauncher](https://github.com/MojoLauncher/MojoLauncher), which is itself based on [PojavLauncher](https://github.com/PojavLauncherTeam/PojavLauncher). Full credit goes to both teams and all upstream contributors.
+Hyper Launcher 3 is a fork of [MojoLauncher](https://github.com/MojoLauncher/MojoLauncher), which is itself based on [PojavLauncher](https://github.com/PojavLauncherTeam/PojavLauncher). Full credit goes to both teams and all upstream contributors.
 
 - [MojoLauncher](https://github.com/MojoLauncher/MojoLauncher): [GNU LGPLv3 License](https://github.com/MojoLauncher/MojoLauncher/blob/v3_openjdk/LICENSE)
 - [PojavLauncher](https://github.com/PojavLauncherTeam/PojavLauncher): [GNU LGPLv3 License](https://github.com/PojavLauncherTeam/PojavLauncher/blob/v3_openjdk/LICENSE)
