@@ -34,7 +34,6 @@ import com.ashmeet.hyperlauncher.utils.rememberDrawablePainter
 import net.ashmeet.hyperlauncher.R
 import net.kdt.pojavlaunch.multirt.Runtime
 
-
 @Composable
 fun InstanceEditorScreen(
     instanceName: String,
@@ -60,17 +59,15 @@ fun InstanceEditorScreen(
     onDelete: () -> Unit
 ) {
     val scrollState = rememberScrollState()
-    
-    // Detect if we are scrolling "fast" or just scrolling to hide the dock
-    // We'll hide it when scrolling down, and show it when scrolling up or stopped.
+
     var isDockVisible by remember { mutableStateOf(true) }
     var lastScrollValue by remember { mutableIntStateOf(0) }
 
     LaunchedEffect(scrollState.value) {
         val diff = scrollState.value - lastScrollValue
-        if (diff > 20) { // Scrolling down significantly
+        if (diff > 20) {
             isDockVisible = false
-        } else if (diff < -20 || !scrollState.isScrollInProgress) { // Scrolling up or stopped
+        } else if (diff < -20 || !scrollState.isScrollInProgress) {
             isDockVisible = true
         }
         lastScrollValue = scrollState.value
@@ -81,18 +78,17 @@ fun InstanceEditorScreen(
         color = MaterialTheme.colorScheme.background
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
-            // Content
+
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .verticalScroll(scrollState)
                     .padding(horizontal = 16.dp)
-                    .padding(top = 8.dp, bottom = 100.dp), // Extra bottom padding for dock
+                    .padding(top = 8.dp, bottom = 100.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(20.dp)
             ) {
-                // ... (existing content items)
-                // Icon
+
                 Box(
                     modifier = Modifier
                         .size(100.dp)
@@ -108,7 +104,7 @@ fun InstanceEditorScreen(
                             .background(MaterialTheme.colorScheme.surfaceVariant)
                             .padding(8.dp)
                     )
-                    
+
                     Surface(
                         shape = CircleShape,
                         color = MaterialTheme.colorScheme.primary,
@@ -123,7 +119,6 @@ fun InstanceEditorScreen(
                     }
                 }
 
-                // Instance Name
                 OutlinedTextField(
                     value = instanceName,
                     onValueChange = onInstanceNameChange,
@@ -133,7 +128,6 @@ fun InstanceEditorScreen(
                     singleLine = true
                 )
 
-                // Version Selection
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
@@ -159,7 +153,6 @@ fun InstanceEditorScreen(
                     )
                 }
 
-                // Control Layout Selection
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
@@ -185,11 +178,10 @@ fun InstanceEditorScreen(
                     )
                 }
 
-                // Shared Data Toggle
                 ListItem(
                     headlineContent = { Text(stringResource(R.string.instance_shared_data)) },
-                    supportingContent = { 
-                        Text(stringResource(if (sharedData) R.string.instance_shared_data_on else R.string.instance_shared_data_off)) 
+                    supportingContent = {
+                        Text(stringResource(if (sharedData) R.string.instance_shared_data_on else R.string.instance_shared_data_off))
                     },
                     trailingContent = {
                         DefaultSwitch(
@@ -201,7 +193,6 @@ fun InstanceEditorScreen(
                     colors = ListItemDefaults.colors(containerColor = Color.Transparent)
                 )
 
-                // JVM Arguments
                 OutlinedTextField(
                     value = jvmArgs,
                     onValueChange = onJvmArgsChange,
@@ -210,35 +201,32 @@ fun InstanceEditorScreen(
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                // Runtime Selection
                 InstanceDropdown(
                     label = stringResource(R.string.pedit_java_runtime),
                     items = runtimes,
                     selectedItem = selectedRuntime,
-                    itemLabel = { 
+                    itemLabel = {
                         if (runtimes.indexOf(it) == runtimes.size - 1) it.name
                         else "${it.name.replace(".tar.xz", "")} - ${it.versionString ?: stringResource(R.string.multirt_runtime_corrupt)}"
                     },
                     onItemSelected = onRuntimeSelected
                 )
 
-                // Renderer Selection
                 InstanceDropdown(
                     label = stringResource(R.string.pedit_renderer),
                     items = renderers,
                     selectedItem = selectedRenderer,
-                    itemLabel = { 
+                    itemLabel = {
                         val index = renderers.indexOf(it)
                         if (index != -1 && index < rendererDisplayNames.size) rendererDisplayNames[index]
                         else it
                     },
                     onItemSelected = onRendererSelected
                 )
-                
+
                 Spacer(modifier = Modifier.height(16.dp))
             }
 
-            // Floating Dock
             AnimatedVisibility(
                 visible = isDockVisible,
                 enter = fadeIn() + slideInVertically { it },
@@ -321,8 +309,7 @@ private fun <T> InstanceDropdown(
                 disabledBorderColor = MaterialTheme.colorScheme.outline
             )
         )
-        
-        // Transparent overlay to catch clicks
+
         Box(
             modifier = Modifier
                 .matchParentSize()

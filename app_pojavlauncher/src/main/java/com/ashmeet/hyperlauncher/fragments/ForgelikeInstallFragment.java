@@ -33,7 +33,7 @@ public abstract class ForgelikeInstallFragment extends ModVersionListFragment<Li
     public List<ModloaderVersionGroup<Object>> mapToGroups(List<String> forgeVersions) {
         List<String> gameVersions = new ArrayList<>();
         List<List<String>> loaderVersions = new ArrayList<>();
-        
+
         for(String version : forgeVersions) {
             if(mUtils.shouldSkipVersion(version)) continue;
             String gameVersion = mUtils.processVersionString(version);

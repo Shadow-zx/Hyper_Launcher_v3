@@ -17,7 +17,6 @@ import com.ashmeet.hyperlauncher.components.MineButton
 import com.ashmeet.hyperlauncher.theme.PojavTheme
 import net.ashmeet.hyperlauncher.R
 
-
 @Composable
 fun SelectAuthMethodScreen(
     onMicrosoftClick: () -> Unit,
@@ -28,7 +27,7 @@ fun SelectAuthMethodScreen(
         modifier = Modifier.fillMaxSize(),
         color = Color.Transparent
     ) {
-        // Selection buttons
+
         Column(
             modifier = Modifier
                 .fillMaxSize()

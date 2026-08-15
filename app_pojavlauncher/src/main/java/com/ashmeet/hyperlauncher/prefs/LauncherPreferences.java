@@ -61,7 +61,7 @@ public class LauncherPreferences {
     public static boolean PREF_BIG_CORE_AFFINITY = false;
     public static boolean PREF_ZINK_PREFER_SYSTEM_DRIVER = false;
     public static boolean PREF_ZINK_FORCE_LEGACY = false;
-    
+
     public static boolean PREF_VERIFY_MANIFEST = true;
     public static String PREF_DOWNLOAD_SOURCE = "default";
     public static boolean PREF_SKIP_NOTIFICATION_PERMISSION_CHECK = false;
@@ -89,9 +89,8 @@ public class LauncherPreferences {
     public static boolean PREF_DRAWER_PULL_BACKGROUND = true;
     public static String PREF_DRAWER_PULL_ICON_PATH = null;
 
-
     public static void loadPreferences(Context ctx) {
-        //Required for CTRLDEF_FILE and MultiRT
+
         Tools.initStorageConstants(ctx);
         boolean isDevicePowerful = isDevicePowerful(ctx);
 
@@ -154,7 +153,7 @@ public class LauncherPreferences {
         String argLwjglLibname = "-Dorg.lwjgl.opengl.libname=";
         for (String arg : JREUtils.parseJavaArguments(PREF_CUSTOM_JAVA_ARGS)) {
             if (arg.startsWith(argLwjglLibname)) {
-                // purge arg
+
                 DEFAULT_PREF.edit().putString("javaArgs",
                     PREF_CUSTOM_JAVA_ARGS.replace(arg, "")).apply();
             }
@@ -199,33 +198,27 @@ public class LauncherPreferences {
         if (deviceRam < 1024) return 296;
         if (deviceRam < 1536) return 448;
         if (deviceRam < 2048) return 656;
-        // Limit the max for 32 bits devices more harshly
+
         if (is32BitsDevice()) return 696;
 
         if (deviceRam < 3064) return 936;
         if (deviceRam < 4096) return 1144;
         if (deviceRam < 6144) return 1536;
-        return 2048; //Default RAM allocation for 64 bits
+        return 2048;
     }
 
-    /// Find a correct resolution for the device
-    ///
-    /// Some devices are shipped with a ridiculously high resolution, which can cause performance issues
-    /// This function will try to find a resolution that is good enough for the device
     private static int findBestResolution(Context context, boolean isDevicePowerful) {
         DisplayMetrics metrics = context.getResources().getDisplayMetrics();
         int minSide = Math.min(metrics.widthPixels, metrics.heightPixels);
         int targetSide = isDevicePowerful ? 1080 : 720;
-        if (minSide <= targetSide) return 100; // No need to scale down
+        if (minSide <= targetSide) return 100;
 
         float ratio = (100f * targetSide / minSide);
-        // The value must match the seekbar values
+
         int increment = context.getResources().getInteger(R.integer.resolution_seekbar_increment);
         return (int) (Math.ceil(ratio / increment) * increment);
     }
 
-    /// Check if the device is considered powerful.
-    /// Powerful devices will have some energy saving tweaks enabled by default
     private static boolean isDevicePowerful(Context context) {
         if (SDK_INT < Build.VERSION_CODES.Q) return false;
         if (Tools.getTotalDeviceMemory(context) <= 4096) return false;

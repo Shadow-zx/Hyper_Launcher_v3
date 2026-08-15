@@ -121,7 +121,7 @@ fun ProgressLayoutContent(
         Column(
             modifier = modifier
                 .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.surface) // background_bottom_bar
+                .background(MaterialTheme.colorScheme.surface)
                 .navigationBarsPadding()
         ) {
             Surface(

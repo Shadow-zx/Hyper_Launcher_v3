@@ -112,8 +112,8 @@ fun InstanceDirectoryScreen(
     onBack: () -> Unit
 ) {
     val isPreview = LocalInspectionMode.current
-    val instanceRoot = remember { 
-        if (isPreview) null else Instances.loadSelectedInstance()?.gameDirectory 
+    val instanceRoot = remember {
+        if (isPreview) null else Instances.loadSelectedInstance()?.gameDirectory
     }
 
     InstanceDirectoryContent(
@@ -295,7 +295,7 @@ fun InstanceDirectoryContent(
                 InstanceNavigationRail(
                     onCreateNew = { sidebarMenuExpanded = true },
                     onRefresh = { currentDir?.let { loadFiles(it) } },
-                    onImportModpack = { isSearchActive = !isSearchActive }, // Toggle search
+                    onImportModpack = { isSearchActive = !isSearchActive },
                     onBack = {
                         if (isSearchActive) {
                             isSearchActive = false
@@ -456,9 +456,9 @@ fun InstanceDirectoryContent(
                                         style = MaterialTheme.typography.bodyLarge,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
-                                    
+
                                     Spacer(modifier = Modifier.height(24.dp))
-                                    
+
                                     TextButton(
                                         onClick = { currentDir?.let { loadFiles(it) } },
                                         shape = RoundedCornerShape(12.dp),
@@ -470,7 +470,6 @@ fun InstanceDirectoryContent(
                                         Spacer(modifier = Modifier.width(8.dp))
                                         Text("Refresh")
                                     }
-                                    
 
                                 }
                             }

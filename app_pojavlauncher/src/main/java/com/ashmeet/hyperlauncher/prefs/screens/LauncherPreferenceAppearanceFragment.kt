@@ -11,7 +11,6 @@ import com.ashmeet.hyperlauncher.screens.layouts.settings.AppearanceSettingsScre
 import com.ashmeet.hyperlauncher.theme.PojavTheme
 import com.ashmeet.hyperlauncher.prefs.LauncherPreferences
 
-
 class LauncherPreferenceAppearanceFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListener {
 
     override fun onCreateView(

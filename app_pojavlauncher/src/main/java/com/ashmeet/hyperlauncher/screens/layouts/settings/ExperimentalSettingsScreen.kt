@@ -39,7 +39,7 @@ fun ExperimentalSettingsScreen(
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
             val items = mutableListOf<@Composable () -> Unit>()
-            
+
             items.add {
                 SettingsSwitchItem(
                     title = stringResource(R.string.preference_shader_dump_title),
@@ -116,4 +116,3 @@ fun ExperimentalSettingsScreen(
         }
     }
 }
-

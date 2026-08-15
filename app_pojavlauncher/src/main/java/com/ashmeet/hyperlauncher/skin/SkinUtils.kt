@@ -84,18 +84,17 @@ object SkinUtils {
         val skinBitmap = getSkinBitmap(skinUrl) ?: return@withContext loadSteveHead2D(context)
 
         val ratio = skinBitmap.width / 64
-        val size = 128 // Target size for UI usage to avoid blurring
+        val size = 128
         val result = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(result)
-        val paint = Paint().apply { isFilterBitmap = false } // Sharp scaling
+        val paint = Paint().apply { isFilterBitmap = false }
 
         val srcBase = Rect(8 * ratio, 8 * ratio, 16 * ratio, 16 * ratio)
         val srcOverlay = Rect(40 * ratio, 8 * ratio, 48 * ratio, 16 * ratio)
         val dst = Rect(0, 0, size, size)
 
-        // Draw base head
         canvas.drawBitmap(skinBitmap, srcBase, dst, paint)
-        // Draw overlay
+
         canvas.drawBitmap(skinBitmap, srcOverlay, dst, paint)
 
         skinBitmap.recycle()
@@ -104,7 +103,7 @@ object SkinUtils {
 
     private suspend fun getSkinBitmap(skinUrl: String?): Bitmap? = withContext(Dispatchers.IO) {
         if (skinUrl == null) return@withContext null
-        
+
         if (skinUrl.startsWith("file://")) {
             val path = skinUrl.substring(7)
             val file = File(path)

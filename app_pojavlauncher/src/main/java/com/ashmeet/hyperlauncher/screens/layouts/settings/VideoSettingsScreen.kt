@@ -119,7 +119,6 @@ fun VideoSettingsScreen(
             }
         }
 
-
         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
             SettingsCard(position = CardPosition.TOP, useSurface = true) {
                 SettingsSwitchItem(
@@ -190,7 +189,7 @@ fun VideoSettingsScreen(
                 }
 
                 if (isAngleAvailable) {
-                    // Position of Angle depends on if Zink is used
+
                     val anglePos = when {
                         isZinkUsed -> CardPosition.MIDDLE
                         else -> CardPosition.SINGLE
@@ -211,7 +210,7 @@ fun VideoSettingsScreen(
                 }
 
                 if (isZinkUsed) {
-                    // Legacy Zink is always at the bottom if Zink is used
+
                     SettingsCard(position = CardPosition.BOTTOM, useSurface = true) {
                         SettingsSwitchItem(
                             title = stringResource(R.string.preference_force_legacy_zink_title),

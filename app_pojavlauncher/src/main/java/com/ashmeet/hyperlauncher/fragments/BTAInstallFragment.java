@@ -67,6 +67,6 @@ public class BTAInstallFragment extends ModVersionListFragment<BTAUtils.BTAVersi
 
     @Override
     public void onDownloadFinished(Context context, File downloadedFile) {
-        // We don't have to do anything after the BTADownloadTask ends, so this is a stub
+
     }
 }

@@ -185,7 +185,7 @@ private fun <T> ModloaderVersionGroupItem(
                 }
             }
         }
-        
+
         HorizontalDivider(
             modifier = Modifier.padding(horizontal = 8.dp),
             thickness = 0.5.dp,

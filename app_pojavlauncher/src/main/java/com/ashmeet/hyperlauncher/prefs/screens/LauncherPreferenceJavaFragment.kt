@@ -26,7 +26,7 @@ class LauncherPreferenceJavaFragment : Fragment(), SharedPreferences.OnSharedPre
         registerForActivityResult(OpenDocumentWithExtension("xz")) { data ->
             if (data != null) {
                 Tools.installRuntimeFromUri(context, data)
-                // The dialog needs to be reopened to see changes, or we'd need a way to observe the runtimes list
+
             }
         }
 
@@ -70,7 +70,7 @@ class LauncherPreferenceJavaFragment : Fragment(), SharedPreferences.OnSharedPre
             try {
                 MultiRTUtils.removeRuntimeNamed(runtime.name)
                 Tools.runOnUiThread {
-                    // Update summary if the deleted one was default
+
                     if (LauncherPreferences.PREF_DEFAULT_RUNTIME == runtime.name) {
                         val remaining = MultiRTUtils.getRuntimes()
                         if (remaining.isNotEmpty()) {
@@ -79,8 +79,7 @@ class LauncherPreferenceJavaFragment : Fragment(), SharedPreferences.OnSharedPre
                             LauncherPreferences.loadPreferences(context)
                         }
                     }
-                    // We can't easily trigger a recompose of the dialog items without a state holder or ViewModel
-                    // But LauncherPreferenceFragment listens to shared pref changes
+
                 }
             } catch (e: Exception) {
                 Tools.runOnUiThread { Tools.showError(context, e) }

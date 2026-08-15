@@ -18,7 +18,6 @@ import net.kdt.pojavlaunch.Tools
 import net.kdt.pojavlaunch.instances.Instance
 import net.kdt.pojavlaunch.instances.Instances
 
-
 class InstanceSelectionFragment : Fragment() {
 
     override fun onCreateView(

@@ -26,7 +26,7 @@ fun SkinPreview(
     onWebViewCreated: (WebView) -> Unit = {}
 ) {
     if (LocalInspectionMode.current) {
-        // Render a placeholder in Previews since WebView isn't supported
+
         Box(modifier = modifier.background(MaterialTheme.colorScheme.primaryContainer))
         return
     }

@@ -64,7 +64,6 @@ fun SettingsScreenWrapper(
                 content()
             }
 
-
             if (onBack != null) {
                 Surface(
                     modifier = Modifier

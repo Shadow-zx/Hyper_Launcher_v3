@@ -30,7 +30,7 @@ class LauncherPreferenceControlFragment : Fragment(), SharedPreferences.OnShared
     ): View {
         val sensorManager = requireContext().getSystemService(Context.SENSOR_SERVICE) as SensorManager
         val isGyroAvailable = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE) != null
-        
+
         return ComposeView(requireContext()).apply {
             setContent {
                 PojavTheme {
@@ -38,7 +38,7 @@ class LauncherPreferenceControlFragment : Fragment(), SharedPreferences.OnShared
                         onBack = { requireActivity().onBackPressedDispatcher.onBackPressed() },
                         onNavigateToCustomControls = { startActivity(Intent(requireContext(), CustomControlsActivity::class.java)) },
                         onNavigateToGamepadMapper = { Tools.swapFragment(requireActivity(), GamepadMapperFragment::class.java, GamepadMapperFragment.TAG, null) },
-                        onWipeController = { 
+                        onWipeController = {
                             Remapper.wipePreferences(requireContext())
                             Toast.makeText(requireContext(), R.string.preference_controller_map_wiped, Toast.LENGTH_SHORT).show()
                         },

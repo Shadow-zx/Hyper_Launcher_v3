@@ -16,7 +16,6 @@ import net.kdt.pojavlaunch.instances.Instances;
 import net.kdt.pojavlaunch.instances.InstanceIconProvider;
 import java.io.IOException;
 
-
 public class DeleteConfirmDialogFragment extends DialogFragment {
     private final Instance mInstance = Instances.loadSelectedInstance();
 

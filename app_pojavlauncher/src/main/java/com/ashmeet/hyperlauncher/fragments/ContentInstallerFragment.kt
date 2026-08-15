@@ -56,7 +56,7 @@ class ContentInstallerFragment : Fragment() {
                 PojavTheme {
                     val scope = rememberCoroutineScope()
                     val context = LocalContext.current
-                    
+
                     LaunchedEffect(Unit) {
                         CurseForgeService.init(context.getString(R.string.curseforge_api_key))
                     }
@@ -66,8 +66,8 @@ class ContentInstallerFragment : Fragment() {
                     var isProjectLoading by remember { mutableStateOf(false) }
                     var viewingProject by remember { mutableStateOf<ModrinthProject?>(null) }
                     var selectedType by remember { mutableStateOf(ContentInstallerType.MODS) }
-                    var selectedSource by remember { 
-                        mutableStateOf(if (LauncherPreferences.PREF_LAST_CONTENT_SOURCE == 1) ContentSource.CURSEFORGE else ContentSource.MODRINTH) 
+                    var selectedSource by remember {
+                        mutableStateOf(if (LauncherPreferences.PREF_LAST_CONTENT_SOURCE == 1) ContentSource.CURSEFORGE else ContentSource.MODRINTH)
                     }
                     var projectVersions by remember { mutableStateOf<List<ModrinthVersion>>(emptyList()) }
                     var selectedProjectMCVersion by remember { mutableStateOf<String?>(null) }
@@ -75,7 +75,7 @@ class ContentInstallerFragment : Fragment() {
 
                     val instance = remember { Instances.loadSelectedInstance() }
                     val instanceVersion = remember(instance) {
-                        instance?.let { 
+                        instance?.let {
                             if (it.versionId == "latest_release" || it.versionId == "latest_snapshot") {
                                 return@let null
                             }
@@ -86,7 +86,7 @@ class ContentInstallerFragment : Fragment() {
                                 null
                             }
                             if (v != null && v.inheritsFrom != null) return@let v.inheritsFrom
-                            
+
                             val id = it.versionId
                             if (id.contains("-")) {
                                 val lastPart = id.substringAfterLast("-")
@@ -94,20 +94,20 @@ class ContentInstallerFragment : Fragment() {
                                     return@let lastPart
                                 }
                             }
-                            
+
                             val regex = Regex("""1\.\d+(\.\d+)?|\d+w\d+[a-z]""")
                             regex.findAll(id).lastOrNull()?.value ?: id
                         }
                     }
-                    
+
                     var selectedVersion by remember { mutableStateOf<String?>(null) }
                     var selectedLoader by remember { mutableStateOf<String?>(null) }
-                    
+
                     val instanceLoader = remember(instance) {
                         instance?.let {
                             val vId = it.versionId.lowercase()
-                            if (vId.contains("fabric")) "fabric" 
-                            else if (vId.contains("forge")) "forge" 
+                            if (vId.contains("fabric")) "fabric"
+                            else if (vId.contains("forge")) "forge"
                             else if (vId.contains("quilt")) "quilt"
                             else if (vId.contains("neoforge")) "neoforge"
                             else null
@@ -117,9 +117,9 @@ class ContentInstallerFragment : Fragment() {
                     var refreshTrigger by remember { mutableIntStateOf(0) }
                     LaunchedEffect(selectedType, selectedVersion, selectedLoader, searchQuery, selectedSource, refreshTrigger) {
                         if (searchQuery.isNotEmpty() && refreshTrigger == 0) {
-                            delay(500) // Debounce typing
+                            delay(500)
                         }
-                        
+
                         isSearching = true
                         val results = if (selectedSource == ContentSource.MODRINTH) {
                             ModrinthService.search(searchQuery, selectedType, selectedVersion ?: instanceVersion, selectedLoader ?: instanceLoader)
@@ -128,7 +128,7 @@ class ContentInstallerFragment : Fragment() {
                         }
                         projects = results
                         isSearching = false
-                        
+
                         results.forEach { project ->
                             if (!project.iconUrl.isNullOrEmpty()) {
                                 scope.launch(Dispatchers.IO) {
@@ -138,8 +138,8 @@ class ContentInstallerFragment : Fragment() {
                                         CurseForgeService.loadIcon(project.iconUrl)
                                     }
                                     withContext(Dispatchers.Main) {
-                                        projects = projects.map { 
-                                            if (it.id == project.id) it.copy(iconBitmap = bitmap) else it 
+                                        projects = projects.map {
+                                            if (it.id == project.id) it.copy(iconBitmap = bitmap) else it
                                         }
                                         if (viewingProject?.id == project.id) {
                                             viewingProject = viewingProject?.copy(iconBitmap = bitmap)
@@ -161,7 +161,7 @@ class ContentInstallerFragment : Fragment() {
                         projectVersions = emptyList()
                         selectedProjectMCVersion = null
                         isProjectLoading = true
-                        
+
                         try {
                             val detailsDeferred = async(Dispatchers.IO) {
                                 if (selectedSource == ContentSource.MODRINTH) {
@@ -170,7 +170,7 @@ class ContentInstallerFragment : Fragment() {
                                     CurseForgeService.getProjectDetails(projectId)
                                 }
                             }
-                            
+
                             val versionsDeferred = async(Dispatchers.IO) {
                                 if (selectedSource == ContentSource.MODRINTH) {
                                     ModrinthService.getProjectVersions(projectId)
@@ -178,10 +178,10 @@ class ContentInstallerFragment : Fragment() {
                                     CurseForgeService.getProjectVersions(projectId)
                                 }
                             }
-                            
+
                             val details = detailsDeferred.await()
                             val versions = versionsDeferred.await()
-                            
+
                             withContext(Dispatchers.Main) {
                                 viewingProject = viewingProject?.copy(
                                     fullDescription = details?.fullDescription,
@@ -207,7 +207,7 @@ class ContentInstallerFragment : Fragment() {
                             if (selectedType != type || selectedSource != source) {
                                 projects = emptyList()
                             }
-                            
+
                             if (selectedSource != source) {
                                 LauncherPreferences.DEFAULT_PREF.edit {
                                     putInt("last_content_source", if (source == ContentSource.CURSEFORGE) 1 else 0)
@@ -238,7 +238,7 @@ class ContentInstallerFragment : Fragment() {
                                         } else {
                                             CurseforgeApi(getString(R.string.curseforge_api_key))
                                         }
-                                        
+
                                         val modItem = ModItem(
                                             if (selectedSource == ContentSource.MODRINTH) CommonApi.PACK_MODRINTH.toInt() else CommonApi.PACK_CURSEFORGE.toInt(),
                                             true,
@@ -248,10 +248,10 @@ class ContentInstallerFragment : Fragment() {
                                             viewingProject?.iconUrl
                                         )
                                         val modDetail = modpackApi.getModDetails(modItem)
-                                        val selectedVersionIndex = modDetail.versionUrls.indexOfFirst { 
-                                            it == version.downloadUrl || it.contains(version.id) 
+                                        val selectedVersionIndex = modDetail.versionUrls.indexOfFirst {
+                                            it == version.downloadUrl || it.contains(version.id)
                                         }
-                                        
+
                                         if (selectedVersionIndex != -1) {
                                             withContext(Dispatchers.Main) {
                                                 modpackApi.handleModpackInstallation(requireContext(), modDetail, selectedVersionIndex)
@@ -282,7 +282,7 @@ class ContentInstallerFragment : Fragment() {
                         availableProjectMCVersions = availableProjectMCVersions,
                         selectedProjectMCVersion = selectedProjectMCVersion,
                         onProjectMCVersionClick = { selectedProjectMCVersion = it.ifEmpty { null } },
-                        onBackToProjects = { 
+                        onBackToProjects = {
                             viewingProject = null
                             projectVersions = emptyList()
                             selectedProjectMCVersion = null
@@ -316,7 +316,7 @@ class ContentInstallerFragment : Fragment() {
                 val connection = url.openConnection()
                 connection.connect()
                 val totalSize = connection.contentLength.toLong()
-                
+
                 connection.getInputStream().use { input ->
                     destFile.outputStream().use { output ->
                         var bytesCopied = 0L

@@ -34,7 +34,7 @@ class SelectAuthFragment : Fragment() {
             Toast.makeText(requireContext(), R.string.tasks_ongoing, Toast.LENGTH_SHORT).show()
             return
         }
-        
+
         parentFragmentManager.beginTransaction()
             .setCustomAnimations(R.anim.fade_enter, R.anim.fade_exit, R.anim.fade_pop_enter, R.anim.fade_pop_exit)
             .replace(R.id.container_fragment_auth, fragmentClass, null, fragmentTag)

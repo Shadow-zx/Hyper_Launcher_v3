@@ -22,8 +22,8 @@ fun PojavTheme(
     content: @Composable () -> Unit
 ) {
     val isInPreview = LocalInspectionMode.current
-    var themePref by remember { 
-        mutableStateOf(if (isInPreview) "system" else LauncherPreferences.PREF_THEME) 
+    var themePref by remember {
+        mutableStateOf(if (isInPreview) "system" else LauncherPreferences.PREF_THEME)
     }
 
     if (!isInPreview) {
@@ -46,7 +46,6 @@ fun PojavTheme(
         else -> isSystemInDarkTheme()
     }
 
-    // you can touch little girls but don't touch this
     val colorScheme = if (isDark) {
         darkColorScheme(
             primary = colorResource(R.color.minebutton_color),

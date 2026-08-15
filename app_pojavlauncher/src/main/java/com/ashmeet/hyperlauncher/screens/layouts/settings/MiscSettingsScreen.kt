@@ -121,10 +121,9 @@ fun MiscSettingsScreen(
             }
         }
 
-
         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
             val visibleItems = mutableListOf<@Composable () -> Unit>()
-            
+
             if (isZinkPreferSystemDriverVisible) {
                 visibleItems.add {
                     SettingsSwitchItem(

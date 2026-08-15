@@ -41,7 +41,6 @@ public class FileSelectorFragment extends Fragment {
             ? Tools.DIR_GAME_NEW
             : Environment.getExternalStorageDirectory().getAbsolutePath();
 
-
     public FileSelectorFragment(){
         super(R.layout.fragment_file_selector);
     }

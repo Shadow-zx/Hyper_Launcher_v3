@@ -38,7 +38,7 @@ fun FabriclikeInstallScreen(
     val filteredGameVersions = remember(gameVersions, onlyStable) {
         if (onlyStable) gameVersions.filter { it.stable } else gameVersions
     }
-    
+
     val filteredLoaderVersions = remember(loaderVersions, onlyStable) {
         if (onlyStable) loaderVersions.filter { it.stable } else loaderVersions
     }
@@ -100,7 +100,7 @@ fun FabriclikeInstallScreen(
                     .padding(vertical = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(24.dp)
             ) {
-                // Left Column: Version selection
+
                 Column(
                     modifier = Modifier.weight(1f),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -120,7 +120,6 @@ fun FabriclikeInstallScreen(
                     )
                 }
 
-                // Right Column: Toggle and Install Button
                 Column(
                     modifier = Modifier.weight(1f),
                     verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -216,8 +215,7 @@ private fun VersionSpinner(
                 disabledBorderColor = MaterialTheme.colorScheme.outline
             )
         )
-        
-        // Transparent overlay to catch clicks as OutlinedTextField might swallow them
+
         Box(
             modifier = Modifier
                 .matchParentSize()
@@ -227,7 +225,7 @@ private fun VersionSpinner(
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
-            modifier = Modifier.fillMaxWidth(0.4f) // Align with column width
+            modifier = Modifier.fillMaxWidth(0.4f)
         ) {
             versions.forEach { version ->
                 DropdownMenuItem(

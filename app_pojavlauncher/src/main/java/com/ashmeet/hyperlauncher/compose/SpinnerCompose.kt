@@ -119,7 +119,7 @@ fun AccountSpinnerCompose(
                 Tools.runOnUiThread {
                     accounts = loadedAccounts.accounts
                     selectedIndex = loadedAccounts.selectionIndex
-                    
+
                     if (selectedIndex >= 0 && selectedIndex < accounts.size) {
                         refreshAccount(accounts[selectedIndex])
                     }
@@ -135,7 +135,6 @@ fun AccountSpinnerCompose(
         reloadAccounts()
     }
 
-    // Listener for refresh and login progress
     DisposableEffect(Unit) {
         val refreshListener = object : ExtraListener<Any> {
             override fun onValueSet(key: String, value: Any): Boolean {
@@ -266,7 +265,7 @@ fun AccountSpinnerUI(
                         )
                     }
                 }
-                
+
                 if (isAuthenticating) {
                     LinearProgressIndicator(
                         progress = { loginProgress },
@@ -380,9 +379,9 @@ fun AccountItemContent(account: Account) {
             }
         }
     }
-    
+
     Spacer(modifier = Modifier.width(16.dp))
-    
+
     Column {
         Text(
             text = account.username,

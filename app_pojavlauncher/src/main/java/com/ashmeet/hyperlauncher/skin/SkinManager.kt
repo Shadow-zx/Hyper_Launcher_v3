@@ -1,9 +1,7 @@
 package com.ashmeet.hyperlauncher.skin
 
-
 import com.ashmeet.hyperlauncher.skin.LocalUuidUtils.toFormattedUuid
 import java.io.File
-
 
 /**
  * Facade over skin validation, UUID generation, and the Yggdrasil server.
@@ -53,7 +51,6 @@ class SkinManager(private val analyzer: SkinAnalyzerFacade) {
             cape      = cape
         )
 
-        // Save skin to permanent storage if provided
         if (skinFile != null && skinFile.exists()) {
             val permanentSkin = File(net.kdt.pojavlaunch.Tools.DIR_CACHE, "skin-$profileId.png")
             if (skinFile.absolutePath != permanentSkin.absolutePath) {

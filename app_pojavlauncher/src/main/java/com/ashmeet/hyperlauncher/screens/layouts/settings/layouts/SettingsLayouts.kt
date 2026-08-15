@@ -18,7 +18,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.ashmeet.hyperlauncher.theme.PojavTheme
 
-
 enum class CardPosition {
     TOP, MIDDLE, BOTTOM, SINGLE
 }

@@ -257,13 +257,12 @@ private fun InstanceSelectionContent(
     }
 }
 
-
 private fun isVanilla(versionId: String?): Boolean {
     if (versionId == null) return true
     val lower = versionId.lowercase()
-    return !lower.contains("fabric") && 
-           !lower.contains("forge") && 
-           !lower.contains("quilt") && 
+    return !lower.contains("fabric") &&
+           !lower.contains("forge") &&
+           !lower.contains("quilt") &&
            !lower.contains("optifine") &&
            !lower.contains("neoforge") &&
            !lower.contains("bta")
@@ -295,4 +294,3 @@ fun InstanceSelectionScreenPreview() {
         )
     }
 }
-

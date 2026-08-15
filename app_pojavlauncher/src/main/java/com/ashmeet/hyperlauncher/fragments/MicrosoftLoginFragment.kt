@@ -16,7 +16,6 @@ import net.kdt.pojavlaunch.Tools
 import net.kdt.pojavlaunch.extra.ExtraConstants
 import net.kdt.pojavlaunch.extra.ExtraCore
 
-
 class MicrosoftLoginFragment : Fragment() {
 
     private var mWebView: WebView? = null
@@ -53,7 +52,7 @@ class MicrosoftLoginFragment : Fragment() {
         if (code == null) {
             activity.onBackPressedDispatcher.onBackPressed()
             if ("access_denied" != error) {
-                val errorMessage = uri.getQueryParameter("error_description") 
+                val errorMessage = uri.getQueryParameter("error_description")
                     ?: uri.getQueryParameter("error")
                     ?: getString(R.string.oauth_unknown_error)
                 Tools.dialog(activity, getString(R.string.global_error), errorMessage)

@@ -23,7 +23,6 @@ import net.kdt.pojavlaunch.extra.ExtraConstants
 import net.kdt.pojavlaunch.extra.ExtraCore
 import net.kdt.pojavlaunch.extra.ExtraListener
 
-
 @Composable
 fun AuthLayout(
     title: String,
@@ -74,7 +73,6 @@ fun AuthLayout(
 
                 Spacer(modifier = Modifier.width(16.dp))
 
-                // Fragment Container on the right side
                 Box(
                     modifier = Modifier
                         .weight(1.2f)

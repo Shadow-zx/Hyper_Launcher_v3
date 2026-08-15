@@ -14,7 +14,6 @@ import net.kdt.pojavlaunch.LauncherActivity
 import net.kdt.pojavlaunch.Tools
 import com.ashmeet.hyperlauncher.prefs.LauncherPreferences
 
-
 open class LauncherPreferenceFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListener {
 
     override fun onCreateView(

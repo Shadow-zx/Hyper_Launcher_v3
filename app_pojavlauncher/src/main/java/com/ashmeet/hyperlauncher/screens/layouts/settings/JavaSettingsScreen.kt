@@ -43,7 +43,7 @@ fun JavaSettingsScreen(
     var javaSandbox by remember { mutableStateOf(LauncherPreferences.PREF_JAVA_SANDBOX) }
     var defaultRuntimeName by remember { mutableStateOf(LauncherPreferences.PREF_DEFAULT_RUNTIME ?: "") }
     var javaArgs by remember { mutableStateOf(LauncherPreferences.PREF_CUSTOM_JAVA_ARGS ?: "") }
-    
+
     var showRuntimeDialog by remember { mutableStateOf(false) }
     var isDeletingRuntimes by remember { mutableStateOf(false) }
     var showJavaArgsDialog by remember { mutableStateOf(false) }

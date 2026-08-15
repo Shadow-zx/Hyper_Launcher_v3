@@ -61,7 +61,7 @@ fun ExitScreen(
 ) {
     val isPreview = LocalInspectionMode.current
     val ignoreNotch = if (isPreview) true else LauncherPreferences.PREF_IGNORE_NOTCH
-    
+
     val crashReportPath = remember(logs) {
         val marker = "#@!@# Game crashed! Crash report saved to: #@!@# "
         val index = logs.indexOf(marker)

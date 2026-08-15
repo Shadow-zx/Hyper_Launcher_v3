@@ -43,7 +43,7 @@ class InstanceEditorFragment : Fragment(), CropperUtils.CropperReceiver {
     private var mRuntimes: List<Runtime> = emptyList()
     private var mRenderNames: List<String> = emptyList()
     private var mRenderDisplayNames: List<String> = emptyList()
-    
+
     private var mRecommendedIconSize = 256
     private lateinit var mCropperLauncher: ActivityResultLauncher<*>
 
@@ -68,7 +68,7 @@ class InstanceEditorFragment : Fragment(), CropperUtils.CropperReceiver {
             parentFragmentManager.popBackStack()
             return View(requireContext())
         }
-        
+
         loadValues(selectedInstance)
 
         return ComposeView(requireContext()).apply {
@@ -93,7 +93,7 @@ class InstanceEditorFragment : Fragment(), CropperUtils.CropperReceiver {
                         rendererDisplayNames = mRenderDisplayNames + getString(R.string.global_default),
                         onRendererSelected = { mSelectedRenderer = it },
                         instanceIcon = mInstanceIcon,
-                        onChangeIcon = { 
+                        onChangeIcon = {
                             mRecommendedIconSize = 256
                             CropperUtils.startCropper(mCropperLauncher)
                         },
@@ -108,7 +108,7 @@ class InstanceEditorFragment : Fragment(), CropperUtils.CropperReceiver {
     private fun loadValues(instance: Instance) {
         mInstance = instance
         mInstanceIcon = InstanceIconProvider.fetchIcon(resources, instance)
-        
+
         val runtimes = MultiRTUtils.getRuntimes().toMutableList()
         if (runtimes.none { it.name == "<Default>" }) {
             runtimes.add(Runtime("<Default>"))
@@ -118,7 +118,7 @@ class InstanceEditorFragment : Fragment(), CropperUtils.CropperReceiver {
         val jvmIndex = if (instance.selectedRuntime != null) {
             mRuntimes.indexOfFirst { it.name == instance.selectedRuntime }
         } else -1
-        
+
         mSelectedRuntime = if (jvmIndex != -1) mRuntimes[jvmIndex] else mRuntimes.last()
 
         val renderersList = RendererCompatUtil.getCompatibleRenderers(requireContext())

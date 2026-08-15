@@ -31,7 +31,6 @@ import com.ashmeet.hyperlauncher.components.SimpleTextSlider
 import com.ashmeet.hyperlauncher.screens.layouts.settings.layouts.TitleAndSummary
 import kotlinx.coroutines.launch
 
-
 @Composable
 fun PreferenceCategory(title: String) {
     Text(
@@ -157,8 +156,6 @@ fun SettingsSwitchItem(
     }
 }
 
-
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsSliderItem(
@@ -223,4 +220,3 @@ fun SettingsSliderItem(
         )
     }
 }
-

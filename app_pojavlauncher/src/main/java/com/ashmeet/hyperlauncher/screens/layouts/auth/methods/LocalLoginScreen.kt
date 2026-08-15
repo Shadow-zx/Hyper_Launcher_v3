@@ -46,7 +46,6 @@ import net.kdt.pojavlaunch.contracts.OpenDocumentWithExtension
 import java.io.File
 import java.io.FileOutputStream
 
-
 @Composable
 fun LocalLoginScreen(
     onLoginClick: (String, String?, String?) -> Unit

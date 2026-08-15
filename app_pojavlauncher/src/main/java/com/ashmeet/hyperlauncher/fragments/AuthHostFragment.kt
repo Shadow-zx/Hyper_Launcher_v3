@@ -11,12 +11,11 @@ import com.ashmeet.hyperlauncher.screens.layouts.auth.AuthLayout
 import com.ashmeet.hyperlauncher.theme.PojavTheme
 import net.ashmeet.hyperlauncher.R
 
-
 class AuthHostFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        
+
         requireActivity().onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 if (childFragmentManager.backStackEntryCount > 0) {

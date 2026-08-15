@@ -45,15 +45,15 @@ fun AppearanceSettingsScreen(
     var screenTransition by remember { mutableStateOf(LauncherPreferences.PREF_SCREEN_TRANSITION) }
     var appTheme by remember { mutableStateOf(LauncherPreferences.PREF_THEME) }
     var hideSidebar by remember { mutableStateOf(LauncherPreferences.PREF_HIDE_SIDEBAR) }
-    
+
     var drawerSizePerc by remember { mutableFloatStateOf(LauncherPreferences.PREF_DRAWER_PULL_SIZE_PERC) }
-    
+
     var drawerBgOpacity by remember { mutableFloatStateOf(LauncherPreferences.PREF_DRAWER_PULL_BG_OPACITY.toFloat()) }
     var drawerIconOpacity by remember { mutableFloatStateOf(LauncherPreferences.PREF_DRAWER_PULL_ICON_OPACITY.toFloat()) }
     var drawerHoldToMove by remember { mutableStateOf(LauncherPreferences.PREF_DRAWER_PULL_HOLD_TO_MOVE) }
     var drawerBackground by remember { mutableStateOf(LauncherPreferences.PREF_DRAWER_PULL_BACKGROUND) }
     var drawerIconPath by remember { mutableStateOf(LauncherPreferences.PREF_DRAWER_PULL_ICON_PATH) }
-    
+
     val context = LocalContext.current
     var showTransitionDialog by remember { mutableStateOf(false) }
     var showThemeDialog by remember { mutableStateOf(false) }
@@ -222,7 +222,7 @@ fun AppearanceSettingsScreen(
                 )
             }
         }
-        
+
     }
 
     if (showThemeDialog) {

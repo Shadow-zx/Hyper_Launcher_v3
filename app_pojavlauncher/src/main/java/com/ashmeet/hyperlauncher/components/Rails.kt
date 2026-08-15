@@ -169,7 +169,7 @@ fun InstanceNavigationRail(
             containerColor = MaterialTheme.colorScheme.primary,
             contentColor = MaterialTheme.colorScheme.onPrimary
         )
-        
+
         Spacer(modifier = Modifier.height(16.dp))
 
         SidebarRailButton(
@@ -177,7 +177,7 @@ fun InstanceNavigationRail(
             label = "Refresh",
             onClick = onRefresh
         )
-        
+
         Spacer(modifier = Modifier.height(16.dp))
 
         SidebarRailButton(
@@ -185,7 +185,7 @@ fun InstanceNavigationRail(
             label = "Import",
             onClick = onImportModpack
         )
-        
+
         Spacer(modifier = Modifier.height(24.dp))
     }
 }

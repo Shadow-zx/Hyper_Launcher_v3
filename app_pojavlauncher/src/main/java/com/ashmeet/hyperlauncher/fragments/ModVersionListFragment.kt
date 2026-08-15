@@ -24,7 +24,7 @@ import java.io.IOException
 
 abstract class ModVersionListFragment<T>(private val mFragmentTag: String) : Fragment(), Runnable, ModloaderDownloadListener {
     private val mExtraTag: String = mFragmentTag + "_proxy"
-    
+
     private var versionGroups by mutableStateOf<List<ModloaderVersionGroup<Any>>>(emptyList())
     private var isLoading by mutableStateOf(false)
     private var isDownloading by mutableStateOf(false)

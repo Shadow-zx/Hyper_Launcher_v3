@@ -10,7 +10,6 @@ import com.ashmeet.hyperlauncher.screens.layouts.instances.InstanceDirectoryScre
 import com.ashmeet.hyperlauncher.theme.PojavTheme
 import net.kdt.pojavlaunch.Tools
 
-
 class InstanceDirectoryFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {

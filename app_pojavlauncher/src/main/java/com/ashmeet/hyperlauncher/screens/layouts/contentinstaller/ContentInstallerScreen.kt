@@ -142,7 +142,7 @@ fun ContentInstallerScreen(
                     containerColor = MaterialTheme.colorScheme.primary,
                     contentColor = MaterialTheme.colorScheme.onPrimary
                 )
-                
+
                 Spacer(modifier = Modifier.height(16.dp))
 
                 SidebarRailButton(
@@ -150,7 +150,7 @@ fun ContentInstallerScreen(
                     label = "Refresh",
                     onClick = onRefresh
                 )
-                
+
                 Spacer(modifier = Modifier.height(16.dp))
 
                 SidebarRailButton(
@@ -293,9 +293,9 @@ fun ContentInstallerScreen(
                                         style = MaterialTheme.typography.bodyLarge,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
-                                    
+
                                     Spacer(modifier = Modifier.height(24.dp))
-                                    
+
                                     TextButton(
                                         onClick = onRefresh,
                                         shape = RoundedCornerShape(12.dp),
@@ -382,7 +382,7 @@ private fun VersionList(
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(16.dp)
             )
-            
+
             val lazyListState = rememberLazyListState()
             LaunchedEffect(availableProjectMCVersions, instanceVersion) {
                 if (availableProjectMCVersions.isNotEmpty()) {
@@ -415,7 +415,7 @@ private fun VersionList(
             val filteredVersions = remember(projectVersions, selectedProjectMCVersion) {
                 projectVersions.filter { it.gameVersions.contains(selectedProjectMCVersion) }
             }
-            
+
             val lazyListState = rememberLazyListState()
             LaunchedEffect(filteredVersions, instanceVersion, instanceLoader) {
                 if (filteredVersions.isNotEmpty()) {
@@ -439,7 +439,7 @@ private fun VersionList(
                 items(filteredVersions, key = { it.id }) { version ->
                     val isMCCompatible = instanceVersion != null && version.gameVersions.any { it.contains(instanceVersion) || instanceVersion.contains(it) }
                     val isLoaderCompatible = instanceLoader == null || version.loaders.any { it.equals(instanceLoader, ignoreCase = true) }
-                    
+
                     VersionItemView(
                         version = version,
                         isCompatible = isMCCompatible && isLoaderCompatible,
@@ -524,4 +524,3 @@ fun ContentInstallerScreenDetailPreview() {
         )
     }
 }
-

@@ -96,7 +96,6 @@ import com.ashmeet.hyperlauncher.theme.PojavTheme
 import com.ashmeet.hyperlauncher.utils.rememberDrawablePainter
 import java.io.IOException
 
-
 @Composable
 fun MainMenuFragmentCompose(
     onWikiClick: () -> Unit,

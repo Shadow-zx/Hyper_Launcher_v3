@@ -169,7 +169,7 @@ fun VersionItemView(
                     overflow = TextOverflow.Ellipsis
                 )
             }
-            
+
             if (!isLoaderCompatible) {
                 val tooltipState = rememberTooltipState()
                 val scope = rememberCoroutineScope()
@@ -312,7 +312,7 @@ fun ProjectDetailsSidebar(project: ModrinthProject) {
         Column(modifier = Modifier.padding(horizontal = 24.dp)) {
             if (project.gallery.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(24.dp))
-                
+
                 Text(
                     text = "Images",
                     style = MaterialTheme.typography.titleMedium,
@@ -345,7 +345,7 @@ fun ProjectDetailsSidebar(project: ModrinthProject) {
                 }
             } else {
                 Spacer(modifier = Modifier.height(24.dp))
-                
+
                 Text(
                     text = "Images",
                     style = MaterialTheme.typography.titleMedium,
@@ -381,7 +381,7 @@ fun SearchFiltersSidebar(
             .verticalScroll(rememberScrollState())
     ) {
         Spacer(modifier = Modifier.height(28.dp))
-        
+
         Column(
             modifier = Modifier.padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(4.dp)
@@ -447,8 +447,8 @@ fun FilterSourceItem(
                                 isShowingDialog = false
                             },
                             shape = RoundedCornerShape(16.dp),
-                            color = if (currentSource == source) 
-                                MaterialTheme.colorScheme.primaryContainer 
+                            color = if (currentSource == source)
+                                MaterialTheme.colorScheme.primaryContainer
                             else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
                             tonalElevation = if (currentSource == source) 4.dp else 0.dp,
                             modifier = Modifier.fillMaxWidth()
@@ -460,8 +460,8 @@ fun FilterSourceItem(
                                 Icon(
                                     imageVector = if (source == ContentSource.MODRINTH) Icons.Rounded.Language else Icons.Rounded.Extension,
                                     contentDescription = null,
-                                    tint = if (currentSource == source) 
-                                        MaterialTheme.colorScheme.primary 
+                                    tint = if (currentSource == source)
+                                        MaterialTheme.colorScheme.primary
                                     else MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                                 Spacer(modifier = Modifier.width(16.dp))
@@ -469,14 +469,14 @@ fun FilterSourceItem(
                                     text = source.displayName,
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = if (currentSource == source) FontWeight.Bold else FontWeight.Normal,
-                                    color = if (currentSource == source) 
-                                        MaterialTheme.colorScheme.onPrimaryContainer 
+                                    color = if (currentSource == source)
+                                        MaterialTheme.colorScheme.onPrimaryContainer
                                     else MaterialTheme.colorScheme.onSurface,
                                     modifier = Modifier.weight(1f)
                                 )
                                 if (currentSource == source) {
                                     Icon(
-                                        Icons.Rounded.Check, 
+                                        Icons.Rounded.Check,
                                         contentDescription = null,
                                         tint = MaterialTheme.colorScheme.primary
                                     )

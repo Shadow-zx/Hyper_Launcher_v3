@@ -18,7 +18,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.ashmeet.hyperlauncher.theme.PojavTheme
 
-
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
 fun MicrosoftLoginScreen(
@@ -31,7 +30,7 @@ fun MicrosoftLoginScreen(
         modifier = Modifier.fillMaxSize(),
         color = Color.Transparent
     ) {
-        // Microsoft WebView
+
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -60,12 +59,11 @@ fun MicrosoftLoginScreen(
                                     }
                                 }
                             }
-                            
-                            // Clear cookies for a fresh session
+
                             CookieManager.getInstance().removeAllCookies(null)
                             clearHistory()
                             clearCache(true)
-                            
+
                             loadUrl(authUrl)
                             onWebViewCreated(this)
                         }
