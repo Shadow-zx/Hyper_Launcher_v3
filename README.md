@@ -62,7 +62,7 @@ Hyper Launcher is designed for:
 
 ## Getting Hyper Launcher
 
-You can get Hyper Launcher via three methods:
+You can get Hyper Launcher 3 via three methods:
 
 1. **Automatic Builds** — Get development builds from [GitHub Actions](https://github.com/HyperLauncher/HyperLauncher/actions).
 
