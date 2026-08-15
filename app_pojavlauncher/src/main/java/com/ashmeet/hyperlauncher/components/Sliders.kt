@@ -107,6 +107,12 @@ fun SimpleTextSlider(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically
     ) {
+        val sliderColors = SliderDefaults.colors(
+            thumbColor = MaterialTheme.colorScheme.primary,
+            activeTrackColor = MaterialTheme.colorScheme.primary,
+            inactiveTrackColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+        )
+
         if (shorter) {
             IndicatorSlider(
                 value = value,
@@ -115,7 +121,8 @@ fun SimpleTextSlider(
                 onValueChangeFinished = onValueChangeFinished,
                 valueRange = valueRange,
                 steps = steps,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
+                colors = sliderColors
             )
         } else {
             Slider(
@@ -125,7 +132,8 @@ fun SimpleTextSlider(
                 onValueChangeFinished = onValueChangeFinished,
                 valueRange = valueRange,
                 steps = steps,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
+                colors = sliderColors
             )
         }
         Surface(

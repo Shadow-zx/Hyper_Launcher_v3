@@ -1,4 +1,4 @@
-package com.ashmeet.hyperlauncher.screens.layouts.contentinstaller.models
+package com.ashmeet.hyperlauncher.screens.layouts.installer.models
 
 import android.graphics.Bitmap
 import androidx.compose.material.icons.Icons

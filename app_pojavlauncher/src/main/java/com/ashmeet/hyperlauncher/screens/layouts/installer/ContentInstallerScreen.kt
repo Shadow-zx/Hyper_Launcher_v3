@@ -1,4 +1,4 @@
-package com.ashmeet.hyperlauncher.screens.layouts.contentinstaller
+package com.ashmeet.hyperlauncher.screens.layouts.installer
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.Spring
@@ -64,15 +64,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ashmeet.hyperlauncher.components.SidebarRailButton
-import com.ashmeet.hyperlauncher.screens.layouts.contentinstaller.components.ProjectDetailsSidebar
-import com.ashmeet.hyperlauncher.screens.layouts.contentinstaller.components.ProjectItemView
-import com.ashmeet.hyperlauncher.screens.layouts.contentinstaller.components.SearchFiltersSidebar
-import com.ashmeet.hyperlauncher.screens.layouts.contentinstaller.components.SubVersionItemView
-import com.ashmeet.hyperlauncher.screens.layouts.contentinstaller.components.VersionItemView
-import com.ashmeet.hyperlauncher.screens.layouts.contentinstaller.models.ContentInstallerType
-import com.ashmeet.hyperlauncher.screens.layouts.contentinstaller.models.ContentSource
-import com.ashmeet.hyperlauncher.screens.layouts.contentinstaller.models.ModrinthProject
-import com.ashmeet.hyperlauncher.screens.layouts.contentinstaller.models.ModrinthVersion
+import com.ashmeet.hyperlauncher.screens.layouts.installer.components.ProjectDetailsSidebar
+import com.ashmeet.hyperlauncher.screens.layouts.installer.components.ProjectItemView
+import com.ashmeet.hyperlauncher.screens.layouts.installer.components.SearchFiltersSidebar
+import com.ashmeet.hyperlauncher.screens.layouts.installer.components.SubVersionItemView
+import com.ashmeet.hyperlauncher.screens.layouts.installer.components.VersionItemView
+import com.ashmeet.hyperlauncher.screens.layouts.installer.models.ContentInstallerType
+import com.ashmeet.hyperlauncher.screens.layouts.installer.models.ContentSource
+import com.ashmeet.hyperlauncher.screens.layouts.installer.models.ModrinthProject
+import com.ashmeet.hyperlauncher.screens.layouts.installer.models.ModrinthVersion
 import com.ashmeet.hyperlauncher.theme.PojavTheme
 import kotlinx.coroutines.delay
 @Composable

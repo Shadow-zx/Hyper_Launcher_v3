@@ -1,5 +1,6 @@
 package com.ashmeet.hyperlauncher.screens.layouts.settings
 
+import android.view.ViewGroup
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
@@ -10,6 +11,7 @@ import androidx.compose.material.icons.filled.Animation
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.rounded.AddPhotoAlternate
 import androidx.compose.material.icons.rounded.AspectRatio
+import androidx.compose.material.icons.rounded.ColorLens
 import androidx.compose.material.icons.rounded.DragIndicator
 import androidx.compose.material.icons.rounded.Opacity
 import androidx.compose.material.icons.rounded.RadioButtonUnchecked
@@ -17,10 +19,12 @@ import androidx.compose.material.icons.rounded.Restore
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.edit
@@ -31,10 +35,12 @@ import com.ashmeet.hyperlauncher.screens.layouts.settings.preferences.Preference
 import com.ashmeet.hyperlauncher.screens.layouts.settings.preferences.SettingsActionItem
 import com.ashmeet.hyperlauncher.screens.layouts.settings.preferences.SettingsSliderItem
 import com.ashmeet.hyperlauncher.screens.layouts.settings.preferences.SettingsSwitchItem
+import com.ashmeet.hyperlauncher.screens.layouts.settings.preferences.PointerHotspotPickerDialog
 import com.ashmeet.hyperlauncher.screens.layouts.settings.preferences.SingleChoiceDialog
 import net.ashmeet.hyperlauncher.R
 import net.kdt.pojavlaunch.Tools
 import com.ashmeet.hyperlauncher.prefs.LauncherPreferences
+import net.kdt.pojavlaunch.colorselector.ColorSelector
 import java.io.File
 import java.io.FileOutputStream
 
@@ -42,8 +48,21 @@ import java.io.FileOutputStream
 fun AppearanceSettingsScreen(
     onBack: () -> Unit
 ) {
+    val view = LocalView.current
+    val parent = remember(view) {
+        var p = view.parent
+        while (p != null) {
+            if (p is ViewGroup && p !is androidx.compose.ui.platform.AbstractComposeView) {
+                return@remember p
+            }
+            p = p.parent
+        }
+        null
+    }
+
     var screenTransition by remember { mutableStateOf(LauncherPreferences.PREF_SCREEN_TRANSITION) }
     var appTheme by remember { mutableStateOf(LauncherPreferences.PREF_THEME) }
+    var themeColor by remember { mutableIntStateOf(LauncherPreferences.PREF_THEME_COLOR) }
     var hideSidebar by remember { mutableStateOf(LauncherPreferences.PREF_HIDE_SIDEBAR) }
 
     var drawerSizePerc by remember { mutableFloatStateOf(LauncherPreferences.PREF_DRAWER_PULL_SIZE_PERC) }
@@ -54,9 +73,15 @@ fun AppearanceSettingsScreen(
     var drawerBackground by remember { mutableStateOf(LauncherPreferences.PREF_DRAWER_PULL_BACKGROUND) }
     var drawerIconPath by remember { mutableStateOf(LauncherPreferences.PREF_DRAWER_PULL_ICON_PATH) }
 
+    var pointerIconPath by remember { mutableStateOf(LauncherPreferences.PREF_POINTER_ICON_PATH) }
+    var pointerHotspotX by remember { mutableFloatStateOf(LauncherPreferences.PREF_POINTER_HOTSPOT_X.toFloat()) }
+    var pointerHotspotY by remember { mutableFloatStateOf(LauncherPreferences.PREF_POINTER_HOTSPOT_Y.toFloat()) }
+    var mouseScale by remember { mutableFloatStateOf(LauncherPreferences.PREF_MOUSESCALE * 100f) }
+
     val context = LocalContext.current
     var showTransitionDialog by remember { mutableStateOf(false) }
     var showThemeDialog by remember { mutableStateOf(false) }
+    var showHotspotDialog by remember { mutableStateOf(false) }
 
     val transitionOptions = listOf("none", "fade", "bounce")
     val transitionOptionNames = transitionOptions.map { id ->
@@ -68,12 +93,13 @@ fun AppearanceSettingsScreen(
         }
     }
 
-    val themeOptions = listOf("system", "light", "dark")
+    val themeOptions = listOf("system", "light", "dark", "custom")
     val themeOptionNames = themeOptions.map { id ->
         when (id) {
             "system" -> stringResource(R.string.preference_app_theme_system)
             "light" -> stringResource(R.string.preference_app_theme_light)
             "dark" -> stringResource(R.string.preference_app_theme_dark)
+            "custom" -> "Custom"
             else -> id
         }
     }
@@ -91,6 +117,27 @@ fun AppearanceSettingsScreen(
                     icon = Icons.Default.Palette,
                     onClick = { showThemeDialog = true }
                 )
+            }
+
+            if (appTheme == "custom") {
+                SettingsCard(position = CardPosition.MIDDLE, useSurface = true) {
+                    SettingsActionItem(
+                        title = "Theme Color",
+                        summary = "Choose a custom color for the launcher",
+                        icon = Icons.Rounded.ColorLens,
+                        onClick = {
+                            if (parent != null) {
+                                val colorSelector = ColorSelector(context, parent) { color ->
+                                    themeColor = color
+                                    LauncherPreferences.DEFAULT_PREF.edit { putInt("app_theme_color", color) }
+                                    LauncherPreferences.PREF_THEME_COLOR = color
+                                }
+                                colorSelector.setAlphaEnabled(false)
+                                colorSelector.show(true, themeColor)
+                            }
+                        }
+                    )
+                }
             }
 
             SettingsCard(position = CardPosition.BOTTOM, useSurface = true) {
@@ -221,6 +268,74 @@ fun AppearanceSettingsScreen(
                     }
                 )
             }
+
+            PreferenceCategory(title = "Pointer Settings")
+            SettingsCard(position = CardPosition.TOP, useSurface = true) {
+                SettingsSliderItem(
+                    title = "Pointer Size",
+                    icon = Icons.Rounded.AspectRatio,
+                    value = mouseScale,
+                    valueRange = 25f..300f,
+                    onValueChange = {
+                        mouseScale = it
+                        LauncherPreferences.DEFAULT_PREF.edit { putInt("mousescale", it.toInt()) }
+                        LauncherPreferences.loadPreferences(context)
+                    },
+                    valueSuffix = "%"
+                )
+            }
+            SettingsCard(position = CardPosition.MIDDLE, useSurface = true) {
+                val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+                    if (uri != null) {
+                        val destination = File(Tools.DIR_DATA, "custom_pointer_icon.png")
+                        try {
+                            context.contentResolver.openInputStream(uri)?.use { input ->
+                                FileOutputStream(destination).use { output ->
+                                    input.copyTo(output)
+                                }
+                            }
+                            LauncherPreferences.DEFAULT_PREF.edit { putString("pointer_icon_path", destination.absolutePath) }
+                            LauncherPreferences.PREF_POINTER_ICON_PATH = destination.absolutePath
+                            pointerIconPath = destination.absolutePath
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                    }
+                }
+                SettingsActionItem(
+                    title = "Change pointer image",
+                    summary = if (pointerIconPath != null) "Custom pointer active" else "Default pointer active",
+                    icon = Icons.Rounded.AddPhotoAlternate,
+                    onClick = { launcher.launch("image/*") }
+                )
+            }
+            SettingsCard(position = CardPosition.MIDDLE, useSurface = true) {
+                SettingsActionItem(
+                    title = "Adjust Hotspot",
+                    summary = "Set the point where clicks occur",
+                    icon = Icons.Rounded.DragIndicator,
+                    onClick = { showHotspotDialog = true }
+                )
+            }
+            SettingsCard(position = CardPosition.BOTTOM, useSurface = true) {
+                SettingsActionItem(
+                    title = "Reset pointer",
+                    icon = Icons.Rounded.Restore,
+                    onClick = {
+                        LauncherPreferences.DEFAULT_PREF.edit {
+                            remove("pointer_icon_path")
+                            remove("pointer_hotspot_x")
+                            remove("pointer_hotspot_y")
+                        }
+                        LauncherPreferences.PREF_POINTER_ICON_PATH = null
+                        LauncherPreferences.PREF_POINTER_HOTSPOT_X = 0
+                        LauncherPreferences.PREF_POINTER_HOTSPOT_Y = 0
+                        pointerIconPath = null
+                        pointerHotspotX = 0f
+                        pointerHotspotY = 0f
+                    }
+                )
+            }
         }
 
     }
@@ -252,6 +367,27 @@ fun AppearanceSettingsScreen(
                 LauncherPreferences.loadPreferences(context)
             },
             onDismiss = { showTransitionDialog = false }
+        )
+    }
+
+    if (showHotspotDialog) {
+        PointerHotspotPickerDialog(
+            title = "Adjust Hotspot",
+            imagePath = pointerIconPath,
+            initialX = pointerHotspotX,
+            initialY = pointerHotspotY,
+            onConfirm = { x, y ->
+                pointerHotspotX = x
+                pointerHotspotY = y
+                LauncherPreferences.DEFAULT_PREF.edit {
+                    putInt("pointer_hotspot_x", x.toInt())
+                    putInt("pointer_hotspot_y", y.toInt())
+                }
+                LauncherPreferences.PREF_POINTER_HOTSPOT_X = x.toInt()
+                LauncherPreferences.PREF_POINTER_HOTSPOT_Y = y.toInt()
+                showHotspotDialog = false
+            },
+            onDismiss = { showHotspotDialog = false }
         )
     }
 }

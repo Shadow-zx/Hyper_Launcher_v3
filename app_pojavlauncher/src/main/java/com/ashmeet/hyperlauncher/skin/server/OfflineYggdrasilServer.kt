@@ -1,18 +1,37 @@
-package com.ashmeet.hyperlauncher.skin
+package com.ashmeet.hyperlauncher.skin.server
 
 import android.util.Base64
 import android.util.Log
-import io.ktor.http.*
-import io.ktor.serialization.kotlinx.json.*
-import io.ktor.server.application.*
-import io.ktor.server.cio.*
-import io.ktor.server.engine.*
-import io.ktor.server.plugins.contentnegotiation.*
-import io.ktor.server.request.*
-import io.ktor.server.response.*
-import io.ktor.server.routing.*
+import com.ashmeet.hyperlauncher.skin.PlayerCape
+import com.ashmeet.hyperlauncher.skin.PlayerSkin
+import com.ashmeet.hyperlauncher.skin.SkinModelType
+import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.withCharset
+import io.ktor.serialization.kotlinx.json.json
+import io.ktor.server.application.ApplicationStarted
+import io.ktor.server.application.install
+import io.ktor.server.cio.CIO
+import io.ktor.server.engine.EmbeddedServer
+import io.ktor.server.engine.embeddedServer
+import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.server.request.receive
+import io.ktor.server.response.header
+import io.ktor.server.response.respond
+import io.ktor.server.response.respondBytes
+import io.ktor.server.response.respondText
+import io.ktor.server.routing.Routing
+import io.ktor.server.routing.get
+import io.ktor.server.routing.post
+import io.ktor.server.routing.routing
 import kotlinx.coroutines.runBlocking
-import kotlinx.serialization.json.*
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.add
+import kotlinx.serialization.json.buildJsonArray
+import kotlinx.serialization.json.buildJsonObject
 import java.security.KeyPairGenerator
 import java.security.Signature
 import java.util.concurrent.ConcurrentHashMap
@@ -120,11 +139,11 @@ class OfflineYggdrasilServer(
 
         get("/sessionserver/session/minecraft/hasJoined") {
             val username = call.request.queryParameters["username"]
-                ?: return@get call.respond(HttpStatusCode.BadRequest)
+                ?: return@get call.respond(HttpStatusCode.Companion.BadRequest)
 
             Log.d(TAG, "GET /hasJoined - Profile for $username")
             val char = byName[username.lowercase()]
-                ?: return@get call.respond(HttpStatusCode.NoContent)
+                ?: return@get call.respond(HttpStatusCode.Companion.NoContent)
 
             call.respondText(
                 char.toProfileResponse(localBase(), ::signRsa, json),
@@ -133,7 +152,7 @@ class OfflineYggdrasilServer(
         }
 
         post("/sessionserver/session/minecraft/join") {
-            call.respond(HttpStatusCode.NoContent)
+            call.respond(HttpStatusCode.Companion.NoContent)
         }
 
         get("/sessionserver/session/minecraft/profile/{uuid}") {
@@ -142,7 +161,7 @@ class OfflineYggdrasilServer(
             Log.d(TAG, "GET /profile/$rawUuid - Requested")
 
             val char = byUuid[uuid]
-                ?: return@get call.respond(HttpStatusCode.NoContent)
+                ?: return@get call.respond(HttpStatusCode.Companion.NoContent)
 
             call.respondText(
                 char.toProfileResponse(localBase(), ::signRsa, json),
@@ -152,11 +171,11 @@ class OfflineYggdrasilServer(
 
         get("/textures/{hash}") {
             val hash = call.parameters["hash"]
-                ?: return@get call.respond(HttpStatusCode.NotFound)
+                ?: return@get call.respond(HttpStatusCode.Companion.NotFound)
 
             Log.d(TAG, "GET /textures/$hash - Download requested")
             val bytes = textureStore[hash]
-                ?: return@get call.respond(HttpStatusCode.NotFound)
+                ?: return@get call.respond(HttpStatusCode.Companion.NotFound)
 
             call.response.header(HttpHeaders.CacheControl, "max-age=2592000, public")
             call.response.header(HttpHeaders.ETag, "\"$hash\"")
@@ -181,9 +200,11 @@ class OfflineYggdrasilServer(
         })
 
         val publicKeyBase64 = Base64.encodeToString(keyPair.public.encoded, Base64.DEFAULT).trim()
-        put("signaturePublickey", JsonPrimitive(
-            "-----BEGIN PUBLIC KEY-----\n$publicKeyBase64\n-----END PUBLIC KEY-----"
-        ))
+        put(
+            "signaturePublickey", JsonPrimitive(
+                "-----BEGIN PUBLIC KEY-----\n$publicKeyBase64\n-----END PUBLIC KEY-----"
+            )
+        )
     }.toString()
 
     private fun signRsa(data: String): String {
@@ -223,7 +244,7 @@ class OfflineYggdrasilServer(
                 })
             }
 
-            val texturesJson = json.encodeToString(JsonObject.serializer(), texturesObj)
+            val texturesJson = json.encodeToString(JsonObject.Companion.serializer(), texturesObj)
             val encoded = Base64.encodeToString(
                 texturesJson.toByteArray(Charsets.UTF_8),
                 Base64.NO_WRAP
@@ -241,7 +262,7 @@ class OfflineYggdrasilServer(
                     })
                 })
             }
-            return json.encodeToString(JsonObject.serializer(), response)
+            return json.encodeToString(JsonObject.Companion.serializer(), response)
         }
     }
 }

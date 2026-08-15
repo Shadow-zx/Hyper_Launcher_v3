@@ -77,6 +77,7 @@ public class LauncherPreferences {
     public static boolean PREF_ALSOFT_FORCE_OPENSL = false;
     public static String PREF_SCREEN_TRANSITION = "none";
     public static String PREF_THEME = "system";
+    public static int PREF_THEME_COLOR = 0xFF3F51B5; // Default primary color
     public static int PREF_LAST_CONTENT_SOURCE = 0;
 
     public static boolean PREF_HIDE_SIDEBAR = false;
@@ -88,6 +89,9 @@ public class LauncherPreferences {
     public static boolean PREF_DRAWER_PULL_HOLD_TO_MOVE = true;
     public static boolean PREF_DRAWER_PULL_BACKGROUND = true;
     public static String PREF_DRAWER_PULL_ICON_PATH = null;
+    public static String PREF_POINTER_ICON_PATH = null;
+    public static int PREF_POINTER_HOTSPOT_X = 0;
+    public static int PREF_POINTER_HOTSPOT_Y = 0;
 
     public static void loadPreferences(Context ctx) {
 
@@ -138,6 +142,7 @@ public class LauncherPreferences {
         PREF_ALSOFT_FORCE_OPENSL = DEFAULT_PREF.getBoolean("alsoftForceOpenSL", false);
         PREF_SCREEN_TRANSITION = DEFAULT_PREF.getString("screen_transition", "none");
         PREF_THEME = DEFAULT_PREF.getString("app_theme", "system");
+        PREF_THEME_COLOR = DEFAULT_PREF.getInt("app_theme_color", 0xFF3F51B5);
         PREF_LAST_CONTENT_SOURCE = DEFAULT_PREF.getInt("last_content_source", 0);
         PREF_HIDE_SIDEBAR = DEFAULT_PREF.getBoolean("hide_sidebar", false);
         PREF_DRAWER_PULL_SIZE_PERC = DEFAULT_PREF.getFloat("drawer_pull_size_perc", 50f);
@@ -148,6 +153,9 @@ public class LauncherPreferences {
         PREF_DRAWER_PULL_HOLD_TO_MOVE = DEFAULT_PREF.getBoolean("drawer_pull_hold_to_move", false);
         PREF_DRAWER_PULL_BACKGROUND = DEFAULT_PREF.getBoolean("drawer_pull_background", true);
         PREF_DRAWER_PULL_ICON_PATH = DEFAULT_PREF.getString("drawer_pull_icon_path", null);
+        PREF_POINTER_ICON_PATH = DEFAULT_PREF.getString("pointer_icon_path", null);
+        PREF_POINTER_HOTSPOT_X = DEFAULT_PREF.getInt("pointer_hotspot_x", 0);
+        PREF_POINTER_HOTSPOT_Y = DEFAULT_PREF.getInt("pointer_hotspot_y", 0);
         updateNightMode();
 
         String argLwjglLibname = "-Dorg.lwjgl.opengl.libname=";

@@ -6,6 +6,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchColors
 import androidx.compose.material3.SwitchDefaults
@@ -19,7 +20,14 @@ fun DefaultSwitch(
     onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    colors: SwitchColors = SwitchDefaults.colors(),
+    colors: SwitchColors = SwitchDefaults.colors(
+        checkedThumbColor = MaterialTheme.colorScheme.onPrimary,
+        checkedTrackColor = MaterialTheme.colorScheme.primary,
+        uncheckedThumbColor = MaterialTheme.colorScheme.outline,
+        uncheckedTrackColor = MaterialTheme.colorScheme.surfaceVariant,
+        checkedIconColor = MaterialTheme.colorScheme.primary,
+        uncheckedIconColor = MaterialTheme.colorScheme.onSurfaceVariant
+    ),
     interactionSource: MutableInteractionSource? = null
 ) {
     Switch(

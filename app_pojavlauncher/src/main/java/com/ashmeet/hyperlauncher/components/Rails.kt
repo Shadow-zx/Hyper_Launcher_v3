@@ -37,7 +37,8 @@ fun SideNavigationRail(
     isExport: Boolean = false
 ) {
     NavigationRail(
-        containerColor = Color.Black.copy(alpha = 0.5f),
+        containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.5f),
+        contentColor = MaterialTheme.colorScheme.onSurface,
         modifier = Modifier
             .fillMaxHeight()
             .width(200.dp),

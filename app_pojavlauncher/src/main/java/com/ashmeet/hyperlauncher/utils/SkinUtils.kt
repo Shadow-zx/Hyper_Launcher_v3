@@ -1,12 +1,17 @@
-package com.ashmeet.hyperlauncher.skin
+package com.ashmeet.hyperlauncher.utils
 
 import android.content.Context
-import android.graphics.*
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.Rect
 import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.platform.LocalContext
+import com.ashmeet.hyperlauncher.skin.SkinModelType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import net.kdt.pojavlaunch.authenticator.AuthType
@@ -61,45 +66,47 @@ object SkinUtils {
     /**
      * Renders a 3D isometric head from a skin bitmap or file.
      */
-    suspend fun renderHead(context: Context, account: Account?): Bitmap? = withContext(Dispatchers.IO) {
-        val skinUrl = getSkinUrl(account)
-        val skinBitmap = getSkinBitmap(skinUrl) ?: return@withContext loadSteveHead3D(context)
+    suspend fun renderHead(context: Context, account: Account?): Bitmap? =
+        withContext(Dispatchers.IO) {
+            val skinUrl = getSkinUrl(account)
+            val skinBitmap = getSkinBitmap(skinUrl) ?: return@withContext loadSteveHead3D(context)
 
-        val head = try {
-            SkinHeadRenderer().render(120, skinBitmap)
-        } catch (e: Exception) {
-            Log.e(TAG, "Renderer error", e)
-            null
+            val head = try {
+                SkinHeadRenderer().render(120, skinBitmap)
+            } catch (e: Exception) {
+                Log.e(TAG, "Renderer error", e)
+                null
+            }
+
+            skinBitmap.recycle()
+            return@withContext head ?: loadSteveHead3D(context)
         }
-
-        skinBitmap.recycle()
-        return@withContext head ?: loadSteveHead3D(context)
-    }
 
     /**
      * Renders a 2D front face head from a skin bitmap or file.
      */
-    suspend fun renderHead2D(context: Context, account: Account?): Bitmap? = withContext(Dispatchers.IO) {
-        val skinUrl = getSkinUrl(account)
-        val skinBitmap = getSkinBitmap(skinUrl) ?: return@withContext loadSteveHead2D(context)
+    suspend fun renderHead2D(context: Context, account: Account?): Bitmap? =
+        withContext(Dispatchers.IO) {
+            val skinUrl = getSkinUrl(account)
+            val skinBitmap = getSkinBitmap(skinUrl) ?: return@withContext loadSteveHead2D(context)
 
-        val ratio = skinBitmap.width / 64
-        val size = 128
-        val result = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
-        val canvas = Canvas(result)
-        val paint = Paint().apply { isFilterBitmap = false }
+            val ratio = skinBitmap.width / 64
+            val size = 128
+            val result = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
+            val canvas = Canvas(result)
+            val paint = Paint().apply { isFilterBitmap = false }
 
-        val srcBase = Rect(8 * ratio, 8 * ratio, 16 * ratio, 16 * ratio)
-        val srcOverlay = Rect(40 * ratio, 8 * ratio, 48 * ratio, 16 * ratio)
-        val dst = Rect(0, 0, size, size)
+            val srcBase = Rect(8 * ratio, 8 * ratio, 16 * ratio, 16 * ratio)
+            val srcOverlay = Rect(40 * ratio, 8 * ratio, 48 * ratio, 16 * ratio)
+            val dst = Rect(0, 0, size, size)
 
-        canvas.drawBitmap(skinBitmap, srcBase, dst, paint)
+            canvas.drawBitmap(skinBitmap, srcBase, dst, paint)
 
-        canvas.drawBitmap(skinBitmap, srcOverlay, dst, paint)
+            canvas.drawBitmap(skinBitmap, srcOverlay, dst, paint)
 
-        skinBitmap.recycle()
-        return@withContext result
-    }
+            skinBitmap.recycle()
+            return@withContext result
+        }
 
     private suspend fun getSkinBitmap(skinUrl: String?): Bitmap? = withContext(Dispatchers.IO) {
         if (skinUrl == null) return@withContext null

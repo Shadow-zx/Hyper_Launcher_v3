@@ -216,6 +216,7 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
         mDrawerPullButton.setOnClickListener(v -> onClickedMenu());
         drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         cursor.setCursorScale(LauncherPreferences.PREF_MOUSESCALE);
+        updatePointerIcon();
 
         try {
             File latestLogFile = new File(Tools.DIR_GAME_HOME, "latestlog.txt");
@@ -431,11 +432,11 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
         if(ingameControlsEditorListener == null || ingameControlsEditorArrayAdapter == null) return;
 
         mControlLayout.setModifiable(true);
+        isInEditor = true;
         setDrawerContent();
         // navDrawer.setAdapter(ingameControlsEditorArrayAdapter);
         // navDrawer.setOnItemClickListener(ingameControlsEditorListener);
         mDrawerPullButton.setVisibility(View.VISIBLE);
-        isInEditor = true;
     }
 
     private void openLogOutput() {
@@ -486,6 +487,22 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
         if(toastString != 0) Toast.makeText(ctx, toastString, Toast.LENGTH_SHORT).show();
     }
 
+    private void updatePointerIcon() {
+        if (cursor == null) return;
+        if (LauncherPreferences.PREF_POINTER_ICON_PATH != null) {
+            File iconFile = new File(LauncherPreferences.PREF_POINTER_ICON_PATH);
+            if (iconFile.exists()) {
+                android.graphics.drawable.Drawable drawable = android.graphics.drawable.Drawable.createFromPath(iconFile.getAbsolutePath());
+                if (drawable != null) {
+                    cursor.setCursor(drawable, LauncherPreferences.PREF_POINTER_HOTSPOT_X, LauncherPreferences.PREF_POINTER_HOTSPOT_Y);
+                    return;
+                }
+            }
+        }
+        // Fallback to default
+        cursor.setCursor(null, 0, 0);
+    }
+
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         if(isInEditor) {
@@ -531,10 +548,10 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
             Tools.showError(this,e);
         }
 
+        isInEditor = false;
         setDrawerContent();
         // navDrawer.setAdapter(gameActionArrayAdapter);
         // navDrawer.setOnItemClickListener(gameActionClickListener);
-        isInEditor = false;
     }
 
     @Override

@@ -1,4 +1,4 @@
-package com.ashmeet.hyperlauncher.prefs.screens
+package com.ashmeet.hyperlauncher.fragments.screens
 
 import android.content.SharedPreferences
 import android.os.Bundle

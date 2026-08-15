@@ -74,6 +74,12 @@
         <item name="android:background">?android:attr/listDivider</item>
     </style>
 
+    <style name="AppSeekBar" parent="Widget.AppCompat.SeekBar">
+        <item name="android:progressTint">@color/minebutton_color</item>
+        <item name="android:thumbTint">@color/minebutton_color</item>
+        <item name="android:progressBackgroundTint">@color/divider</item>
+    </style>
+
     <item name="dimension_tracker" type="id" />
     <style name="DimensionTracker">
         <item name="android:id">@id/dimension_tracker</item>

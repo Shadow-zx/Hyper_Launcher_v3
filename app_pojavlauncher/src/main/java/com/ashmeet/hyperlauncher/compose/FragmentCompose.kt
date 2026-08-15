@@ -91,7 +91,7 @@ import net.kdt.pojavlaunch.instances.Instances
 import com.ashmeet.hyperlauncher.prefs.LauncherPreferences
 import com.ashmeet.hyperlauncher.screens.layouts.settings.layouts.CardPosition
 import com.ashmeet.hyperlauncher.screens.layouts.settings.layouts.SettingsCard
-import com.ashmeet.hyperlauncher.skin.SkinUtils
+import com.ashmeet.hyperlauncher.utils.SkinUtils
 import com.ashmeet.hyperlauncher.theme.PojavTheme
 import com.ashmeet.hyperlauncher.utils.rememberDrawablePainter
 import java.io.IOException

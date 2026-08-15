@@ -1,4 +1,4 @@
-package com.ashmeet.hyperlauncher.screens.layouts.contentinstaller.components
+package com.ashmeet.hyperlauncher.screens.layouts.installer.components
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
@@ -69,9 +69,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.ashmeet.hyperlauncher.screens.layouts.contentinstaller.models.ContentSource
-import com.ashmeet.hyperlauncher.screens.layouts.contentinstaller.models.ModrinthProject
-import com.ashmeet.hyperlauncher.screens.layouts.contentinstaller.models.ModrinthVersion
+import com.ashmeet.hyperlauncher.screens.layouts.installer.models.ContentSource
+import com.ashmeet.hyperlauncher.screens.layouts.installer.models.ModrinthProject
+import com.ashmeet.hyperlauncher.screens.layouts.installer.models.ModrinthVersion
 import com.ashmeet.hyperlauncher.screens.layouts.settings.layouts.CardPosition
 import com.ashmeet.hyperlauncher.screens.layouts.settings.layouts.SettingsCard
 import com.ashmeet.hyperlauncher.screens.layouts.settings.preferences.SettingsActionItem

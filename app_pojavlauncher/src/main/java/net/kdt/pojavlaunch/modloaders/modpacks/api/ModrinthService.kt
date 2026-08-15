@@ -2,9 +2,9 @@ package net.kdt.pojavlaunch.modloaders.modpacks.api
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import com.ashmeet.hyperlauncher.screens.layouts.contentinstaller.models.ContentInstallerType
-import com.ashmeet.hyperlauncher.screens.layouts.contentinstaller.models.ModrinthProject
-import com.ashmeet.hyperlauncher.screens.layouts.contentinstaller.models.ModrinthVersion
+import com.ashmeet.hyperlauncher.screens.layouts.installer.models.ContentInstallerType
+import com.ashmeet.hyperlauncher.screens.layouts.installer.models.ModrinthProject
+import com.ashmeet.hyperlauncher.screens.layouts.installer.models.ModrinthVersion
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import kotlinx.coroutines.Dispatchers

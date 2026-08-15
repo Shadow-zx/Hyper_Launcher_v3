@@ -63,7 +63,7 @@ import net.kdt.pojavlaunch.extra.ExtraListener
 import java.io.IOException
 import androidx.compose.ui.tooling.preview.Preview
 import net.kdt.pojavlaunch.progresskeeper.ProgressKeeper
-import com.ashmeet.hyperlauncher.skin.SkinUtils
+import com.ashmeet.hyperlauncher.utils.SkinUtils
 import com.ashmeet.hyperlauncher.theme.PojavTheme
 
 @Composable

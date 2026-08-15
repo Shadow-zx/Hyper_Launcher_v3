@@ -1,5 +1,6 @@
 package com.ashmeet.hyperlauncher.fragments
 
+import android.annotation.SuppressLint
 import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
@@ -14,11 +15,11 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.edit
 import androidx.fragment.app.Fragment
-import com.ashmeet.hyperlauncher.screens.layouts.contentinstaller.ContentInstallerScreen
-import com.ashmeet.hyperlauncher.screens.layouts.contentinstaller.models.ContentInstallerType
-import com.ashmeet.hyperlauncher.screens.layouts.contentinstaller.models.ContentSource
-import com.ashmeet.hyperlauncher.screens.layouts.contentinstaller.models.ModrinthProject
-import com.ashmeet.hyperlauncher.screens.layouts.contentinstaller.models.ModrinthVersion
+import com.ashmeet.hyperlauncher.screens.layouts.installer.ContentInstallerScreen
+import com.ashmeet.hyperlauncher.screens.layouts.installer.models.ContentInstallerType
+import com.ashmeet.hyperlauncher.screens.layouts.installer.models.ContentSource
+import com.ashmeet.hyperlauncher.screens.layouts.installer.models.ModrinthProject
+import com.ashmeet.hyperlauncher.screens.layouts.installer.models.ModrinthVersion
 import com.ashmeet.hyperlauncher.theme.PojavTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -46,6 +47,7 @@ import kotlin.collections.map
 
 class ContentInstallerFragment : Fragment() {
 
+    @SuppressLint("LocalContextGetResourceValueCall")
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,

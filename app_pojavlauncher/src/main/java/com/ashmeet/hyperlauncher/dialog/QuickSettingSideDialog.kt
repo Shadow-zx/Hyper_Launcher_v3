@@ -2,43 +2,41 @@ package com.ashmeet.hyperlauncher.dialog
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import com.ashmeet.hyperlauncher.prefs.LauncherPreferences
 import com.ashmeet.hyperlauncher.prefs.LauncherPreferences.*
-import com.google.android.material.materialswitch.MaterialSwitch
-import com.kdt.CustomSeekbar
+import com.ashmeet.hyperlauncher.screens.layouts.settings.preferences.SettingsSliderItem
+import com.ashmeet.hyperlauncher.screens.layouts.settings.preferences.SettingsSwitchItem
+import com.ashmeet.hyperlauncher.theme.PojavTheme
 import com.kdt.SideDialogView
 import net.ashmeet.hyperlauncher.R
 import net.kdt.pojavlaunch.Tools
-import net.kdt.pojavlaunch.utils.interfaces.SimpleSeekBarListener
 
 /**
  * Side dialog for quick settings that you can change in game
  * The implementation has to take action on some preference changes
  */
 abstract class QuickSettingSideDialog(context: Context, parent: ViewGroup) :
-    SideDialogView(context, parent, R.layout.dialog_quick_setting) {
+    SideDialogView(context, parent, R.layout.dialog_compose) {
 
     private var mEditor: SharedPreferences.Editor? = null
-
-    private lateinit var mGyroSwitch: MaterialSwitch
-    private lateinit var mGyroXSwitch: MaterialSwitch
-    private lateinit var mGyroYSwitch: MaterialSwitch
-    private lateinit var mGestureSwitch: MaterialSwitch
-
-    private lateinit var mGyroSensitivityBar: CustomSeekbar
-    private lateinit var mMouseSpeedBar: CustomSeekbar
-    private lateinit var mGestureDelayBar: CustomSeekbar
-    private lateinit var mResolutionBar: CustomSeekbar
-
-    private lateinit var mGyroSensitivityText: TextView
-    private lateinit var mGyroSensitivityDisplayText: TextView
-    private lateinit var mMouseSpeedText: TextView
-    private lateinit var mGestureDelayText: TextView
-    private lateinit var mGestureDelayDisplayText: TextView
-    private lateinit var mResolutionText: TextView
 
     private var mOriginalGyroEnabled = false
     private var mOriginalGyroXEnabled = false
@@ -56,39 +54,6 @@ abstract class QuickSettingSideDialog(context: Context, parent: ViewGroup) :
     }
 
     override fun onInflate() {
-        bindLayout()
-        Tools.runOnUiThread {
-            setupListeners()
-            updateGyroCompatibility()
-        }
-    }
-
-    override fun onDestroy() {
-        removeListeners()
-    }
-
-    private fun bindLayout() {
-        mDialogContent.apply {
-            mGyroSwitch = findViewById(R.id.checkboxGyro)
-            mGyroXSwitch = findViewById(R.id.checkboxGyroX)
-            mGyroYSwitch = findViewById(R.id.checkboxGyroY)
-            mGestureSwitch = findViewById(R.id.checkboxGesture)
-
-            mGyroSensitivityBar = findViewById(R.id.editGyro_seekbar)
-            mMouseSpeedBar = findViewById(R.id.editMouseSpeed_seekbar)
-            mGestureDelayBar = findViewById(R.id.editGestureDelay_seekbar)
-            mResolutionBar = findViewById(R.id.editResolution_seekbar)
-
-            mGyroSensitivityText = findViewById(R.id.editGyro_textView_percent)
-            mGyroSensitivityDisplayText = findViewById(R.id.editGyro_textView)
-            mMouseSpeedText = findViewById(R.id.editMouseSpeed_textView_percent)
-            mGestureDelayText = findViewById(R.id.editGestureDelay_textView_percent)
-            mGestureDelayDisplayText = findViewById(R.id.editGestureDelay_textView)
-            mResolutionText = findViewById(R.id.editResolution_textView_percent)
-        }
-    }
-
-    private fun setupListeners() {
         mEditor = DEFAULT_PREF.edit()
 
         mOriginalGyroEnabled = PREF_ENABLE_GYRO
@@ -101,118 +66,26 @@ abstract class QuickSettingSideDialog(context: Context, parent: ViewGroup) :
         mOriginalGestureDelay = PREF_LONGPRESS_TRIGGER
         mOriginalResolution = PREF_SCALE_FACTOR
 
-        mGyroSwitch.isChecked = mOriginalGyroEnabled
-        mGyroXSwitch.isChecked = mOriginalGyroXEnabled
-        mGyroYSwitch.isChecked = mOriginalGyroYEnabled
-        mGestureSwitch.isChecked = mOriginalGestureDisabled
-
-        mGyroSwitch.setOnCheckedChangeListener { _, isChecked ->
-            PREF_ENABLE_GYRO = isChecked
-            onGyroStateChanged()
-            updateGyroVisibility(isChecked)
-            mEditor?.putBoolean("enableGyro", isChecked)
+        val composeView = mDialogContent.findViewById<ComposeView>(R.id.compose_view)
+        composeView.setContent {
+            PojavTheme {
+                Surface(
+                    color = Color.Transparent,
+                    contentColor = MaterialTheme.colorScheme.onSurface
+                ) {
+                    QuickSettingContent(
+                        onResolutionChanged = { onResolutionChanged() },
+                        onGyroStateChanged = { onGyroStateChanged() }
+                    ) { key, value ->
+                        when (value) {
+                            is Boolean -> mEditor?.putBoolean(key, value)
+                            is Int -> mEditor?.putInt(key, value)
+                            is Float -> mEditor?.putFloat(key, value)
+                        }
+                    }
+                }
+            }
         }
-
-        mGyroXSwitch.setOnCheckedChangeListener { _, isChecked ->
-            PREF_GYRO_INVERT_X = isChecked
-            onGyroStateChanged()
-            mEditor?.putBoolean("gyroInvertX", isChecked)
-        }
-
-        mGyroYSwitch.setOnCheckedChangeListener { _, isChecked ->
-            PREF_GYRO_INVERT_Y = isChecked
-            onGyroStateChanged()
-            mEditor?.putBoolean("gyroInvertY", isChecked)
-        }
-
-        mGestureSwitch.setOnCheckedChangeListener { _, isChecked ->
-            PREF_DISABLE_GESTURES = isChecked
-            updateGestureVisibility(isChecked)
-            mEditor?.putBoolean("disableGestures", isChecked)
-        }
-
-        mGyroSensitivityBar.setOnSeekBarChangeListener(SimpleSeekBarListener { _, progress, _ ->
-            PREF_GYRO_SENSITIVITY = progress / 100f
-            mEditor?.putInt("gyroSensitivity", progress)
-            setSeekTextPercent(mGyroSensitivityText, progress)
-        })
-        mGyroSensitivityBar.progress = (mOriginalGyroSensitivity * 100f).toInt()
-        setSeekTextPercent(mGyroSensitivityText, mGyroSensitivityBar.progress)
-
-        mMouseSpeedBar.setOnSeekBarChangeListener(SimpleSeekBarListener { _, progress, _ ->
-            PREF_MOUSESPEED = progress / 100f
-            mEditor?.putInt("mousespeed", progress)
-            setSeekTextPercent(mMouseSpeedText, progress)
-        })
-        mMouseSpeedBar.progress = (mOriginalMouseSpeed * 100f).toInt()
-        setSeekTextPercent(mMouseSpeedText, mMouseSpeedBar.progress)
-
-        mGestureDelayBar.setOnSeekBarChangeListener(SimpleSeekBarListener { _, progress, _ ->
-            PREF_LONGPRESS_TRIGGER = progress
-            mEditor?.putInt("timeLongPressTrigger", progress)
-            setSeekTextMillisecond(mGestureDelayText, progress)
-        })
-        mGestureDelayBar.progress = mOriginalGestureDelay
-        setSeekTextMillisecond(mGestureDelayText, mGestureDelayBar.progress)
-
-        mResolutionBar.setOnSeekBarChangeListener(SimpleSeekBarListener { _, progress, _ ->
-            PREF_SCALE_FACTOR = progress / 100f
-            mEditor?.putInt("resolutionRatio", progress)
-            setSeekTextPercent(mResolutionText, progress)
-            onResolutionChanged()
-        })
-        mResolutionBar.progress = (mOriginalResolution * 100).toInt()
-        setSeekTextPercent(mResolutionText, mResolutionBar.progress)
-
-        updateGyroVisibility(mOriginalGyroEnabled)
-        updateGestureVisibility(mOriginalGestureDisabled)
-    }
-
-    private fun setSeekTextMillisecond(target: TextView, value: Int) {
-        setSeekText(target, R.string.millisecond_format, value)
-    }
-
-    private fun setSeekTextPercent(target: TextView, value: Int) {
-        setSeekText(target, R.string.percent_format, value)
-    }
-
-    private fun setSeekText(target: TextView, format: Int, value: Int) {
-        target.text = target.context.getString(format, value)
-    }
-
-    private fun updateGyroVisibility(isEnabled: Boolean) {
-        val visibility = if (isEnabled) View.VISIBLE else View.GONE
-        mGyroXSwitch.visibility = visibility
-        mGyroYSwitch.visibility = visibility
-        mGyroSensitivityBar.visibility = visibility
-        mGyroSensitivityText.visibility = visibility
-        mGyroSensitivityDisplayText.visibility = visibility
-    }
-
-    private fun updateGyroCompatibility() {
-        val isGyroAvailable = Tools.deviceSupportsGyro(mDialogContent.context)
-        if (!isGyroAvailable) {
-            mGyroSwitch.visibility = View.GONE
-            updateGestureVisibility(false)
-        }
-    }
-
-    private fun updateGestureVisibility(isDisabled: Boolean) {
-        val visibility = if (isDisabled) View.GONE else View.VISIBLE
-        mGestureDelayBar.visibility = visibility
-        mGestureDelayText.visibility = visibility
-        mGestureDelayDisplayText.visibility = visibility
-    }
-
-    private fun removeListeners() {
-        mGyroSwitch.setOnCheckedChangeListener(null)
-        mGyroXSwitch.setOnCheckedChangeListener(null)
-        mGyroYSwitch.setOnCheckedChangeListener(null)
-        mGestureSwitch.setOnCheckedChangeListener(null)
-        mGyroSensitivityBar.setOnSeekBarChangeListener(null)
-        mMouseSpeedBar.setOnSeekBarChangeListener(null)
-        mGestureDelayBar.setOnSeekBarChangeListener(null)
-        mResolutionBar.setOnSeekBarChangeListener(null)
     }
 
     private fun setupCancelButton() {
@@ -249,4 +122,132 @@ abstract class QuickSettingSideDialog(context: Context, parent: ViewGroup) :
      * Use [LauncherPreferences.PREF_GYRO_INVERT_Y]
      */
     abstract fun onGyroStateChanged()
+}
+
+@Composable
+private fun QuickSettingContent(
+    onResolutionChanged: () -> Unit,
+    onGyroStateChanged: () -> Unit,
+    onPreferenceChanged: (String, Any) -> Unit
+) {
+    val context = LocalContext.current
+    var enableGyro by remember { mutableStateOf(PREF_ENABLE_GYRO) }
+    var gyroInvertX by remember { mutableStateOf(PREF_GYRO_INVERT_X) }
+    var gyroInvertY by remember { mutableStateOf(PREF_GYRO_INVERT_Y) }
+    var gyroSensitivity by remember { mutableFloatStateOf(PREF_GYRO_SENSITIVITY * 100f) }
+
+    var mouseSpeed by remember { mutableFloatStateOf(PREF_MOUSESPEED * 100f) }
+
+    var disableGestures by remember { mutableStateOf(PREF_DISABLE_GESTURES) }
+    var gestureDelay by remember { mutableFloatStateOf(PREF_LONGPRESS_TRIGGER.toFloat()) }
+
+    var resolutionScaler by remember { mutableFloatStateOf(PREF_SCALE_FACTOR * 100f) }
+
+    val isGyroAvailable = remember { Tools.deviceSupportsGyro(context) }
+
+    Column(
+        modifier = Modifier.padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        // Resolution
+        SettingsSliderItem(
+            title = stringResource(R.string.mcl_setting_title_resolution_scaler),
+            value = resolutionScaler,
+            valueRange = 25f..100f,
+            valueSuffix = "%",
+            onValueChange = {
+                resolutionScaler = it
+                PREF_SCALE_FACTOR = it / 100f
+                onPreferenceChanged("resolutionRatio", it.toInt())
+                onResolutionChanged()
+            }
+        )
+
+        // Gyro
+        if (isGyroAvailable) {
+            SettingsSwitchItem(
+                title = stringResource(R.string.preference_enable_gyro_title),
+                checked = enableGyro,
+                onCheckedChange = {
+                    enableGyro = it
+                    PREF_ENABLE_GYRO = it
+                    onPreferenceChanged("enableGyro", it)
+                    onGyroStateChanged()
+                }
+            )
+
+            if (enableGyro) {
+                SettingsSwitchItem(
+                    title = stringResource(R.string.preference_gyro_invert_x_axis),
+                    checked = gyroInvertX,
+                    onCheckedChange = {
+                        gyroInvertX = it
+                        PREF_GYRO_INVERT_X = it
+                        onPreferenceChanged("gyroInvertX", it)
+                        onGyroStateChanged()
+                    }
+                )
+                SettingsSwitchItem(
+                    title = stringResource(R.string.preference_gyro_invert_y_axis),
+                    checked = gyroInvertY,
+                    onCheckedChange = {
+                        gyroInvertY = it
+                        PREF_GYRO_INVERT_Y = it
+                        onPreferenceChanged("gyroInvertY", it)
+                        onGyroStateChanged()
+                    }
+                )
+                SettingsSliderItem(
+                    title = stringResource(R.string.preference_gyro_sensitivity_title),
+                    value = gyroSensitivity,
+                    valueRange = 25f..300f,
+                    valueSuffix = "%",
+                    onValueChange = {
+                        gyroSensitivity = it
+                        PREF_GYRO_SENSITIVITY = it / 100f
+                        onPreferenceChanged("gyroSensitivity", it.toInt())
+                        onGyroStateChanged()
+                    }
+                )
+            }
+        }
+
+        // Mouse Speed
+        SettingsSliderItem(
+            title = stringResource(R.string.mcl_setting_title_mousespeed),
+            value = mouseSpeed,
+            valueRange = 25f..300f,
+            valueSuffix = "%",
+            onValueChange = {
+                mouseSpeed = it
+                PREF_MOUSESPEED = it / 100f
+                onPreferenceChanged("mousespeed", it.toInt())
+            }
+        )
+
+        // Gestures
+        SettingsSwitchItem(
+            title = stringResource(R.string.mcl_disable_gestures),
+            checked = disableGestures,
+            onCheckedChange = {
+                disableGestures = it
+                PREF_DISABLE_GESTURES = it
+                onPreferenceChanged("disableGestures", it)
+            }
+        )
+
+        if (!disableGestures) {
+            SettingsSliderItem(
+                title = stringResource(R.string.mcl_setting_title_longpresstrigger),
+                value = gestureDelay,
+                valueRange = 100f..1000f,
+                valueSuffix = " ms",
+                onValueChange = {
+                    gestureDelay = it
+                    PREF_LONGPRESS_TRIGGER = it.toInt()
+                    onPreferenceChanged("timeLongPressTrigger", it.toInt())
+                }
+            )
+        }
+    }
 }

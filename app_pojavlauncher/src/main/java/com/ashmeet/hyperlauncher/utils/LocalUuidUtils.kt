@@ -1,4 +1,6 @@
-package com.ashmeet.hyperlauncher.skin
+package com.ashmeet.hyperlauncher.utils
+
+import com.ashmeet.hyperlauncher.skin.SkinModelType
 
 /**
  * Generates a deterministic offline UUID from a player's username.

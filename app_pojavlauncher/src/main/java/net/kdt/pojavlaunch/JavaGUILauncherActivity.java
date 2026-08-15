@@ -18,13 +18,14 @@ import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.Keep;
 import androidx.appcompat.app.AlertDialog;
 
+import com.ashmeet.hyperlauncher.prefs.LauncherPreferences;
 import com.kdt.LoggerView;
 
+import net.ashmeet.hyperlauncher.R;
 import net.kdt.pojavlaunch.customcontrols.keyboard.AwtCharSender;
 import net.kdt.pojavlaunch.customcontrols.keyboard.TouchCharInput;
 import net.kdt.pojavlaunch.multirt.MultiRTUtils;
 import net.kdt.pojavlaunch.multirt.Runtime;
-import com.ashmeet.hyperlauncher.prefs.LauncherPreferences;
 import net.kdt.pojavlaunch.utils.JREUtils;
 import net.kdt.pojavlaunch.utils.MathUtils;
 import net.kdt.pojavlaunch.utils.jre.JavaRunner;
@@ -43,8 +44,6 @@ import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 import java.util.zip.ZipEntry;
-
-import net.ashmeet.hyperlauncher.R;
 
 public class JavaGUILauncherActivity extends BaseActivity implements View.OnTouchListener {
 
@@ -103,6 +102,7 @@ public class JavaGUILauncherActivity extends BaseActivity implements View.OnTouc
             ViewGroup.LayoutParams params = mMousePointerImageView.getLayoutParams();
             params.width = (int) (36 * LauncherPreferences.PREF_MOUSESCALE);
             params.height = (int) (54 * LauncherPreferences.PREF_MOUSESCALE);
+            updatePointerIcon();
         });
 
         mTouchPad.setOnTouchListener(new View.OnTouchListener() {
@@ -396,6 +396,43 @@ public class JavaGUILauncherActivity extends BaseActivity implements View.OnTouc
     public void toggleKeyboard(View view) {
         mTouchCharInput.switchKeyboardState();
     }
+
+    private void updatePointerIcon() {
+        if (mMousePointerImageView == null) return;
+        if (LauncherPreferences.PREF_POINTER_ICON_PATH != null) {
+            File iconFile = new File(LauncherPreferences.PREF_POINTER_ICON_PATH);
+            if (iconFile.exists()) {
+                android.graphics.drawable.Drawable drawable = android.graphics.drawable.Drawable.createFromPath(iconFile.getAbsolutePath());
+                if (drawable != null) {
+                    float ratio = (float) drawable.getIntrinsicWidth() / drawable.getIntrinsicHeight();
+                    int height = (int) (54 * LauncherPreferences.PREF_MOUSESCALE);
+                    int width = (int) (height * ratio);
+
+                    ViewGroup.LayoutParams params = mMousePointerImageView.getLayoutParams();
+                    params.width = width;
+                    params.height = height;
+                    mMousePointerImageView.setLayoutParams(params);
+
+                    mMousePointerImageView.setImageDrawable(drawable);
+
+                    float hX = (LauncherPreferences.PREF_POINTER_HOTSPOT_X / 100f) * width;
+                    float hY = (LauncherPreferences.PREF_POINTER_HOTSPOT_Y / 100f) * height;
+
+                    mMousePointerImageView.setTranslationX(-hX);
+                    mMousePointerImageView.setTranslationY(-hY);
+                    return;
+                }
+            }
+        }
+        mMousePointerImageView.setImageResource(R.drawable.ic_mouse_pointer);
+        ViewGroup.LayoutParams params = mMousePointerImageView.getLayoutParams();
+        params.width = (int) (36 * LauncherPreferences.PREF_MOUSESCALE);
+        params.height = (int) (54 * LauncherPreferences.PREF_MOUSESCALE);
+        mMousePointerImageView.setLayoutParams(params);
+        mMousePointerImageView.setTranslationX(0);
+        mMousePointerImageView.setTranslationY(0);
+    }
+
     public void performCopy(View view) {
         AWTInputBridge.sendKey(' ', AWTInputEvent.VK_CONTROL, 1);
         AWTInputBridge.sendKey(' ', AWTInputEvent.VK_C);
