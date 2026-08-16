@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
+import net.ashmeet.hyperlauncher.R;
 import net.kdt.pojavlaunch.customcontrols.LayoutBitmaps;
 import net.kdt.pojavlaunch.utils.FileUtils;
 
@@ -24,8 +25,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-
-import net.ashmeet.hyperlauncher.R;
 
 /**
  * An activity dedicated to importing control files.
@@ -43,6 +42,7 @@ public class ImportControlActivity extends Activity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Tools.getDisplayMetrics(this);
         if(Tools.checkStorageInteractive(this)) {
             Tools.initStorageConstants(getApplicationContext());
         }else {

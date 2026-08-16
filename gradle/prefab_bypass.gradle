@@ -29,9 +29,24 @@ project.afterEvaluate {
         def task = tasks.findByName("${taskName}[$arch]")
         if (task != null) {
             task.doFirst {
-                def prefabPackageFiles = abi.variant.prefabPackages.files
+                // Find all prefab packages from all configurations
+                def prefabPackageFiles = new ArrayList<File>()
+                configurations.each { config ->
+                    if (config.canBeResolved) {
+                        try {
+                            config.resolvedConfiguration.resolvedArtifacts.each { artifact ->
+                                if (artifact.file.name.endsWith(".aar")) {
+                                    def prefabDir = new File(project.buildDir, "intermediates/prefab_package_fingerprints/${artifact.name}")
+                                    if (prefabDir.exists()) prefabPackageFiles.add(prefabDir)
+                                }
+                            }
+                        } catch (Exception ignored) {}
+                    }
+                }
+                
                 for (File file : prefabPackageFiles) {
                     def libsDir = findFirstLibsSubdirectory(file)
+                    if (libsDir == null) continue
                     def libsArchDir = new File(libsDir, dirName)
                     if (!libsArchDir.exists()) {
                         libsArchDir.mkdirs()
@@ -57,17 +72,19 @@ project.afterEvaluate {
     for(arch in archList) {
         def abiName = "$arch"
         def dirName = "android.$arch"
+
         configurePrefabForTask("configureNdkBuildDebug", arch, dirName, abiName)
         configurePrefabForTask("configureNdkBuildRelease", arch, dirName, abiName)
         configurePrefabForTask("configureCMakeDebug", arch, dirName, abiName)
         configurePrefabForTask("configureCMakeRelease", arch, dirName, abiName)
+        configurePrefabForTask("configureCMakeRelWithDebInfo", arch, dirName, abiName)
     }
 }
 
 def findFirstLibsSubdirectory(File baseDir) {
     // make sure the baseDir exists
     if (!baseDir.exists() || !baseDir.isDirectory()) {
-        throw new IllegalArgumentException("baseDir not exists: $baseDir")
+        return null
     }
     def result = null
     baseDir.eachFileRecurse(groovy.io.FileType.DIRECTORIES) { dir ->

@@ -66,7 +66,7 @@ public class LauncherPreferences {
     public static String PREF_DOWNLOAD_SOURCE = "default";
     public static boolean PREF_SKIP_NOTIFICATION_PERMISSION_CHECK = false;
     public static boolean PREF_VSYNC_IN_ZINK = true;
-    public static boolean PREF_FULLSCREEN_LAUNCHER = false;
+    public static boolean PREF_FULLSCREEN_LAUNCHER = true;
 
     public static boolean PREF_RAPID_START = true;
     public static boolean PREF_VERIFY_FILES = true;
@@ -75,7 +75,7 @@ public class LauncherPreferences {
     public static boolean PREF_KEYBOARD_AUTOPANNING = true;
     public static boolean PREF_MIGRATION_NOTICE = true;
     public static boolean PREF_ALSOFT_FORCE_OPENSL = false;
-    public static String PREF_SCREEN_TRANSITION = "none";
+    public static String PREF_SCREEN_TRANSITION = "bounce";
     public static String PREF_THEME = "system";
     public static int PREF_THEME_COLOR = 0xFF3F51B5;
     public static int PREF_LAST_CONTENT_SOURCE = 0;

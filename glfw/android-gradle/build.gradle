@@ -11,7 +11,8 @@ android {
         externalNativeBuild {
             cmake {
                 arguments "-DGLFW_BUILD_WAYLAND=OFF", "-DGLFW_BUILD_X11=OFF", "-DGLFW_BUILD_ANDROID=ON",
-                        "-DGLFW_BUILD_EXAMPLES=OFF", "-DGLFW_BUILD_TESTS=OFF", "-DGLFW_INSTALL=OFF", "-DBUILD_SHARED_LIBS=ON"
+                        "-DGLFW_BUILD_EXAMPLES=OFF", "-DGLFW_BUILD_TESTS=OFF", "-DGLFW_INSTALL=OFF", "-DBUILD_SHARED_LIBS=ON",
+                        "-DCMAKE_SHARED_LINKER_FLAGS=-Wl,-z,max-page-size=16384"
                 cFlags "-Wno-nullability-completeness"
             }
         }
