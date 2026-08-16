@@ -48,6 +48,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.ashmeet.hyperlauncher.prefs.LauncherPreferences
 import net.ashmeet.hyperlauncher.R
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -60,18 +61,33 @@ fun MineButton(
     shape: Shape = CircleShape,
     isUppercase: Boolean = false
 ) {
+    val isCustomTheme = remember { LauncherPreferences.PREF_THEME == "custom" }
+    val primaryColor = MaterialTheme.colorScheme.primary
+    val contentColor = if (isCustomTheme) {
+        // Create a significantly darker version of the primary color for the text
+        Color(
+            red = primaryColor.red * 0.3f,
+            green = primaryColor.green * 0.3f,
+            blue = primaryColor.blue * 0.3f,
+            alpha = 1f
+        )
+    } else {
+        MaterialTheme.colorScheme.onPrimary
+    }
+
     Button(
         onClick = onClick,
         modifier = modifier.height(height),
         shape = shape,
         colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.primary,
-            contentColor = MaterialTheme.colorScheme.onPrimary
+            containerColor = primaryColor,
+            contentColor = contentColor
         ),
         contentPadding = PaddingValues(horizontal = 24.dp, vertical = 0.dp)
     ) {
         Text(
-            text = if (isUppercase) text.uppercase() else text
+            text = if (isUppercase) text.uppercase() else text,
+            fontWeight = if (isCustomTheme) FontWeight.Bold else FontWeight.Normal
         )
     }
 }

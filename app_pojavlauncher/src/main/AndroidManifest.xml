@@ -34,6 +34,7 @@
         android:resizeableActivity="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:theme="@style/AppTheme"
+        android:screenOrientation="sensorLandscape"
         android:networkSecurityConfig="@xml/netconfig"
         android:enableOnBackInvokedCallback="false"
         tools:ignore="UnusedAttribute">
@@ -49,6 +50,7 @@
             android:name="net.kdt.pojavlaunch.TestStorageActivity"
             android:exported="true"
             android:label="@string/app_short_name"
+            android:screenOrientation="sensorLandscape"
             android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -65,6 +67,7 @@
             android:name="net.kdt.pojavlaunch.ImportControlActivity"
             android:configChanges="keyboard|keyboardHidden"
             android:exported="true"
+            android:screenOrientation="sensorLandscape"
             android:launchMode="singleInstance"
             android:windowSoftInputMode="stateVisible">
             <intent-filter

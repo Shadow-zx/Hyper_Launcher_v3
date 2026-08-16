@@ -1,4 +1,4 @@
-package com.ashmeet.hyperlauncher.compose
+package com.ashmeet.hyperlauncher.skin
 
 import android.annotation.SuppressLint
 import android.webkit.WebSettings

@@ -1,15 +1,22 @@
 package net.kdt.pojavlaunch.colorselector
 
-import android.graphics.Color
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
-import com.ashmeet.hyperlauncher.theme.PojavTheme
+import com.ashmeet.hyperlauncher.colorpicker.rememberColorPickerController
+import com.ashmeet.hyperlauncher.colorpicker.components.VerticalAlphaBarPicker
+import com.ashmeet.hyperlauncher.colorpicker.components.ColorSquarePicker
+import com.ashmeet.hyperlauncher.colorpicker.components.VerticalHueBarPicker
+import com.ashmeet.hyperlauncher.colorpicker.components.TransparentChecker
 
 @Composable
 fun ColorSelectorContent(
@@ -18,13 +25,11 @@ fun ColorSelectorContent(
     onColorChanged: (Int) -> Unit,
     onClose: () -> Unit
 ) {
-    var currentColor by remember { mutableIntStateOf(initialColor) }
-    val hsv = remember { floatArrayOf(0f, 0f, 0f) }
-    
-    // Initialize HSV once
-    remember(currentColor) {
-        Color.colorToHSV(currentColor, hsv)
-        true
+    val controller = rememberColorPickerController(initialColor = Color(initialColor))
+    val currentColor by controller.color
+
+    LaunchedEffect(currentColor) {
+        onColorChanged(currentColor.toArgb())
     }
 
     BackHandler {
@@ -38,101 +43,74 @@ fun ColorSelectorContent(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
+        // Main Row: Square Picker and Sliders
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(140.dp), // Reduced height to fit better
+                .height(160.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            // SV Rectangle
-            AndroidView(
-                factory = { context ->
-                    SVRectangleView(context, null).apply {
-                        setRectSelectionListener { luminosity, intensity ->
-                            hsv[1] = intensity
-                            hsv[2] = luminosity
-                            currentColor = Color.HSVToColor(Color.alpha(currentColor), hsv)
-                            onColorChanged(currentColor)
-                        }
-                    }
-                },
+            ColorSquarePicker(
+                controller = controller,
                 modifier = Modifier
                     .weight(1f)
-                    .fillMaxHeight(),
-                update = { view ->
-                    view.setLuminosityIntensity(hsv[2], hsv[1])
-                    val hueHsv = floatArrayOf(hsv[0], 1f, 1f)
-                    view.setColor(Color.HSVToColor(hueHsv), true)
-                }
+                    .fillMaxHeight()
+                    .clip(RoundedCornerShape(8.dp))
+            )
+
+            // Vertical Hue Picker
+            VerticalHueBarPicker(
+                controller = controller,
+                modifier = Modifier
+                    .width(24.dp)
+                    .fillMaxHeight()
+                    .clip(RoundedCornerShape(4.dp))
             )
 
             if (alphaEnabled) {
-                // Alpha Slider
-                AndroidView(
-                    factory = { context ->
-                        AlphaView(context, null).apply {
-                            setAlphaSelectionListener { alpha ->
-                                currentColor = Color.HSVToColor(alpha, hsv)
-                                onColorChanged(currentColor)
-                            }
-                        }
-                    },
+                // Vertical Alpha Picker
+                VerticalAlphaBarPicker(
+                    controller = controller,
                     modifier = Modifier
                         .width(24.dp)
-                        .fillMaxHeight(),
-                    update = { view ->
-                        view.setAlpha(Color.alpha(currentColor))
-                    }
+                        .fillMaxHeight()
+                        .clip(RoundedCornerShape(4.dp))
                 )
             }
-
-            // Hue Slider
-            AndroidView(
-                factory = { context ->
-                    HueView(context, null).apply {
-                        setHueSelectionListener { hue ->
-                            hsv[0] = hue
-                            currentColor = Color.HSVToColor(Color.alpha(currentColor), hsv)
-                            onColorChanged(currentColor)
-                        }
-                    }
-                },
-                modifier = Modifier
-                    .width(24.dp)
-                    .fillMaxHeight(),
-                update = { view ->
-                    view.setHue(hsv[0])
-                }
-            )
         }
 
+        // Bottom Row: Preview and HEX
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            // Preview
-            AndroidView(
-                factory = { context ->
-                    ColorSideBySideView(context, null)
-                },
+            Box(
                 modifier = Modifier
-                    .size(48.dp),
-                update = { view ->
-                    view.setColor(currentColor)
-                }
-            )
+                    .size(48.dp)
+                    .clip(RoundedCornerShape(8.dp))
+            ) {
+                TransparentChecker(modifier = Modifier.fillMaxSize())
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(currentColor)
+                )
+            }
 
-            // Hex Edit
-            var hexText by remember(currentColor) { mutableStateOf(String.format("%08X", currentColor)) }
+            var hexText by remember(currentColor) { 
+                mutableStateOf(String.format("%08X", currentColor.toArgb())) 
+            }
+
             OutlinedTextField(
                 value = hexText,
                 onValueChange = { hex ->
                     hexText = hex
                     try {
-                        val color = Color.parseColor("#$hex")
-                        currentColor = color
-                        onColorChanged(currentColor)
+                        if (hex.length == 8) {
+                            val colorInt = android.graphics.Color.parseColor("#$hex")
+                            controller.setColor(Color(colorInt))
+                        }
                     } catch (e: Exception) {
                         // Ignore invalid hex
                     }
