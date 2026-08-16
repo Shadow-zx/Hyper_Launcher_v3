@@ -77,7 +77,7 @@ public class LauncherPreferences {
     public static boolean PREF_ALSOFT_FORCE_OPENSL = false;
     public static String PREF_SCREEN_TRANSITION = "none";
     public static String PREF_THEME = "system";
-    public static int PREF_THEME_COLOR = 0xFF3F51B5; // Default primary color
+    public static int PREF_THEME_COLOR = 0xFF3F51B5;
     public static int PREF_LAST_CONTENT_SOURCE = 0;
 
     public static boolean PREF_HIDE_SIDEBAR = false;

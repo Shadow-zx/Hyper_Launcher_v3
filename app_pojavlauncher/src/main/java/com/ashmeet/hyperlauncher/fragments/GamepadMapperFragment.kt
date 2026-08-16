@@ -133,7 +133,7 @@ class GamepadMapperFragment : Fragment(), View.OnKeyListener, View.OnGenericMoti
                                 .clickable { showGrabDialog = true }
                                 .padding(8.dp)
                         )
-                        
+
                         if (showGrabDialog) {
                             SingleChoiceDialog(
                                 title = stringResource(R.string.controller_remapper_operating_mode),
@@ -159,7 +159,7 @@ class GamepadMapperFragment : Fragment(), View.OnKeyListener, View.OnGenericMoti
                             this.adapter = adapter
                             onAdapterCreated(adapter)
                             onInputManagerCreated(RemapperManager(ctx, remapperViewBuilder))
-                            
+
                             isFocusable = true
                             isFocusableInTouchMode = true
                             requestFocus()

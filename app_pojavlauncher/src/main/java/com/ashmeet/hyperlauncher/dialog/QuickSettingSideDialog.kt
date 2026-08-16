@@ -149,7 +149,7 @@ private fun QuickSettingContent(
         modifier = Modifier.padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        // Resolution
+
         SettingsSliderItem(
             title = stringResource(R.string.mcl_setting_title_resolution_scaler),
             value = resolutionScaler,
@@ -163,7 +163,6 @@ private fun QuickSettingContent(
             }
         )
 
-        // Gyro
         if (isGyroAvailable) {
             SettingsSwitchItem(
                 title = stringResource(R.string.preference_enable_gyro_title),
@@ -212,7 +211,6 @@ private fun QuickSettingContent(
             }
         }
 
-        // Mouse Speed
         SettingsSliderItem(
             title = stringResource(R.string.mcl_setting_title_mousespeed),
             value = mouseSpeed,
@@ -225,7 +223,6 @@ private fun QuickSettingContent(
             }
         )
 
-        // Gestures
         SettingsSwitchItem(
             title = stringResource(R.string.mcl_disable_gestures),
             checked = disableGestures,

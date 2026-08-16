@@ -94,13 +94,13 @@ fun PojavTheme(
 
 private fun generateCustomColorScheme(primary: Color, isDark: Boolean): ColorScheme {
     val onPrimary = if (primary.luminance() > 0.5f) Color.Black else Color.White
-    
+
     return if (isDark) {
-        // Dark Mode: Primary-tinted dark colors
+
         val darkBackground = Color(0xFF121212)
         val tintedBackground = primary.copy(alpha = 0.08f).compositeOver(darkBackground)
         val tintedSurface = primary.copy(alpha = 0.12f).compositeOver(darkBackground)
-        
+
         darkColorScheme(
             primary = primary,
             onPrimary = onPrimary,
@@ -113,11 +113,11 @@ private fun generateCustomColorScheme(primary: Color, isDark: Boolean): ColorSch
             error = Color(0xFFCF6679)
         )
     } else {
-        // Light Mode: Primary-tinted light colors
+
         val lightBackground = Color(0xFFF2F2F2)
         val tintedBackground = primary.copy(alpha = 0.05f).compositeOver(lightBackground)
         val tintedSurface = primary.copy(alpha = 0.08f).compositeOver(Color.White)
-        
+
         lightColorScheme(
             primary = primary,
             onPrimary = onPrimary,
