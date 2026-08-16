@@ -43,7 +43,7 @@ import net.kdt.pojavlaunch.lifecycle.ContextAwareDoneListener;
 import net.kdt.pojavlaunch.lifecycle.ContextExecutor;
 import net.kdt.pojavlaunch.modloaders.modpacks.imagecache.IconCacheJanitor;
 import com.ashmeet.hyperlauncher.prefs.LauncherPreferences;
-import com.ashmeet.hyperlauncher.fragments.screens.LauncherPreferenceFragment;
+import com.ashmeet.hyperlauncher.fragments.LauncherPreference.LauncherPreferenceFragment;
 import net.kdt.pojavlaunch.progresskeeper.ProgressKeeper;
 import net.kdt.pojavlaunch.progresskeeper.TaskCountListener;
 import com.ashmeet.hyperlauncher.helper.LauncherComposeHelper;

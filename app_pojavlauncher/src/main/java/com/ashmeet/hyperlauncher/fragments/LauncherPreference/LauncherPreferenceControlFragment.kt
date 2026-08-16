@@ -1,4 +1,4 @@
-package com.ashmeet.hyperlauncher.fragments.screens
+package com.ashmeet.hyperlauncher.fragments.LauncherPreference
 
 import android.content.Context
 import android.content.Intent

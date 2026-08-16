@@ -1,4 +1,4 @@
-package com.ashmeet.hyperlauncher.fragments.screens
+package com.ashmeet.hyperlauncher.fragments.LauncherPreference
 
 import android.content.SharedPreferences
 import android.os.Bundle
@@ -7,25 +7,22 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
-import com.ashmeet.hyperlauncher.screens.layouts.settings.ExperimentalSettingsScreen
+import com.ashmeet.hyperlauncher.screens.layouts.settings.AppearanceSettingsScreen
 import com.ashmeet.hyperlauncher.theme.PojavTheme
 import com.ashmeet.hyperlauncher.prefs.LauncherPreferences
-import net.kdt.pojavlaunch.utils.GLInfoUtils
 
-class LauncherPreferenceExperimentalFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListener {
+class LauncherPreferenceAppearanceFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListener {
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val hasFreedreno = GLInfoUtils.getGlInfo().isAdreno
         return ComposeView(requireContext()).apply {
             setContent {
                 PojavTheme {
-                    ExperimentalSettingsScreen(
-                        onBack = { requireActivity().onBackPressed() },
-                        isFreedrenoAvailable = hasFreedreno
+                    AppearanceSettingsScreen(
+                        onBack = { requireActivity().onBackPressed() }
                     )
                 }
             }
