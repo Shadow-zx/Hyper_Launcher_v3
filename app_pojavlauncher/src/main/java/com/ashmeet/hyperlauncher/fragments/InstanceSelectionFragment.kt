@@ -9,6 +9,7 @@ import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
+import com.ashmeet.hyperlauncher.fragments.selection.ProfileTypeSelectFragment
 import com.ashmeet.hyperlauncher.screens.layouts.instances.InstanceSelectionScreen
 import com.ashmeet.hyperlauncher.theme.PojavTheme
 import com.google.android.material.dialog.MaterialAlertDialogBuilder

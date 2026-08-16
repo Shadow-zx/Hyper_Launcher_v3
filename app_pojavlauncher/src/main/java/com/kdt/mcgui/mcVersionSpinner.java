@@ -28,7 +28,7 @@ import net.kdt.pojavlaunch.extra.ExtraConstants;
 import net.kdt.pojavlaunch.extra.ExtraCore;
 import net.kdt.pojavlaunch.extra.ExtraListener;
 
-import com.ashmeet.hyperlauncher.fragments.ProfileTypeSelectFragment;
+import com.ashmeet.hyperlauncher.fragments.selection.ProfileTypeSelectFragment;
 import net.kdt.pojavlaunch.instances.DisplayInstance;
 import net.kdt.pojavlaunch.instances.Instances;
 import net.kdt.pojavlaunch.instances.InstanceAdapter;

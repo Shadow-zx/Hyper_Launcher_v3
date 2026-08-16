@@ -1,43 +1,67 @@
-package com.ashmeet.hyperlauncher.fragments;
+package com.ashmeet.hyperlauncher.fragments
 
-import android.app.Dialog;
-import android.os.Bundle;
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.res.stringResource
+import androidx.fragment.app.DialogFragment
+import com.ashmeet.hyperlauncher.theme.PojavTheme
+import net.ashmeet.hyperlauncher.R
+import net.kdt.pojavlaunch.Tools
+import net.kdt.pojavlaunch.instances.InstanceIconProvider
+import net.kdt.pojavlaunch.instances.Instances
+import java.io.IOException
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.DialogFragment;
+class DeleteConfirmDialogFragment : DialogFragment() {
+    private val mInstance = Instances.loadSelectedInstance()
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-
-import net.ashmeet.hyperlauncher.R;
-import net.kdt.pojavlaunch.Tools;
-import net.kdt.pojavlaunch.instances.Instance;
-import net.kdt.pojavlaunch.instances.Instances;
-import net.kdt.pojavlaunch.instances.InstanceIconProvider;
-import java.io.IOException;
-
-public class DeleteConfirmDialogFragment extends DialogFragment {
-    private final Instance mInstance = Instances.loadSelectedInstance();
-
-    @NonNull
-    @Override
-    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        if (mInstance == null) dismiss();
-        return new MaterialAlertDialogBuilder(requireContext())
-                .setTitle(R.string.instance_delete)
-                .setMessage(R.string.instance_delete_confirmation)
-                .setPositiveButton(R.string.global_delete, (dialog, which) -> {
-                    if (mInstance == null) return;
-                    InstanceIconProvider.dropIcon(mInstance);
-                    Tools.removeCurrentFragment(requireActivity());
-                    try {
-                        Instances.removeInstance(mInstance);
-                    } catch (IOException e) {
-                        Tools.showErrorRemote(e);
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        return ComposeView(requireContext()).apply {
+            setContent {
+                PojavTheme {
+                    if (mInstance == null) {
+                        dismiss()
+                    } else {
+                        AlertDialog(
+                            onDismissRequest = { dismiss() },
+                            title = { Text(text = stringResource(R.string.instance_delete)) },
+                            text = { Text(text = stringResource(R.string.instance_delete_confirmation)) },
+                            confirmButton = {
+                                TextButton(onClick = {
+                                    InstanceIconProvider.dropIcon(mInstance)
+                                    Tools.removeCurrentFragment(requireActivity())
+                                    try {
+                                        Instances.removeInstance(mInstance)
+                                    } catch (e: IOException) {
+                                        Tools.showErrorRemote(e)
+                                    }
+                                    dismiss()
+                                }) {
+                                    Text(text = stringResource(R.string.global_delete))
+                                }
+                            },
+                            dismissButton = {
+                                TextButton(onClick = { dismiss() }) {
+                                    Text(text = stringResource(R.string.global_no))
+                                }
+                            }
+                        )
                     }
-                })
-                .setNegativeButton(R.string.global_no, null)
-                .create();
+                }
+            }
+        }
     }
-    public static String TAG = "delete_dialog_confirm";
+
+    companion object {
+        const val TAG = "delete_dialog_confirm"
+    }
 }

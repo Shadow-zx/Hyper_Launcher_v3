@@ -1,122 +1,207 @@
-package com.ashmeet.hyperlauncher.fragments;
+package com.ashmeet.hyperlauncher.fragments
 
-import android.app.Activity;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.view.InputDevice;
-import android.view.KeyEvent;
-import android.view.MotionEvent;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Spinner;
+import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.view.*
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.ashmeet.hyperlauncher.theme.PojavTheme
+import fr.spse.gamepad_remapper.RemapperManager
+import fr.spse.gamepad_remapper.RemapperView
+import net.ashmeet.hyperlauncher.R
+import net.kdt.pojavlaunch.customcontrols.gamepad.Gamepad
+import net.kdt.pojavlaunch.customcontrols.gamepad.GamepadMapperAdapter
+import com.ashmeet.hyperlauncher.screens.layouts.settings.preferences.SingleChoiceDialog
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-import net.ashmeet.hyperlauncher.R;
-import net.kdt.pojavlaunch.customcontrols.gamepad.Gamepad;
-import net.kdt.pojavlaunch.customcontrols.gamepad.GamepadMapperAdapter;
-
-import fr.spse.gamepad_remapper.RemapperManager;
-import fr.spse.gamepad_remapper.RemapperView;
-
-public class GamepadMapperFragment extends Fragment implements
-        View.OnKeyListener, View.OnGenericMotionListener, AdapterView.OnItemSelectedListener {
-    public static final String TAG = "GamepadMapperFragment";
-    private final RemapperView.Builder mRemapperViewBuilder = new RemapperView.Builder(null)
-            .remapA(true)
-            .remapB(true)
-            .remapX(true)
-            .remapY(true)
-            .remapLeftJoystick(true)
-            .remapRightJoystick(true)
-            .remapStart(true)
-            .remapSelect(true)
-            .remapLeftShoulder(true)
-            .remapRightShoulder(true)
-            .remapLeftTrigger(true)
-            .remapRightTrigger(true)
-            .remapDpad(true);
-    private final Handler mExitHandler = new Handler(Looper.getMainLooper());
-    private final Runnable mExitRunnable = () -> {
-        Activity activity = getActivity();
-        if(activity == null) return;
-        activity.onBackPressed();
-    };
-    private RemapperManager mInputManager;
-    private GamepadMapperAdapter mMapperAdapter;
-    private Gamepad mGamepad;
-    public GamepadMapperFragment() {
-        super(R.layout.fragment_controller_remapper);
+class GamepadMapperFragment : Fragment(), View.OnKeyListener, View.OnGenericMotionListener {
+    companion object {
+        const val TAG = "GamepadMapperFragment"
     }
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        RecyclerView buttonRecyclerView = view.findViewById(R.id.gamepad_remapper_recycler);
-        mMapperAdapter = new GamepadMapperAdapter(view.getContext());
-        buttonRecyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
-        buttonRecyclerView.setAdapter(mMapperAdapter);
-        buttonRecyclerView.setOnKeyListener(this);
-        buttonRecyclerView.setOnGenericMotionListener(this);
-        buttonRecyclerView.requestFocus();
-        mInputManager = new RemapperManager(view.getContext(), mRemapperViewBuilder);
-        Spinner grabStateSpinner = view.findViewById(R.id.gamepad_remapper_mode_spinner);
-        ArrayAdapter<String> mGrabStateAdapter = new ArrayAdapter<>(view.getContext(), R.layout.support_simple_spinner_dropdown_item);
-        mGrabStateAdapter.addAll(getString(R.string.customctrl_visibility_in_menus), getString(R.string.customctrl_visibility_ingame));
-        grabStateSpinner.setAdapter(mGrabStateAdapter);
-        grabStateSpinner.setSelection(0);
-        grabStateSpinner.setOnItemSelectedListener(this);
+    private val remapperViewBuilder = RemapperView.Builder(null)
+        .remapA(true)
+        .remapB(true)
+        .remapX(true)
+        .remapY(true)
+        .remapLeftJoystick(true)
+        .remapRightJoystick(true)
+        .remapStart(true)
+        .remapSelect(true)
+        .remapLeftShoulder(true)
+        .remapRightShoulder(true)
+        .remapLeftTrigger(true)
+        .remapRightTrigger(true)
+        .remapDpad(true)
+
+    private val exitHandler = Handler(Looper.getMainLooper())
+    private val exitRunnable = Runnable {
+        requireActivity().onBackPressedDispatcher.onBackPressed()
     }
 
-    private void createGamepad(InputDevice inputDevice) {
-        mGamepad = new Gamepad(inputDevice, mMapperAdapter, null) {
-            @Override
-            public void handleGamepadInput(int keycode, float value) {
-                if(keycode == KeyEvent.KEYCODE_BUTTON_SELECT) {
-                    handleExitButton(value > 0.5);
+    private var inputManager: RemapperManager? = null
+    private var mapperAdapter: GamepadMapperAdapter? = null
+    private var gamepad: Gamepad? = null
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        return ComposeView(requireContext()).apply {
+            setContent {
+                PojavTheme {
+                    GamepadMapperContent(
+                        onAdapterCreated = { mapperAdapter = it },
+                        onInputManagerCreated = { inputManager = it },
+                        onKeyListenerSet = { this@GamepadMapperFragment.view?.setOnKeyListener(this@GamepadMapperFragment) },
+                        onGenericMotionListenerSet = { this@GamepadMapperFragment.view?.setOnGenericMotionListener(this@GamepadMapperFragment) }
+                    )
                 }
-                super.handleGamepadInput(keycode, value);
             }
-        };
+        }
     }
 
-    private void handleExitButton(boolean isPressed) {
-        if(isPressed) mExitHandler.postDelayed(mExitRunnable, 400);
-        else mExitHandler.removeCallbacks(mExitRunnable);
+    @Composable
+    fun GamepadMapperContent(
+        onAdapterCreated: (GamepadMapperAdapter) -> Unit,
+        onInputManagerCreated: (RemapperManager) -> Unit,
+        onKeyListenerSet: () -> Unit,
+        onGenericMotionListenerSet: () -> Unit
+    ) {
+        var grabState by remember { mutableStateOf(0) }
+        val grabOptions = listOf(
+            stringResource(R.string.customctrl_visibility_in_menus),
+            stringResource(R.string.customctrl_visibility_ingame)
+        )
+
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            Column(modifier = Modifier.fillMaxSize()) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = stringResource(R.string.controller_remapper_exit_part1),
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Image(
+                            painter = painterResource(id = R.drawable.button_select),
+                            contentDescription = stringResource(R.string.controller_button_select),
+                            modifier = Modifier.size(30.dp)
+                        )
+                        Text(
+                            text = stringResource(R.string.controller_remapper_exit_part2),
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            text = stringResource(R.string.controller_remapper_operating_mode),
+                            color = MaterialTheme.colorScheme.onSurface,
+                            fontSize = 12.sp
+                        )
+                        var showGrabDialog by remember { mutableStateOf(false) }
+                        Text(
+                            text = grabOptions[grabState],
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier
+                                .clickable { showGrabDialog = true }
+                                .padding(8.dp)
+                        )
+                        
+                        if (showGrabDialog) {
+                            SingleChoiceDialog(
+                                title = stringResource(R.string.controller_remapper_operating_mode),
+                                options = grabOptions,
+                                optionValues = listOf("0", "1"),
+                                selectedValue = grabState.toString(),
+                                onValueChange = {
+                                    val newState = it.toInt()
+                                    grabState = newState
+                                    mapperAdapter?.setGrabState(newState == 1)
+                                },
+                                onDismiss = { showGrabDialog = false }
+                            )
+                        }
+                    }
+                }
+
+                AndroidView(
+                    factory = { ctx ->
+                        RecyclerView(ctx).apply {
+                            layoutManager = LinearLayoutManager(ctx)
+                            val adapter = GamepadMapperAdapter(ctx)
+                            this.adapter = adapter
+                            onAdapterCreated(adapter)
+                            onInputManagerCreated(RemapperManager(ctx, remapperViewBuilder))
+                            
+                            isFocusable = true
+                            isFocusableInTouchMode = true
+                            requestFocus()
+                        }
+                    },
+                    modifier = Modifier.weight(1f).fillMaxWidth(),
+                    update = {
+                        onKeyListenerSet()
+                        onGenericMotionListenerSet()
+                    }
+                )
+            }
+        }
     }
 
-    @Override
-    public boolean onKey(View view, int i, KeyEvent keyEvent) {
-        View mainView = getView();
-        if(!Gamepad.isGamepadEvent(keyEvent) || mainView == null) return false;
-        if(mGamepad == null) createGamepad(keyEvent.getDevice());
-        mInputManager.handleKeyEventInput(mainView.getContext(), keyEvent, mGamepad);
-        return true;
+    private fun createGamepad(inputDevice: InputDevice) {
+        gamepad = object : Gamepad(inputDevice, mapperAdapter, null) {
+            override fun handleGamepadInput(keycode: Int, value: Float) {
+                if (keycode == KeyEvent.KEYCODE_BUTTON_SELECT) {
+                    handleExitButton(value > 0.5)
+                }
+                super.handleGamepadInput(keycode, value)
+            }
+        }
     }
 
-    @Override
-    public boolean onGenericMotion(View view, MotionEvent motionEvent) {
-        View mainView = getView();
-        if(!Gamepad.isGamepadEvent(motionEvent) || mainView == null) return false;
-        if(mGamepad == null) createGamepad(motionEvent.getDevice());
-        mInputManager.handleMotionEventInput(mainView.getContext(), motionEvent, mGamepad);
-        return true;
+    private fun handleExitButton(isPressed: Boolean) {
+        if (isPressed) exitHandler.postDelayed(exitRunnable, 400)
+        else exitHandler.removeCallbacks(exitRunnable)
     }
 
-    @Override
-    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-        boolean grab = i == 1;
-        mMapperAdapter.setGrabState(grab);
+    override fun onKey(v: View, keyCode: Int, event: KeyEvent): Boolean {
+        if (!Gamepad.isGamepadEvent(event)) return false
+        if (gamepad == null) createGamepad(event.device)
+        inputManager?.handleKeyEventInput(requireContext(), event, gamepad)
+        return true
     }
 
-    @Override
-    public void onNothingSelected(AdapterView<?> adapterView) {
-
+    override fun onGenericMotion(v: View, event: MotionEvent): Boolean {
+        if (!Gamepad.isGamepadEvent(event)) return false
+        if (gamepad == null) createGamepad(event.device)
+        inputManager?.handleMotionEventInput(requireContext(), event, gamepad)
+        return true
     }
 }

@@ -1,80 +1,64 @@
-package com.ashmeet.hyperlauncher.fragments;
+package com.ashmeet.hyperlauncher.fragments
 
-import android.content.Context;
+import android.content.Context
+import com.ashmeet.hyperlauncher.screens.layouts.modloader.ModloaderVersionGroup
+import com.ashmeet.hyperlauncher.screens.layouts.modloader.ModloaderVersionItem
+import com.kdt.mcgui.ProgressLayout
+import net.ashmeet.hyperlauncher.R
+import net.kdt.pojavlaunch.instances.InstanceInstaller
+import net.kdt.pojavlaunch.instances.Instances
+import net.kdt.pojavlaunch.modloaders.ModloaderListenerProxy
+import net.kdt.pojavlaunch.modloaders.OptiFineDownloadTask
+import net.kdt.pojavlaunch.modloaders.OptiFineUtils
+import java.io.File
+import java.io.IOException
 
-import com.ashmeet.hyperlauncher.screens.layouts.modloader.ModloaderVersionGroup;
-import com.ashmeet.hyperlauncher.screens.layouts.modloader.ModloaderVersionItem;
-import com.kdt.mcgui.ProgressLayout;
-
-import net.ashmeet.hyperlauncher.R;
-import net.kdt.pojavlaunch.instances.InstanceInstaller;
-import net.kdt.pojavlaunch.instances.Instances;
-import net.kdt.pojavlaunch.modloaders.ModloaderListenerProxy;
-import net.kdt.pojavlaunch.modloaders.OptiFineDownloadTask;
-import net.kdt.pojavlaunch.modloaders.OptiFineUtils;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-public class OptiFineInstallFragment extends ModVersionListFragment<OptiFineUtils.OptiFineVersions> {
-    public static final String TAG = "OptiFineInstallFragment";
-    public OptiFineInstallFragment() {
-        super(TAG);
-    }
-    @Override
-    public int getTitleText() {
-        return R.string.of_dl_select_version;
+class OptiFineInstallFragment : ModVersionListFragment<OptiFineUtils.OptiFineVersions>(TAG) {
+    companion object {
+        const val TAG = "OptiFineInstallFragment"
     }
 
-    @Override
-    public int getNoDataMsg() {
-        return R.string.of_dl_failed_to_scrape;
-    }
-    @Override
-    public OptiFineUtils.OptiFineVersions loadVersionList() throws IOException {
-        return OptiFineUtils.downloadOptiFineVersions();
+    override fun getTitleText(): Int = R.string.of_dl_select_version
+    override fun getNoDataMsg(): Int = R.string.of_dl_failed_to_scrape
+
+    @Throws(IOException::class)
+    override fun loadVersionList(): OptiFineUtils.OptiFineVersions {
+        return OptiFineUtils.downloadOptiFineVersions()
     }
 
-    @Override
-    public List<ModloaderVersionGroup<Object>> mapToGroups(OptiFineUtils.OptiFineVersions versionList) {
-        List<ModloaderVersionGroup<Object>> groups = new ArrayList<>();
-        for (int i = 0; i < versionList.gameVersions.size(); i++) {
-            List<ModloaderVersionItem<Object>> items = new ArrayList<>();
-            for (OptiFineUtils.OptiFineVersion v : versionList.optifineVersions.get(i)) {
-                items.add(new ModloaderVersionItem<>(v.versionName, v));
+    override fun mapToGroups(versionList: OptiFineUtils.OptiFineVersions): List<ModloaderVersionGroup<Any>> {
+        val groups = mutableListOf<ModloaderVersionGroup<Any>>()
+        for (i in versionList.gameVersions.indices) {
+            val items = mutableListOf<ModloaderVersionItem<Any>>()
+            for (v in versionList.optifineVersions[i]) {
+                items.add(ModloaderVersionItem(v.versionName, v as Any))
             }
-            groups.add(new ModloaderVersionGroup<>(versionList.gameVersions.get(i), items));
+            groups.add(ModloaderVersionGroup(versionList.gameVersions[i], items))
         }
-        return groups;
+        return groups
     }
 
-    private void createInstance(OptiFineUtils.OptiFineVersion version, ModloaderListenerProxy listenerProxy) {
+    private fun createInstance(version: OptiFineUtils.OptiFineVersion, listenerProxy: ModloaderListenerProxy) {
         try {
-            ProgressLayout.setProgress(ProgressLayout.INSTALL_MODPACK, 0);
-            new OptiFineDownloadTask(version).prepareForInstall();
-            InstanceInstaller instanceInstaller = OptiFineUtils.createInstaller(version);
-            Instances.createInstance(instance -> {
-                instance.name = "OptiFine";
-                instance.installer = instanceInstaller;
-                instance.sharedData = true;
-            }, "OptiFine");
-            ProgressLayout.clearProgress(ProgressLayout.INSTALL_MODPACK);
-            instanceInstaller.start();
-            listenerProxy.onDownloadFinished(null);
-        }catch (Exception e) {
-            listenerProxy.onDownloadError(e);
+            ProgressLayout.setProgress(ProgressLayout.INSTALL_MODPACK, 0)
+            OptiFineDownloadTask(version).prepareForInstall()
+            val instanceInstaller = OptiFineUtils.createInstaller(version)
+            Instances.createInstance({ instance ->
+                instance.name = "OptiFine"
+                instance.installer = instanceInstaller
+                instance.sharedData = true
+            }, "OptiFine")
+            ProgressLayout.clearProgress(ProgressLayout.INSTALL_MODPACK)
+            instanceInstaller.start()
+            listenerProxy.onDownloadFinished(null)
+        } catch (e: Exception) {
+            listenerProxy.onDownloadError(e)
         }
     }
 
-    @Override
-    public Runnable createDownloadTask(Object selectedVersion, ModloaderListenerProxy listenerProxy) {
-        return ()->createInstance((OptiFineUtils.OptiFineVersion) selectedVersion, listenerProxy);
+    override fun createDownloadTask(selectedVersion: Any, listenerProxy: ModloaderListenerProxy): Runnable {
+        return Runnable { createInstance(selectedVersion as OptiFineUtils.OptiFineVersion, listenerProxy) }
     }
 
-    @Override
-    public void onDownloadFinished(Context context, File downloadedFile) {
-
-    }
+    override fun onDownloadFinished(context: Context, downloadedFile: File?) {}
 }
