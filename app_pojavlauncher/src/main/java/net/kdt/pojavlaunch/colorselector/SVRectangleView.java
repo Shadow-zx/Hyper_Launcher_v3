@@ -40,6 +40,9 @@ public class SVRectangleView extends View {
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            getParent().requestDisallowInterceptTouchEvent(true);
+        }
         float x = event.getX();
         float y = event.getY();
         mFingerPosX = x * mWidthInverted;

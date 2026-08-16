@@ -43,6 +43,9 @@ public class HueView extends View {
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            getParent().requestDisallowInterceptTouchEvent(true);
+        }
         mSelectionHue = event.getY() * mHeightHueRatio;
         invalidate();
         if(mHueSelectionListener != null) mHueSelectionListener.onHueSelected(mSelectionHue);

@@ -48,6 +48,9 @@ public class AlphaView extends View {
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            getParent().requestDisallowInterceptTouchEvent(true);
+        }
         mSelectedAlpha = (int) MathUtils.clamp(mAlphaDiv * event.getY(), 0, 0xff);
         if(mAlphaSelectionListener != null) mAlphaSelectionListener.onAlphaSelected(mSelectedAlpha);
         invalidate();
