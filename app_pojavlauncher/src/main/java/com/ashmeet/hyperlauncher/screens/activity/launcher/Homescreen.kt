@@ -283,6 +283,7 @@ fun MainMenuFragmentCompose(
                                 modifier = Modifier
                                     .size(64.dp)
                                     .scale(headScale)
+                                    .clip(RoundedCornerShape(12.dp))
                                     .clickable(
                                         interactionSource = headInteractionSource,
                                         indication = null,
@@ -295,7 +296,7 @@ fun MainMenuFragmentCompose(
                                         Image(
                                             bitmap = skinHead!!.asImageBitmap(),
                                             contentDescription = null,
-                                            modifier = Modifier.fillMaxSize(),
+                                            modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(12.dp)),
                                             contentScale = ContentScale.Fit,
                                             filterQuality = FilterQuality.None
                                         )

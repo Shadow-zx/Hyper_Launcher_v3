@@ -41,6 +41,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -63,14 +64,19 @@ fun MineButton(
 ) {
     val isCustomTheme = remember { LauncherPreferences.PREF_CUSTOM_THEME }
     val primaryColor = MaterialTheme.colorScheme.primary
+    val isLightMode = MaterialTheme.colorScheme.surface.luminance() > 0.5f
     val contentColor = if (isCustomTheme) {
-        // Create a significantly darker version of the primary color for the text
-        Color(
-            red = primaryColor.red * 0.3f,
-            green = primaryColor.green * 0.3f,
-            blue = primaryColor.blue * 0.3f,
-            alpha = 1f
-        )
+        if (isLightMode) {
+            Color.White
+        } else {
+            // Create a significantly darker version of the primary color for the text
+            Color(
+                red = primaryColor.red * 0.3f,
+                green = primaryColor.green * 0.3f,
+                blue = primaryColor.blue * 0.3f,
+                alpha = 1f
+            )
+        }
     } else {
         MaterialTheme.colorScheme.onPrimary
     }
@@ -101,6 +107,10 @@ fun SidebarRailButton(
     contentColor: Color = MaterialTheme.colorScheme.onSurface,
     isExpanded: Boolean = false
 ) {
+    val isCustomTheme = remember { LauncherPreferences.PREF_CUSTOM_THEME }
+    val isLightMode = MaterialTheme.colorScheme.surface.luminance() > 0.5f
+    val finalContentColor = if (isCustomTheme && isLightMode) Color.White else contentColor
+
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
     val scale by animateFloatAsState(
@@ -130,7 +140,7 @@ fun SidebarRailButton(
             Icon(
                 imageVector = icon,
                 contentDescription = label,
-                tint = contentColor,
+                tint = finalContentColor,
                 modifier = Modifier.size(28.dp)
             )
 
@@ -144,7 +154,7 @@ fun SidebarRailButton(
                     Text(
                         text = label,
                         style = MaterialTheme.typography.bodyLarge,
-                        color = contentColor,
+                        color = finalContentColor,
                         maxLines = 1
                     )
                 }
