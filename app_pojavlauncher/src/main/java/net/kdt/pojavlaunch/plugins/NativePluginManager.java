@@ -1,7 +1,7 @@
 package net.kdt.pojavlaunch.plugins;
 
 import android.content.Context;
-import java.io.File;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,12 +15,10 @@ public class NativePluginManager {
     }
 
     public static void discoverAarPlugins(Context context) {
-        // ZStd JNI
+        // MobileGlues
         registerPlugin(new NativePlugin() {
             @Override
             public String[] getPaths() {
-                // Return the native library directory for the AAR
-                // In a packaged AAR, the libraries are usually in the app's native library dir
                 return new String[]{context.getApplicationInfo().nativeLibraryDir};
             }
 
@@ -30,7 +28,7 @@ public class NativePluginManager {
             }
         });
 
-        // MobileGlues
+        // Krypton
         registerPlugin(new NativePlugin() {
             @Override
             public String[] getPaths() {

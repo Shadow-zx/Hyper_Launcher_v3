@@ -18,15 +18,20 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.text.InputType;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.InputDevice;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewPropertyAnimator;
 import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -35,13 +40,12 @@ import androidx.compose.ui.platform.ComposeView;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.ashmeet.hyperlauncher.dialog.QuickSettingSideDialog;
 import com.ashmeet.hyperlauncher.helper.LauncherComposeHelper;
 import com.ashmeet.hyperlauncher.prefs.LauncherPreferences;
-import com.ashmeet.hyperlauncher.dialog.QuickSettingSideDialog;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.ashmeet.hyperlauncher.screens.activity.game.LoggerView;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import net.ashmeet.hyperlauncher.R;
 import net.kdt.pojavlaunch.authenticator.accounts.Account;
@@ -53,6 +57,7 @@ import net.kdt.pojavlaunch.customcontrols.ControlJoystickData;
 import net.kdt.pojavlaunch.customcontrols.ControlLayout;
 import net.kdt.pojavlaunch.customcontrols.CustomControls;
 import net.kdt.pojavlaunch.customcontrols.EditorExitable;
+import net.kdt.pojavlaunch.customcontrols.handleview.DrawerPullButton;
 import net.kdt.pojavlaunch.customcontrols.keyboard.LwjglCharSender;
 import net.kdt.pojavlaunch.customcontrols.keyboard.TouchCharInput;
 import net.kdt.pojavlaunch.customcontrols.mouse.GyroControl;
@@ -82,16 +87,16 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
     public static final String INTENT_LAUNCH_CLASSPATH = "intent_classpath";
 
     public static TouchCharInput touchCharInput;
-    private LauncherGLSurface launcherGLView;
+    public LauncherGLSurface launcherGLView;
     private static WeakReference<GLFWCursorView> weakCursor;
-    private GLFWCursorView cursor;
-    private LoggerView loggerView;
-    private DrawerLayout drawerLayout;
-    private ComposeView navDrawer;
-    private View mDrawerPullButton;
+    public GLFWCursorView cursor;
+    public LoggerView loggerView;
+    public LauncherComposeHelper.DrawerController drawerController;
+    public ComposeView navDrawer;
+    public View mDrawerPullButton;
     private GyroControl mGyroControl = null;
-    private ControlLayout mControlLayout;
-    private HotbarView mHotbarView;
+    public ControlLayout mControlLayout;
+    public HotbarView mHotbarView;
     private volatile AndroidClipboardProvider mClipboardProvider;
 
     Instance instance;
@@ -211,10 +216,10 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
     protected void initLayout(int resId) {
         setContentView(resId);
         bindValues();
-        mControlLayout.setMenuListener(this);
+        setDrawerContent();
 
+        mControlLayout.setMenuListener(this);
         mDrawerPullButton.setOnClickListener(v -> onClickedMenu());
-        drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         cursor.setCursorScale(LauncherPreferences.PREF_MOUSESCALE);
         updatePointerIcon();
 
@@ -246,12 +251,10 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
                      case 3: openQuickSettings(); break;
                      case 4: openCustomControls(); break;
                 }
-                drawerLayout.closeDrawers();
+                if (drawerController != null) drawerController.close();
             };
             setDrawerContent();
-            // navDrawer.setAdapter(gameActionArrayAdapter);
-            // navDrawer.setOnItemClickListener(gameActionClickListener);
-            drawerLayout.closeDrawers();
+            if (drawerController != null) drawerController.close();
 
             launcherGLView.setSurfaceReadyListener(() -> {
                 try {
@@ -294,31 +297,88 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
     }
 
     private void setDrawerContent() {
-        LauncherComposeHelper.setMainDrawerContent(navDrawer, isInEditor, false, position -> {
-            runOnUiThread(() -> {
-                if (isInEditor) {
-                    ingameControlsEditorListener.onItemClick(null, null, position, 0);
-                } else {
-                    gameActionClickListener.onItemClick(null, null, position, 0);
+        ComposeView composeView = findViewById(R.id.main_compose_view);
+        if (composeView == null) return;
+        LauncherComposeHelper.setBaseMainContent(
+                composeView,
+                isInEditor,
+                mControlLayout,
+                loggerView,
+                controller -> { drawerController = controller; return Unit.INSTANCE; },
+                position -> {
+                    runOnUiThread(() -> {
+                        if (isInEditor) {
+                            ingameControlsEditorListener.onItemClick(null, null, position, 0);
+                        } else {
+                            gameActionClickListener.onItemClick(null, null, position, 0);
+                        }
+                        if (drawerController != null) drawerController.close();
+                    });
+                    return Unit.INSTANCE;
                 }
-                drawerLayout.closeDrawers();
-            });
-            return Unit.INSTANCE;
-        });
+        );
     }
 
     /** Boilerplate binding */
     private void bindValues(){
-        mControlLayout = findViewById(R.id.main_control_layout);
-        launcherGLView = findViewById(R.id.main_game_render_view);
-        cursor = findViewById(R.id.main_touchpad);
+        float density = getResources().getDisplayMetrics().density;
+
+        mControlLayout = new ControlLayout(this);
+        mControlLayout.setId(R.id.main_control_layout);
+        mControlLayout.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        mControlLayout.setBackgroundResource(R.drawable.no_focus_shown);
+        mControlLayout.setKeepScreenOn(true);
+
+        launcherGLView = new LauncherGLSurface(this);
+        launcherGLView.setId(R.id.main_game_render_view);
+        launcherGLView.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            launcherGLView.setDefaultFocusHighlightEnabled(false);
+        }
+        mControlLayout.addView(launcherGLView);
+
+        cursor = new GLFWCursorView(this);
+        cursor.setId(R.id.main_touchpad);
+        cursor.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        cursor.setFocusable(false);
+        cursor.setTranslationZ(density * 1f);
+        cursor.setVisibility(View.GONE);
+        cursor.setCursor(ContextCompat.getDrawable(this, R.drawable.ic_mouse_pointer), 0, 0);
+        mControlLayout.addView(cursor);
         weakCursor = new WeakReference<>(cursor);
-        drawerLayout = findViewById(R.id.main_drawer_options);
-        navDrawer = findViewById(R.id.main_navigation_view);
-        loggerView = findViewById(R.id.mainLoggerView);
-        touchCharInput = findViewById(R.id.mainTouchCharInput);
-        mDrawerPullButton = findViewById(R.id.drawer_button);
-        mHotbarView = findViewById(R.id.hotbar_view);
+
+        touchCharInput = new TouchCharInput(this);
+        touchCharInput.setId(R.id.mainTouchCharInput);
+        touchCharInput.setLayoutParams(new FrameLayout.LayoutParams((int)(1 * density), (int)(1 * density)));
+        touchCharInput.setBackgroundColor(Color.DKGRAY);
+        int imeOpts = EditorInfo.IME_FLAG_NO_FULLSCREEN | EditorInfo.IME_FLAG_NO_EXTRACT_UI | EditorInfo.IME_ACTION_DONE;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            imeOpts |= EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING;
+        }
+        touchCharInput.setImeOptions(imeOpts);
+        touchCharInput.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE | InputType.TYPE_TEXT_FLAG_AUTO_COMPLETE | InputType.TYPE_TEXT_FLAG_AUTO_CORRECT | InputType.TYPE_TEXT_VARIATION_FILTER);
+        mControlLayout.addView(touchCharInput);
+
+        mDrawerPullButton = new DrawerPullButton(this);
+        mDrawerPullButton.setId(R.id.drawer_button);
+        FrameLayout.LayoutParams pullParams = new FrameLayout.LayoutParams((int)(40 * density), (int)(20 * density));
+        pullParams.gravity = Gravity.END;
+        mDrawerPullButton.setLayoutParams(pullParams);
+        int p = (int)(8 * density);
+        mDrawerPullButton.setPadding(p, p, p, p);
+        mDrawerPullButton.setElevation(10f * density);
+        mControlLayout.addView(mDrawerPullButton);
+
+        mHotbarView = new HotbarView(this);
+        mHotbarView.setId(R.id.hotbar_view);
+        mHotbarView.setLayoutParams(new FrameLayout.LayoutParams(0, 0));
+        mControlLayout.addView(mHotbarView);
+
+        loggerView = new LoggerView(this);
+        loggerView.setId(R.id.mainLoggerView);
+        loggerView.setVisibility(View.GONE);
+
+        navDrawer = new ComposeView(this);
     }
 
     @Override
@@ -500,11 +560,17 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
             }
         }
         // Fallback to default
-        cursor.setCursor(null, 0, 0);
+        cursor.setCursor(ContextCompat.getDrawable(this, R.drawable.ic_mouse_pointer), 0, 0);
     }
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
+        if (event.getKeyCode() == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN) {
+            if (drawerController != null && drawerController.isOpen()) {
+                drawerController.close();
+                return true;
+            }
+        }
         if(isInEditor) {
             if(event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
                 if(event.getAction() == KeyEvent.ACTION_DOWN) mControlLayout.askToExit(this);
@@ -532,8 +598,7 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
 
     @Override
     public void onClickedMenu() {
-        drawerLayout.openDrawer(navDrawer);
-        navDrawer.requestLayout();
+        if (drawerController != null) drawerController.toggle();
     }
 
     @Override

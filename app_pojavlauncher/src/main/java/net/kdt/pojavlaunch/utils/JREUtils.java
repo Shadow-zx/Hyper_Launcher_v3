@@ -4,22 +4,30 @@ import static com.ashmeet.hyperlauncher.prefs.LauncherPreferences.PREF_DUMP_SHAD
 import static com.ashmeet.hyperlauncher.prefs.LauncherPreferences.PREF_VSYNC_IN_ZINK;
 import static com.ashmeet.hyperlauncher.prefs.LauncherPreferences.PREF_ZINK_PREFER_SYSTEM_DRIVER;
 
-import android.content.*;
-import android.system.*;
-import android.util.*;
+import android.content.Context;
+import android.system.Os;
+import android.util.ArrayMap;
+import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.ashmeet.hyperlauncher.prefs.LauncherPreferences;
 
-import java.io.*;
-import java.nio.ByteBuffer;
-import java.util.*;
-import net.kdt.pojavlaunch.*;
+import net.kdt.pojavlaunch.Logger;
+import net.kdt.pojavlaunch.Tools;
 import net.kdt.pojavlaunch.extra.ExtraConstants;
 import net.kdt.pojavlaunch.extra.ExtraCore;
 import net.kdt.pojavlaunch.multirt.Runtime;
 import net.kdt.pojavlaunch.plugins.LibraryPlugin;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class JREUtils {
     public static void redirectAndPrintJRELog() {
@@ -265,7 +273,7 @@ public class JREUtils {
             case "opengles2_5":
             case "opengles3":
             default:
-                renderLibrary = "libgl4es_114.so";
+                renderLibrary = "libkrypton.so";
                 useGles = true;
                 glesVersion = Integer.parseInt((String) ExtraCore.getValue(ExtraConstants.OPEN_GL_VERSION));
                 break;

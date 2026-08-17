@@ -288,7 +288,7 @@ public class GameRunner {
 
         String rendererLibrary = JREUtils.loadGraphicsLibrary(rendererName);
         if(rendererLibrary == null) {
-            Log.i("GameRunner", "Falling back to GL4ES 1.1.4");
+            Log.i("GameRunner", "Falling back to Krypton");
             rendererName = "opengles2";
             rendererLibrary = JREUtils.loadGraphicsLibrary(rendererName);
         }
