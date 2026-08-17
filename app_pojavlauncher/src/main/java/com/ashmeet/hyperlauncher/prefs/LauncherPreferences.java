@@ -77,6 +77,7 @@ public class LauncherPreferences {
     public static boolean PREF_ALSOFT_FORCE_OPENSL = false;
     public static String PREF_SCREEN_TRANSITION = "bounce";
     public static String PREF_THEME = "system";
+    public static boolean PREF_CUSTOM_THEME = false;
     public static int PREF_THEME_COLOR = 0xFF3F51B5;
     public static int PREF_LAST_CONTENT_SOURCE = 0;
 
@@ -142,6 +143,18 @@ public class LauncherPreferences {
         PREF_ALSOFT_FORCE_OPENSL = DEFAULT_PREF.getBoolean("alsoftForceOpenSL", false);
         PREF_SCREEN_TRANSITION = DEFAULT_PREF.getString("screen_transition", "none");
         PREF_THEME = DEFAULT_PREF.getString("app_theme", "system");
+        PREF_CUSTOM_THEME = DEFAULT_PREF.getBoolean("app_custom_theme", false);
+        
+        // Migration
+        if ("custom".equals(PREF_THEME)) {
+            PREF_THEME = "system";
+            PREF_CUSTOM_THEME = true;
+            DEFAULT_PREF.edit()
+                .putString("app_theme", "system")
+                .putBoolean("app_custom_theme", true)
+                .apply();
+        }
+
         PREF_THEME_COLOR = DEFAULT_PREF.getInt("app_theme_color", 0xFF3F51B5);
         PREF_LAST_CONTENT_SOURCE = DEFAULT_PREF.getInt("last_content_source", 0);
         PREF_HIDE_SIDEBAR = DEFAULT_PREF.getBoolean("hide_sidebar", false);

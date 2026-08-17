@@ -90,22 +90,15 @@ object SkinUtils {
             val skinUrl = getSkinUrl(account)
             val skinBitmap = getSkinBitmap(skinUrl) ?: return@withContext loadSteveHead2D(context)
 
-            val ratio = skinBitmap.width / 64
-            val size = 128
-            val result = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
-            val canvas = Canvas(result)
-            val paint = Paint().apply { isFilterBitmap = false }
-
-            val srcBase = Rect(8 * ratio, 8 * ratio, 16 * ratio, 16 * ratio)
-            val srcOverlay = Rect(40 * ratio, 8 * ratio, 48 * ratio, 16 * ratio)
-            val dst = Rect(0, 0, size, size)
-
-            canvas.drawBitmap(skinBitmap, srcBase, dst, paint)
-
-            canvas.drawBitmap(skinBitmap, srcOverlay, dst, paint)
+            val head = try {
+                SkinHeadRenderer().render2D(128, skinBitmap)
+            } catch (e: Exception) {
+                Log.e(TAG, "2D Renderer error", e)
+                null
+            }
 
             skinBitmap.recycle()
-            return@withContext result
+            return@withContext head ?: loadSteveHead2D(context)
         }
 
     private suspend fun getSkinBitmap(skinUrl: String?): Bitmap? = withContext(Dispatchers.IO) {
@@ -172,18 +165,15 @@ object SkinUtils {
             null
         } ?: return null
 
-        val ratio = steveBitmap.width / 64
-        val size = 128
-        val result = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
-        val canvas = Canvas(result)
-        val paint = Paint().apply { isFilterBitmap = false }
-
-        val srcBase = Rect(8 * ratio, 8 * ratio, 16 * ratio, 16 * ratio)
-        val dst = Rect(0, 0, size, size)
-        canvas.drawBitmap(steveBitmap, srcBase, dst, paint)
+        val head = try {
+            SkinHeadRenderer().render2D(128, steveBitmap)
+        } catch (e: Exception) {
+            Log.e(TAG, "2D Renderer failed for steve.png", e)
+            null
+        }
 
         steveBitmap.recycle()
-        return result
+        return head
     }
 
     /**

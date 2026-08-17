@@ -9,9 +9,9 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.FragmentActivity
 import net.ashmeet.hyperlauncher.R
 import com.ashmeet.hyperlauncher.components.SideNavigationRail
-import com.ashmeet.hyperlauncher.screens.activity.PojavLauncherScreen
+import com.ashmeet.hyperlauncher.screens.activity.launcher.PojavLauncherScreen
 import com.ashmeet.hyperlauncher.theme.PojavTheme
-import com.ashmeet.hyperlauncher.screens.activity.ExitScreen
+import com.ashmeet.hyperlauncher.screens.activity.game.ExitScreen
 
 object LauncherComposeHelper {
     private var settingsIconRes: Int by mutableIntStateOf(R.drawable.ic_sharp_settings_24)

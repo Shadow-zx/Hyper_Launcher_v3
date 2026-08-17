@@ -62,6 +62,7 @@ fun AppearanceSettingsScreen(
 
     var screenTransition by remember { mutableStateOf(LauncherPreferences.PREF_SCREEN_TRANSITION) }
     var appTheme by remember { mutableStateOf(LauncherPreferences.PREF_THEME) }
+    var isCustomTheme by remember { mutableStateOf(LauncherPreferences.PREF_CUSTOM_THEME) }
     var themeColor by remember { mutableIntStateOf(LauncherPreferences.PREF_THEME_COLOR) }
     var hideSidebar by remember { mutableStateOf(LauncherPreferences.PREF_HIDE_SIDEBAR) }
 
@@ -93,13 +94,12 @@ fun AppearanceSettingsScreen(
         }
     }
 
-    val themeOptions = listOf("system", "light", "dark", "custom")
+    val themeOptions = listOf("system", "light", "dark")
     val themeOptionNames = themeOptions.map { id ->
         when (id) {
             "system" -> stringResource(R.string.preference_app_theme_system)
             "light" -> stringResource(R.string.preference_app_theme_light)
             "dark" -> stringResource(R.string.preference_app_theme_dark)
-            "custom" -> "Custom"
             else -> id
         }
     }
@@ -119,7 +119,22 @@ fun AppearanceSettingsScreen(
                 )
             }
 
-            if (appTheme == "custom") {
+            SettingsCard(position = CardPosition.MIDDLE, useSurface = true) {
+                SettingsSwitchItem(
+                    title = "Custom Theme",
+                    summary = "Enable custom colors for the launcher",
+                    icon = Icons.Rounded.ColorLens,
+                    checked = isCustomTheme,
+                    onCheckedChange = {
+                        isCustomTheme = it
+                        LauncherPreferences.DEFAULT_PREF.edit { putBoolean("app_custom_theme", it) }
+                        LauncherPreferences.PREF_CUSTOM_THEME = it
+                        LauncherPreferences.loadPreferences(context)
+                    }
+                )
+            }
+
+            if (isCustomTheme) {
                 SettingsCard(position = CardPosition.MIDDLE, useSurface = true) {
                     SettingsActionItem(
                         title = "Theme Color",

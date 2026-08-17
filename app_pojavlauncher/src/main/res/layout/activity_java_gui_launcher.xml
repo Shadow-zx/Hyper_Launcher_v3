@@ -187,7 +187,7 @@
 
 	</androidx.constraintlayout.widget.ConstraintLayout>
 
-	<com.kdt.LoggerView
+	<com.ashmeet.hyperlauncher.screens.activity.game.LoggerView
 		android:id="@+id/launcherLoggerView"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"

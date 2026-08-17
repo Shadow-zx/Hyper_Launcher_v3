@@ -62,7 +62,7 @@
 
 		</net.kdt.pojavlaunch.customcontrols.ControlLayout>
 
-		<com.kdt.LoggerView
+		<com.ashmeet.hyperlauncher.screens.activity.game.LoggerView
 			android:id="@+id/mainLoggerView"
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"

@@ -61,7 +61,7 @@ fun MineButton(
     shape: Shape = CircleShape,
     isUppercase: Boolean = false
 ) {
-    val isCustomTheme = remember { LauncherPreferences.PREF_THEME == "custom" }
+    val isCustomTheme = remember { LauncherPreferences.PREF_CUSTOM_THEME }
     val primaryColor = MaterialTheme.colorScheme.primary
     val contentColor = if (isCustomTheme) {
         // Create a significantly darker version of the primary color for the text

@@ -41,7 +41,7 @@ import com.ashmeet.hyperlauncher.helper.LauncherComposeHelper;
 import com.ashmeet.hyperlauncher.prefs.LauncherPreferences;
 import com.ashmeet.hyperlauncher.dialog.QuickSettingSideDialog;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.kdt.LoggerView;
+import com.ashmeet.hyperlauncher.screens.activity.game.LoggerView;
 
 import net.ashmeet.hyperlauncher.R;
 import net.kdt.pojavlaunch.authenticator.accounts.Account;

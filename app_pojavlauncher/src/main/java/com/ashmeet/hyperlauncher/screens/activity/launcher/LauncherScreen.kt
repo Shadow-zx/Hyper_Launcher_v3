@@ -1,4 +1,4 @@
-package com.ashmeet.hyperlauncher.screens.activity
+package com.ashmeet.hyperlauncher.screens.activity.launcher
 
 import android.widget.FrameLayout
 import androidx.compose.foundation.background
