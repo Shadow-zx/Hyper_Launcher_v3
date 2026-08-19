@@ -1,7 +1,9 @@
 package net.kdt.pojavlaunch.modloaders.modpacks.api
 
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
+import android.graphics.drawable.BitmapDrawable
+import coil.imageLoader
+import coil.request.ImageRequest
 import com.ashmeet.hyperlauncher.screens.layouts.installer.models.ContentInstallerType
 import com.ashmeet.hyperlauncher.screens.layouts.installer.models.ModrinthProject
 import com.ashmeet.hyperlauncher.screens.layouts.installer.models.ModrinthVersion
@@ -9,7 +11,7 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.net.URL
+import net.kdt.pojavlaunch.lifecycle.ContextExecutor
 
 object ModrinthService {
     private val apiHandler = ApiHandler("https://api.modrinth.com/v2")
@@ -98,11 +100,15 @@ object ModrinthService {
     }
 
     suspend fun loadIcon(url: String): Bitmap? = withContext(Dispatchers.IO) {
+        val context = ContextExecutor.getContext() ?: return@withContext null
         try {
-            val connection = URL(url).openConnection()
-            connection.connect()
-            val input = connection.getInputStream()
-            BitmapFactory.decodeStream(input)
+            val loader = context.imageLoader
+            val request = ImageRequest.Builder(context)
+                .data(url)
+                .allowHardware(false)
+                .build()
+            val result = loader.execute(request)
+            (result.drawable as? BitmapDrawable)?.bitmap
         } catch (e: Exception) {
             null
         }

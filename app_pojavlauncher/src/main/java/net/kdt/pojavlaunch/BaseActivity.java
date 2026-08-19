@@ -1,8 +1,13 @@
 package net.kdt.pojavlaunch;
 
-import android.content.*;
+import static com.ashmeet.hyperlauncher.prefs.LauncherPreferences.PREF_FULLSCREEN_LAUNCHER;
+import static com.ashmeet.hyperlauncher.prefs.LauncherPreferences.PREF_IGNORE_NOTCH;
+
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
-import android.os.*;
+import android.os.Build;
+import android.os.Bundle;
 import android.view.View;
 import android.view.WindowInsets;
 import android.view.WindowInsetsController;
@@ -10,10 +15,9 @@ import android.view.WindowManager;
 
 import androidx.activity.EdgeToEdge;
 import androidx.activity.SystemBarStyle;
-import androidx.appcompat.app.*;
-import net.kdt.pojavlaunch.utils.*;
+import androidx.appcompat.app.AppCompatActivity;
 
-import static com.ashmeet.hyperlauncher.prefs.LauncherPreferences.PREF_IGNORE_NOTCH;
+import net.kdt.pojavlaunch.utils.LocaleUtils;
 
 public abstract class BaseActivity extends AppCompatActivity {
 
@@ -25,11 +29,11 @@ public abstract class BaseActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        if (shouldEnableEdgeToEdge()) {
+        if (shouldEnableEdgeToEdge() || Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
             EdgeToEdge.enable(this, SystemBarStyle.dark(Color.TRANSPARENT));
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                 WindowInsetsController controller = getWindow().getInsetsController();
-                if (controller != null) {
+                if (controller != null && shouldEnableEdgeToEdge()) {
                     controller.hide(WindowInsets.Type.systemBars());
                     controller.setSystemBarsBehavior(WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
                 }
@@ -44,8 +48,10 @@ public abstract class BaseActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         LocaleUtils.setLocale(this);
 
-        if (!shouldEnableEdgeToEdge()) {
+        if (!shouldEnableEdgeToEdge() && Build.VERSION.SDK_INT < Build.VERSION_CODES.VANILLA_ICE_CREAM) {
             Tools.setInsetsMode(this, setFullscreen(), shouldIgnoreNotch());
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+            Tools.setInsetsMode(this, shouldEnableEdgeToEdge() && setFullscreen(), shouldIgnoreNotch());
         } else {
             View insetView = findViewById(android.R.id.content);
             if (insetView != null) {
@@ -59,7 +65,7 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     /** @return Whether the activity should be set as a fullscreen one */
     public boolean setFullscreen(){
-        return true;
+        return PREF_FULLSCREEN_LAUNCHER;
     }
 
 
@@ -97,6 +103,6 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     /** @return Whether the activity should enable Edge-to-Edge */
     protected boolean shouldEnableEdgeToEdge() {
-        return false;
+        return PREF_FULLSCREEN_LAUNCHER;
     }
 }

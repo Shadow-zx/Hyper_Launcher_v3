@@ -5,12 +5,12 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.compose.ui.platform.ComposeView;
+
+import com.ashmeet.hyperlauncher.helper.LauncherComposeHelper;
 
 import net.ashmeet.hyperlauncher.R;
 import net.kdt.pojavlaunch.customcontrols.LayoutBitmaps;
@@ -36,7 +36,8 @@ public class ImportControlActivity extends Activity {
     private boolean mHasIntentChanged = true;
     private volatile boolean mIsFileVerified = false;
 
-    private EditText mEditText;
+    private String mFileName = "";
+    private ComposeView mComposeView;
 
     
     @Override
@@ -50,8 +51,17 @@ public class ImportControlActivity extends Activity {
             return;
         }
 
-        setContentView(R.layout.activity_import_control);
-        mEditText = findViewById(R.id.editText_import_control_file_name);
+        mComposeView = new ComposeView(this);
+        setContentView(mComposeView);
+        updateComposeContent();
+    }
+
+    private void updateComposeContent() {
+        LauncherComposeHelper.setImportControlContent(mComposeView, mFileName, fileName -> {
+            mFileName = fileName;
+            startImport();
+            return kotlin.Unit.INSTANCE;
+        });
     }
 
     /**
@@ -83,7 +93,8 @@ public class ImportControlActivity extends Activity {
             finishAndRemoveTask();
             return;
         }
-        mEditText.setText(trimFileName(Tools.getFileName(this, mUriData)));
+        mFileName = trimFileName(Tools.getFileName(this, mUriData));
+        updateComposeContent();
         mHasIntentChanged = false;
 
         //Import and verify thread
@@ -100,21 +111,13 @@ public class ImportControlActivity extends Activity {
                 finishAndRemoveTask();
             });
         }).start();
-
-        //Auto show the keyboard
-        Tools.MAIN_HANDLER.postDelayed(() -> {
-            InputMethodManager imm = (InputMethodManager) getApplicationContext().getSystemService(INPUT_METHOD_SERVICE);
-            imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, 0);
-            mEditText.setSelection(mEditText.getText().length());
-        }, 100);
     }
 
     /**
      * Start the import.
-     * @param view the view which called the function
      */
-    public void startImport(View view) {
-        String fileName = trimFileName(mEditText.getText().toString());
+    public void startImport() {
+        String fileName = trimFileName(mFileName);
         //Step 1 check for suffixes.
         if(!isFileNameValid(fileName)){
             Toast.makeText(this, getText(R.string.import_control_invalid_name), Toast.LENGTH_SHORT).show();

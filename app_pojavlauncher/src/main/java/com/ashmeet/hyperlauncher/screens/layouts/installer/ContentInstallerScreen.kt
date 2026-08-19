@@ -34,6 +34,7 @@ import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.Warning
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -60,6 +61,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -100,6 +102,51 @@ fun ContentInstallerScreen(
 ) {
     var searchQuery by remember { mutableStateOf("") }
     var isSearchActive by remember { mutableStateOf(false) }
+    var bypassWarning by remember { mutableStateOf(false) }
+
+    val isUnsupported = remember(instanceLoader, selectedType) {
+        (selectedType == ContentInstallerType.MODS || selectedType == ContentInstallerType.MODPACKS) &&
+                (instanceLoader == null || instanceLoader == "optifine")
+    }
+
+    if (isUnsupported && !bypassWarning) {
+        AlertDialog(
+            onDismissRequest = onBack,
+            icon = {
+                Icon(
+                    imageVector = Icons.Rounded.Warning,
+                    contentDescription = null,
+                    modifier = Modifier.size(32.dp),
+                    tint = MaterialTheme.colorScheme.error
+                )
+            },
+            title = {
+                Text(
+                    text = "Unsupported Instance",
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            text = {
+                Text(
+                    text = if (instanceLoader == "optifine")
+                        "Mods and modpacks cannot be installed on OptiFine instances. Please use a mod loader like Fabric, Forge, Quilt, or NeoForge."
+                    else
+                        "Mods and modpacks cannot be installed on Vanilla instances. Please install a mod loader like Fabric, Forge, Quilt, or NeoForge first.",
+                    textAlign = TextAlign.Center
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = { bypassWarning = true }) {
+                    Text("Use Anyway")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = onBack) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -314,7 +361,7 @@ fun ContentInstallerScreen(
                             LazyColumn(
                                 state = lazyListState,
                                 modifier = Modifier.fillMaxSize(),
-                                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
+                                contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 24.dp, bottom = 48.dp),
                                 verticalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
                                 items(projects, key = { it.id }) { p ->
@@ -399,7 +446,7 @@ private fun VersionList(
             LazyColumn(
                 state = lazyListState,
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 48.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(availableProjectMCVersions, key = { it }) { v ->
@@ -433,7 +480,7 @@ private fun VersionList(
             LazyColumn(
                 state = lazyListState,
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 48.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(filteredVersions, key = { it.id }) { version ->

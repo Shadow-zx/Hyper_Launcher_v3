@@ -1,5 +1,6 @@
 package com.ashmeet.hyperlauncher.skin
 
+import com.ashmeet.hyperlauncher.skin.model.SkinModelType
 import com.ashmeet.hyperlauncher.skin.server.OfflineYggdrasilServer
 import com.ashmeet.hyperlauncher.utils.LocalUuidUtils
 import com.ashmeet.hyperlauncher.utils.LocalUuidUtils.toFormattedUuid

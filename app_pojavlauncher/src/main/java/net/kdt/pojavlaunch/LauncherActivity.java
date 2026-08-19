@@ -24,29 +24,30 @@ import androidx.fragment.app.FragmentManager;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
+import com.ashmeet.hyperlauncher.fragments.AuthHostFragment;
+import com.ashmeet.hyperlauncher.fragments.ContentInstallerFragment;
+import com.ashmeet.hyperlauncher.fragments.InstanceDirectoryFragment;
+import com.ashmeet.hyperlauncher.fragments.LauncherPreference.LauncherPreferenceFragment;
+import com.ashmeet.hyperlauncher.fragments.MainMenuFragment;
+import com.ashmeet.hyperlauncher.fragments.MicrosoftLoginFragment;
+import com.ashmeet.hyperlauncher.helper.LauncherComposeHelper;
+import com.ashmeet.hyperlauncher.prefs.LauncherPreferences;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
+import net.ashmeet.hyperlauncher.BuildConfig;
 import net.ashmeet.hyperlauncher.R;
 import net.kdt.pojavlaunch.authenticator.accounts.Accounts;
 import net.kdt.pojavlaunch.extra.ExtraConstants;
 import net.kdt.pojavlaunch.extra.ExtraCore;
 import net.kdt.pojavlaunch.extra.ExtraListener;
-import com.ashmeet.hyperlauncher.fragments.AuthHostFragment;
-import com.ashmeet.hyperlauncher.fragments.ContentInstallerFragment;
-import com.ashmeet.hyperlauncher.fragments.InstanceDirectoryFragment;
-import com.ashmeet.hyperlauncher.fragments.MainMenuFragment;
-import com.ashmeet.hyperlauncher.fragments.MicrosoftLoginFragment;
 import net.kdt.pojavlaunch.instances.Instance;
 import net.kdt.pojavlaunch.instances.InstanceInstaller;
 import net.kdt.pojavlaunch.instances.Instances;
 import net.kdt.pojavlaunch.lifecycle.ContextAwareDoneListener;
 import net.kdt.pojavlaunch.lifecycle.ContextExecutor;
 import net.kdt.pojavlaunch.modloaders.modpacks.imagecache.IconCacheJanitor;
-import com.ashmeet.hyperlauncher.prefs.LauncherPreferences;
-import com.ashmeet.hyperlauncher.fragments.LauncherPreference.LauncherPreferenceFragment;
 import net.kdt.pojavlaunch.progresskeeper.ProgressKeeper;
 import net.kdt.pojavlaunch.progresskeeper.TaskCountListener;
-import com.ashmeet.hyperlauncher.helper.LauncherComposeHelper;
 import net.kdt.pojavlaunch.services.ProgressServiceKeeper;
 import net.kdt.pojavlaunch.tasks.AsyncVersionList;
 import net.kdt.pojavlaunch.tasks.MoJsonDownloader;
@@ -340,8 +341,11 @@ public class LauncherActivity extends BaseActivity implements PreferenceFragment
 
     // Call async
     private void checkPreviousInstalls(){
-        final String[] packages = {"net.ashmeet.hyperlauncher", "net.ashmeet.hyperlauncher.debug"};
+        final String[] packages = {"git.artdeell.mjlaunch", "git.artdeell.mojo", "net.ashmeet.hyperlauncher", "net.ashmeet.hyperlauncher.debug"};
         for(String s : packages){
+            // Don't check for self
+            if (s.equals(BuildConfig.APPLICATION_ID)) continue;
+
             Intent i = getPackageManager().getLaunchIntentForPackage(s);
             if(i == null) continue;
             Tools.runOnUiThread(() ->

@@ -9,7 +9,6 @@ import android.view.View;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.compose.ui.platform.ComposeView;
-import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.ashmeet.hyperlauncher.helper.LauncherComposeHelper;
 import com.ashmeet.hyperlauncher.prefs.LauncherPreferences;
@@ -27,8 +26,6 @@ import java.io.IOException;
 
 
 public class CustomControlsActivity extends BaseActivity implements EditorExitable, CropperUtils.CropperReceiver {
-	private DrawerLayout mDrawerLayout;
-	private ComposeView mDrawerNavigationView;
 	private ControlLayout mControlLayout;
 	private CropperUtils.CropperReceiver mCropperReceiver;
 	private ActivityResultLauncher<?> mCropperLauncher;
@@ -44,17 +41,13 @@ public class CustomControlsActivity extends BaseActivity implements EditorExitab
 
 		mCropperLauncher = CropperUtils.registerCropper(this, this);
 
-		setContentView(R.layout.activity_custom_controls);
+		ComposeView composeView = new ComposeView(this);
+		setContentView(composeView);
 
-		mControlLayout = findViewById(R.id.customctrl_controllayout);
-		mDrawerLayout = findViewById(R.id.customctrl_drawerlayout);
-		mDrawerNavigationView = findViewById(R.id.customctrl_navigation_view);
-		View mPullDrawerButton = findViewById(R.id.drawer_button);
+		mControlLayout = new ControlLayout(this);
+		mControlLayout.setModifiable(true);
 
-		mPullDrawerButton.setOnClickListener(v -> mDrawerLayout.openDrawer(mDrawerNavigationView));
-		mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-
-		LauncherComposeHelper.setMainDrawerContent(mDrawerNavigationView, true, true, position -> {
+		LauncherComposeHelper.setControlsEditorContent(composeView, mControlLayout, position -> {
 			switch(position) {
 				case 0: mControlLayout.addControlButton(new ControlData("New")); break;
 				case 1: mControlLayout.addDrawer(new ControlDrawerData()); break;
@@ -80,10 +73,8 @@ public class CustomControlsActivity extends BaseActivity implements EditorExitab
 					}
 					break;
 			}
-			mDrawerLayout.closeDrawers();
 			return kotlin.Unit.INSTANCE;
 		});
-		mControlLayout.setModifiable(true);
 	}
 
 	@Override

@@ -13,9 +13,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.FragmentActivity
 import com.ashmeet.hyperlauncher.components.SideNavigationRail
-import com.ashmeet.hyperlauncher.screens.activity.game.BaseMainScreen
 import com.ashmeet.hyperlauncher.screens.activity.game.ExitScreen
 import com.ashmeet.hyperlauncher.screens.activity.game.LoggerView
+import com.ashmeet.hyperlauncher.screens.activity.game.controls.ControlsEditorScreen
+import com.ashmeet.hyperlauncher.screens.activity.game.controls.GameControlsScreen
+import com.ashmeet.hyperlauncher.screens.activity.game.controls.ImportControlScreen
 import com.ashmeet.hyperlauncher.screens.activity.launcher.PojavLauncherScreen
 import com.ashmeet.hyperlauncher.theme.PojavTheme
 import kotlinx.coroutines.launch
@@ -136,15 +138,59 @@ object LauncherComposeHelper {
                     override fun isOpen(): Boolean = drawerState.isOpen
                 })
 
-                BaseMainScreen(
+                GameControlsScreen(
                     drawerState = drawerState,
                     controlLayout = controlLayout,
                     loggerView = loggerView,
-                    drawerContent = {
-                        SideNavigationRail(isEditor = isInEditor, onAction = onAction, isExport = false)
-                    }
+                    onDrawerButtonTap = {
+                        scope.launch {
+                            if (drawerState.isOpen) drawerState.close()
+                            else drawerState.open()
+                        }
+                    },
+                    onAction = onAction
                 )
             }
+        }
+    }
+
+    @JvmStatic
+    fun setControlsEditorContent(
+        composeView: ComposeView,
+        controlLayout: ControlLayout,
+        onAction: (Int) -> Unit
+    ) {
+        composeView.setContent {
+            PojavTheme {
+                val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+                val scope = rememberCoroutineScope()
+
+                ControlsEditorScreen(
+                    controlLayout = controlLayout,
+                    onDrawerButtonTap = {
+                        scope.launch {
+                            if (drawerState.isOpen) drawerState.close()
+                            else drawerState.open()
+                        }
+                    },
+                    onAction = onAction,
+                    drawerState = drawerState
+                )
+            }
+        }
+    }
+
+    @JvmStatic
+    fun setImportControlContent(
+        composeView: ComposeView,
+        initialFileName: String,
+        onImport: (String) -> Unit
+    ) {
+        composeView.setContent {
+            ImportControlScreen(
+                initialFileName = initialFileName,
+                onImport = onImport
+            )
         }
     }
 }

@@ -9,7 +9,7 @@ import net.kdt.pojavlaunch.authenticator.AuthType;
 import net.kdt.pojavlaunch.utils.FileUtils;
 import net.kdt.pojavlaunch.utils.JSONUtils;
 
-import com.ashmeet.hyperlauncher.skin.SkinModelType;
+import com.ashmeet.hyperlauncher.skin.model.SkinModelType;
 
 import java.io.*;
 import java.net.URL;

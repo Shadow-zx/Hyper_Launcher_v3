@@ -273,7 +273,7 @@ public class JREUtils {
             case "opengles2_5":
             case "opengles3":
             default:
-                renderLibrary = "libkrypton.so";
+                renderLibrary = "libng_gl4es.so";
                 useGles = true;
                 glesVersion = Integer.parseInt((String) ExtraCore.getValue(ExtraConstants.OPEN_GL_VERSION));
                 break;

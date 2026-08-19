@@ -6,20 +6,21 @@ import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Rect
+import android.graphics.drawable.BitmapDrawable
 import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.platform.LocalContext
-import com.ashmeet.hyperlauncher.skin.SkinModelType
+import coil.imageLoader
+import coil.request.ImageRequest
+import com.ashmeet.hyperlauncher.skin.model.SkinModelType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import net.kdt.pojavlaunch.authenticator.AuthType
 import net.kdt.pojavlaunch.authenticator.accounts.Account
 import net.kdt.pojavlaunch.authenticator.accounts.SkinHeadRenderer
-import java.io.File
-import java.net.HttpURLConnection
-import java.net.URL
+
 
 object SkinUtils {
 
@@ -69,7 +70,7 @@ object SkinUtils {
     suspend fun renderHead(context: Context, account: Account?): Bitmap? =
         withContext(Dispatchers.IO) {
             val skinUrl = getSkinUrl(account)
-            val skinBitmap = getSkinBitmap(skinUrl) ?: return@withContext loadSteveHead3D(context)
+            val skinBitmap = getSkinBitmap(context, skinUrl) ?: return@withContext loadSteveHead3D(context)
 
             val head = try {
                 SkinHeadRenderer().render(120, skinBitmap)
@@ -78,7 +79,6 @@ object SkinUtils {
                 null
             }
 
-            skinBitmap.recycle()
             return@withContext head ?: loadSteveHead3D(context)
         }
 
@@ -88,7 +88,7 @@ object SkinUtils {
     suspend fun renderHead2D(context: Context, account: Account?): Bitmap? =
         withContext(Dispatchers.IO) {
             val skinUrl = getSkinUrl(account)
-            val skinBitmap = getSkinBitmap(skinUrl) ?: return@withContext loadSteveHead2D(context)
+            val skinBitmap = getSkinBitmap(context, skinUrl) ?: return@withContext loadSteveHead2D(context)
 
             val head = try {
                 SkinHeadRenderer().render2D(128, skinBitmap)
@@ -97,39 +97,22 @@ object SkinUtils {
                 null
             }
 
-            skinBitmap.recycle()
             return@withContext head ?: loadSteveHead2D(context)
         }
 
-    private suspend fun getSkinBitmap(skinUrl: String?): Bitmap? = withContext(Dispatchers.IO) {
+    private suspend fun getSkinBitmap(context: Context, skinUrl: String?): Bitmap? = withContext(Dispatchers.IO) {
         if (skinUrl == null) return@withContext null
 
-        if (skinUrl.startsWith("file://")) {
-            val path = skinUrl.substring(7)
-            val file = File(path)
-            if (file.exists()) {
-                return@withContext try {
-                    BitmapFactory.decodeFile(file.absolutePath)
-                } catch (e: Exception) {
-                    Log.e(TAG, "Failed to decode skin file $path", e)
-                    null
-                }
-            }
-        } else {
-            return@withContext downloadBitmap(skinUrl)
-        }
-        return@withContext null
-    }
-
-    private fun downloadBitmap(urlString: String): Bitmap? {
-        return try {
-            val url = URL(urlString)
-            val connection = url.openConnection() as HttpURLConnection
-            connection.doInput = true
-            connection.connect()
-            connection.inputStream.use { BitmapFactory.decodeStream(it) }
+        return@withContext try {
+            val loader = context.imageLoader
+            val request = ImageRequest.Builder(context)
+                .data(skinUrl)
+                .allowHardware(false) // Need software bitmap for rendering/recycling
+                .build()
+            val result = loader.execute(request)
+            (result.drawable as? BitmapDrawable)?.bitmap
         } catch (e: Exception) {
-            Log.w(TAG, "Failed to download skin from $urlString", e)
+            Log.e(TAG, "Failed to load skin bitmap from $skinUrl", e)
             null
         }
     }

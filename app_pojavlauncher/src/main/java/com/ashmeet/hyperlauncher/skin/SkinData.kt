@@ -1,5 +1,7 @@
 package com.ashmeet.hyperlauncher.skin
 
+import com.ashmeet.hyperlauncher.skin.model.SkinModelType
+
 /**
  * Skin texture: raw PNG bytes, its SHA-256 hex hash, and the arm model.
  * The hash is used both as a cache key and as the URL path segment served

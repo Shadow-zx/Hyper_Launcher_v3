@@ -4,7 +4,7 @@ import android.util.Base64
 import android.util.Log
 import com.ashmeet.hyperlauncher.skin.PlayerCape
 import com.ashmeet.hyperlauncher.skin.PlayerSkin
-import com.ashmeet.hyperlauncher.skin.SkinModelType
+import com.ashmeet.hyperlauncher.skin.model.SkinModelType
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode

@@ -2,6 +2,7 @@ package com.ashmeet.hyperlauncher.skin
 
 import android.graphics.BitmapFactory
 import android.graphics.Color
+import com.ashmeet.hyperlauncher.skin.model.SkinModelType
 import java.security.MessageDigest
 
 /** SHA-256 hex digest of a ByteArray. Used for texture cache keys + URLs. */

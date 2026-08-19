@@ -1,4 +1,4 @@
-package com.ashmeet.hyperlauncher.skin
+package com.ashmeet.hyperlauncher.skin.model
 
 /**
  * Arm model of a Minecraft player skin.

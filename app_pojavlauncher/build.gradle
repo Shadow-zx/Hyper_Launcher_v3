@@ -60,7 +60,7 @@ configurations {
 android {
     namespace 'net.ashmeet.hyperlauncher'
 
-    compileSdk = 37
+    compileSdk 37
 
     lintOptions {
         abortOnError false
@@ -90,7 +90,7 @@ android {
     defaultConfig {
         applicationId "net.ashmeet.hyperlauncher"
         minSdkVersion 23
-        targetSdkVersion 36
+        targetSdkVersion 37
         versionCode 3
         versionName getVersionName()
         multiDexEnabled false //important
@@ -144,13 +144,9 @@ android {
         }
 
         release {
-            // Don't set to true or java.awt will be a.a or something similar.
-            minifyEnabled false
-            //noinspection ProguardAndroidTxtUsage
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            // defaultConfig already set
-            // multiDexEnabled = true
-            // debuggable = true
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             resValue 'string', 'storageProviderAuthorities', 'net.ashmeet.hyperlauncher.scoped.gamefolder'
             resValue 'string', 'application_package', 'net.ashmeet.hyperlauncher'
         }

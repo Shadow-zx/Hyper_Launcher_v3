@@ -7,14 +7,10 @@
 # For more details, see
 #   http://developer.android.com/guide/developing/tools/proguard.html
 
-# Add any project specific keep options here:
-
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
+# General optimization settings
+-keepattributes Signature,AnnotationDefault,EnclosingMethod,InnerClasses,SourceFile,LineNumberTable
+-repackageclasses ''
+-allowaccessmodification
 
 # We use Reflection on the builder to avoid creating too many objects
  -keep class net.objecthunter.exp4j.ExpressionBuilder**
@@ -22,14 +18,44 @@
     *;
  }
 # Option screens
- -keep class net.kdt.pojavlaunch.prefs.screens** {*;}
+-keep class com.ashmeet.hyperlauncher.fragments.LauncherPreference.LauncherPreferenceFragment { *; }
+-keep class com.ashmeet.hyperlauncher.fragments.LauncherPreference.LauncherPreferenceJavaFragment { *; }
+-keep class com.ashmeet.hyperlauncher.fragments.LauncherPreference.LauncherPreferenceVideoFragment { *; }
+-keep class com.ashmeet.hyperlauncher.fragments.LauncherPreference.LauncherPreferenceControlFragment { *; }
+-keep class com.ashmeet.hyperlauncher.fragments.LauncherPreference.LauncherPreferenceAppearanceFragment { *; }
+-keep class com.ashmeet.hyperlauncher.fragments.LauncherPreference.LauncherPreferenceExperimentalFragment { *; }
+-keep class com.ashmeet.hyperlauncher.fragments.LauncherPreference.LauncherPreferenceMiscellaneousFragment { *; }
 
 # Minecraft JSON classes (GSON mapping and Reflection)
 -keep class net.kdt.pojavlaunch.JVersionList** { *; }
+-keep class net.kdt.pojavlaunch.modloaders.modpacks.api.** { *; }
 
 # ASM and Bytecode Injectors
 -keep class org.objectweb.asm.** { *; }
 -keep class org.angelauramc.methodsInjectorAgent.** { *; }
 -keep class java.lang.instrument.** { *; }
+
+# Keep AWT/Swing classes if they are bundled (common issue in PojavLauncher)
+-keep class java.awt.** { *; }
+-keep class javax.swing.** { *; }
+-dontwarn java.awt.**
+-dontwarn javax.swing.**
+
+# Gson rules
+-keepattributes *Annotation*
+-keep class com.google.gson.reflect.TypeToken
+-keep class * extends com.google.gson.TypeAdapter
+-keep class com.google.gson.stream.**
+-keep class net.kdt.pojavlaunch.** {
+    @com.google.gson.annotations.SerializedName <fields>;
+}
+
+# Coil
+-keep class coil.** { *; }
+-dontwarn coil.**
+
+# Ktor
+-keep class io.ktor.** { *; }
+-dontwarn io.ktor.**
 
 

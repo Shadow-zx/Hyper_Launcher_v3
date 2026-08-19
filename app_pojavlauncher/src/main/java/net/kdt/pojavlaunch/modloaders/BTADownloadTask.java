@@ -1,8 +1,13 @@
 package net.kdt.pojavlaunch.modloaders;
 
+import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.kdt.mcgui.ProgressLayout;
 
@@ -10,12 +15,18 @@ import net.ashmeet.hyperlauncher.R;
 import net.kdt.pojavlaunch.Tools;
 import net.kdt.pojavlaunch.instances.Instance;
 import net.kdt.pojavlaunch.instances.Instances;
+import net.kdt.pojavlaunch.lifecycle.ContextExecutor;
 import net.kdt.pojavlaunch.progresskeeper.ProgressKeeper;
 import net.kdt.pojavlaunch.utils.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
+import coil.Coil;
+import coil.request.ImageRequest;
+import coil.target.Target;
 
 public class BTADownloadTask implements Runnable {
     private static final String BASE_JSON = "{\"inheritsFrom\":\"b1.7.3\",\"mainClass\":\"net.minecraft.client.Minecraft\",\"libraries\":[{\"name\":\"bta-client:bta-client:%1$s\",\"downloads\":{\"artifact\":{\"path\":\"bta-client/bta-client-%1$s.jar\",\"url\":\"%2$s\"}}}],\"id\":\"%3$s\"}";
@@ -40,11 +51,41 @@ public class BTADownloadTask implements Runnable {
     }
 
     private void tryDownloadIcon(Instance targetInstance) {
+        Context context = ContextExecutor.getContext();
+        if (context == null) return;
+
+        final CountDownLatch latch = new CountDownLatch(1);
+        ImageRequest request = new ImageRequest.Builder(context)
+                .data(mBtaVersion.iconUrl)
+                .allowHardware(false)
+                .target(new Target() {
+                    @Override
+                    public void onStart(@Nullable Drawable placeholder) {}
+
+                    @Override
+                    public void onSuccess(@NonNull Drawable result) {
+                        if (result instanceof BitmapDrawable) {
+                            Bitmap iconBitmap = ((BitmapDrawable) result).getBitmap();
+                            try {
+                                targetInstance.encodeNewIcon(iconBitmap);
+                            } catch (IOException e) {
+                                Log.e("BTADownloadTask", "Failed to encode icon", e);
+                            }
+                        }
+                        latch.countDown();
+                    }
+
+                    @Override
+                    public void onError(@Nullable Drawable errorDrawable) {
+                        latch.countDown();
+                    }
+                })
+                .build();
+        Coil.imageLoader(context).enqueue(request);
         try {
-            Bitmap iconBitmap = BitmapFactory.decodeStream(new URL(mBtaVersion.iconUrl).openStream());
-            targetInstance.encodeNewIcon(iconBitmap);
-        }catch (IOException e) {
-            Log.w("BTADownloadTask", "Failed to download bta icon", e);
+            latch.await(30, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            Log.w("BTADownloadTask", "Interrupted while downloading bta icon", e);
         }
     }
 

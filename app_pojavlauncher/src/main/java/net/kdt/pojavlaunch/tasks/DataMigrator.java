@@ -14,14 +14,11 @@ import android.widget.Toast;
 
 import com.kdt.mcgui.ProgressLayout;
 
+import net.ashmeet.hyperlauncher.R;
 import net.kdt.pojavlaunch.Tools;
-
-import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
-
-import net.ashmeet.hyperlauncher.R;
 
 /**
  * A class for migrating data from other launcher installations
@@ -75,7 +72,9 @@ public class DataMigrator {
         ProgressLayout.setProgress(ProgressLayout.DATA_MIGRATION, 0);
         try {
             activity.getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            copyFileTree(activity, getFilesUri(DocumentsContract.buildDocumentUriUsingTree(uri, DocumentsContract.getTreeDocumentId(uri))), root, 100);
+            Uri treeUri = DocumentsContract.buildDocumentUriUsingTree(uri, DocumentsContract.getTreeDocumentId(uri));
+            Uri resolvedUri = resolveSourceUri(treeUri);
+            copyFileTree(activity, getFilesUri(resolvedUri), root, 100);
             Tools.runOnUiThread(() -> Toast.makeText(activity, R.string.migration_progress_finish, Toast.LENGTH_LONG).show());
         } catch (Exception e) {
             Log.e("DataMigration", "Failed to import data to the launcher: " + e.getMessage());
@@ -87,6 +86,43 @@ public class DataMigrator {
         ProgressLayout.clearProgress(ProgressLayout.DATA_MIGRATION);
     }
 
+    private Uri resolveSourceUri(Uri treeUri) {
+        // Look for MJLaunch first, then Mojo
+        String[] targets = {"git.artdeell.mjlaunch", "git.artdeell.mojo"};
+        for (String target : targets) {
+            Uri found = findChild(treeUri, target);
+            if (found != null) return found;
+        }
+        return treeUri;
+    }
+
+    private Uri findChild(Uri uri, String name) {
+        String[] projection = {DocumentsContract.Document.COLUMN_DOCUMENT_ID};
+        String[] selectionArgs = {name};
+        try (Cursor cursor = activity.getContentResolver().query(uri, projection, null, selectionArgs, null)) {
+            if (cursor != null && cursor.moveToFirst()) {
+                return DocumentsContract.buildDocumentUriUsingTree(uri, cursor.getString(0));
+            }
+        } catch (Exception ignored) {
+        }
+
+        // Fallback: iterate children if selectionArgs query is not supported by the provider
+        Uri childrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(uri, DocumentsContract.getDocumentId(uri));
+        try (Cursor cursor = activity.getContentResolver().query(childrenUri, TREE_PROJECTION, null, null, null)) {
+            if (cursor != null) {
+                while (cursor.moveToNext()) {
+                    String displayName = cursor.getString(cursor.getColumnIndexOrThrow(DocumentsContract.Document.COLUMN_DISPLAY_NAME));
+                    if (name.equals(displayName)) {
+                        String id = cursor.getString(cursor.getColumnIndexOrThrow(DocumentsContract.Document.COLUMN_DOCUMENT_ID));
+                        return DocumentsContract.buildDocumentUriUsingTree(uri, id);
+                    }
+                }
+            }
+        } catch (Exception ignored) {
+        }
+        return null;
+    }
+
     /**
      * Migrate data from other MojoLauncher installations.
     */
@@ -94,7 +130,7 @@ public class DataMigrator {
         String authority = uri.getAuthority();
         if(authority == null) return;
         // Shouldn't allow importing from any non-Mojo app
-        if(!authority.contains(activity.getString(R.string.group_id))) {
+        if(!authority.contains(activity.getString(R.string.group_id)) && !"com.android.externalstorage.documents".equals(authority)) {
             Toast.makeText(activity, R.string.migration_progress_foreign, Toast.LENGTH_LONG).show();
             return;
         }

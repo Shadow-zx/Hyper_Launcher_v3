@@ -108,11 +108,14 @@ class ContentInstallerFragment : Fragment() {
                     val instanceLoader = remember(instance) {
                         instance?.let {
                             val vId = it.versionId.lowercase()
-                            if (vId.contains("fabric")) "fabric"
-                            else if (vId.contains("forge")) "forge"
-                            else if (vId.contains("quilt")) "quilt"
-                            else if (vId.contains("neoforge")) "neoforge"
-                            else null
+                            when {
+                                vId.contains("fabric") -> "fabric"
+                                vId.contains("forge") -> "forge"
+                                vId.contains("quilt") -> "quilt"
+                                vId.contains("neoforge") -> "neoforge"
+                                vId.contains("optifine") -> "optifine"
+                                else -> null
+                            }
                         }
                     }
 

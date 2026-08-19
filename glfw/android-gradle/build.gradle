@@ -4,10 +4,11 @@ plugins {
 
 android {
     namespace 'git.artdeell.dnbglfw'
-    compileSdk 36
+    compileSdk 37
 
     defaultConfig {
         minSdk 21
+        targetSdk 37
         externalNativeBuild {
             cmake {
                 arguments "-DGLFW_BUILD_WAYLAND=OFF", "-DGLFW_BUILD_X11=OFF", "-DGLFW_BUILD_ANDROID=ON",

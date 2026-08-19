@@ -67,25 +67,77 @@ fun PojavTheme(
             darkColorScheme(
                 primary = primaryColor,
                 onPrimary = colorResource(R.color.minebutton_text_color),
+                primaryContainer = primaryColor.copy(alpha = 0.3f),
+                onPrimaryContainer = Color.White,
+                secondary = primaryColor,
+                onSecondary = colorResource(R.color.minebutton_text_color),
+                secondaryContainer = primaryColor.copy(alpha = 0.2f),
+                onSecondaryContainer = Color.White,
+                tertiary = primaryColor,
+                onTertiary = colorResource(R.color.minebutton_text_color),
+                tertiaryContainer = primaryColor.copy(alpha = 0.15f),
+                onTertiaryContainer = Color.White,
+                error = colorResource(R.color.warning),
+                onError = Color.Black,
+                errorContainer = Color(0xFF93000A),
+                onErrorContainer = Color(0xFFFFDAD6),
                 background = colorResource(R.color.background_app),
+                onBackground = colorResource(R.color.primary_text),
                 surface = colorResource(R.color.background_status_bar),
                 onSurface = colorResource(R.color.primary_text),
                 surfaceVariant = colorResource(R.color.background_overlay),
                 onSurfaceVariant = colorResource(R.color.secondary_text),
                 outline = colorResource(R.color.divider),
-                error = colorResource(R.color.warning),
+                outlineVariant = colorResource(R.color.divider).copy(alpha = 0.5f),
+                scrim = Color.Black,
+                inverseSurface = Color.White,
+                inverseOnSurface = Color.Black,
+                inversePrimary = primaryColor,
+                surfaceDim = Color(0xFF1A1A1A),
+                surfaceBright = Color(0xFF3B3B3B),
+                surfaceContainerLowest = Color(0xFF0F0F0F),
+                surfaceContainerLow = Color(0xFF1A1A1A),
+                surfaceContainer = Color(0xFF212121),
+                surfaceContainerHigh = Color(0xFF2B2B2B),
+                surfaceContainerHighest = Color(0xFF333333)
             )
         } else {
             lightColorScheme(
                 primary = primaryColor,
                 onPrimary = colorResource(R.color.minebutton_text_color),
+                primaryContainer = primaryColor.copy(alpha = 0.1f),
+                onPrimaryContainer = Color.Black,
+                secondary = primaryColor,
+                onSecondary = colorResource(R.color.minebutton_text_color),
+                secondaryContainer = primaryColor.copy(alpha = 0.05f),
+                onSecondaryContainer = Color.Black,
+                tertiary = primaryColor,
+                onTertiary = colorResource(R.color.minebutton_text_color),
+                tertiaryContainer = primaryColor.copy(alpha = 0.03f),
+                onTertiaryContainer = Color.Black,
+                error = colorResource(R.color.warning),
+                onError = Color.White,
+                errorContainer = Color(0xFFFFDAD6),
+                onErrorContainer = Color(0xFF410002),
                 background = colorResource(R.color.background_app),
+                onBackground = colorResource(R.color.primary_text),
                 surface = colorResource(R.color.background_status_bar),
                 onSurface = colorResource(R.color.primary_text),
                 surfaceVariant = colorResource(R.color.background_overlay),
                 onSurfaceVariant = colorResource(R.color.secondary_text),
                 outline = colorResource(R.color.divider),
-                error = colorResource(R.color.warning),
+                outlineVariant = colorResource(R.color.divider).copy(alpha = 0.5f),
+                scrim = Color.Black,
+                inverseSurface = Color(0xFF313033),
+                inverseOnSurface = Color(0xFFF4EFF4),
+                inversePrimary = primaryColor,
+                surfaceDim = Color(0xFFDED8E1),
+                surfaceBright = Color(0xFFFEF7FF),
+                surfaceContainerLowest = Color.White,
+                surfaceContainerLow = Color(0xFFF7F2FA),
+                surfaceContainer = Color(0xFFF3EDF7),
+                surfaceContainerHigh = Color(0xFFECE6F0),
+                surfaceContainerHighest = Color(0xFFE6E0E9)
             )
         }
     }
@@ -100,38 +152,90 @@ private fun generateCustomColorScheme(primary: Color, isDark: Boolean): ColorSch
     val onPrimary = if (primary.luminance() > 0.5f) Color.Black else Color.White
 
     return if (isDark) {
-
         val darkBackground = Color(0xFF121212)
         val tintedBackground = primary.copy(alpha = 0.08f).compositeOver(darkBackground)
         val tintedSurface = primary.copy(alpha = 0.12f).compositeOver(darkBackground)
+        val onSurface = Color.White.copy(alpha = 0.9f)
 
         darkColorScheme(
             primary = primary,
             onPrimary = onPrimary,
+            primaryContainer = primary.copy(alpha = 0.3f).compositeOver(darkBackground),
+            onPrimaryContainer = Color.White,
+            secondary = primary,
+            onSecondary = onPrimary,
+            secondaryContainer = primary.copy(alpha = 0.2f).compositeOver(darkBackground),
+            onSecondaryContainer = Color.White,
+            tertiary = primary,
+            onTertiary = onPrimary,
+            tertiaryContainer = primary.copy(alpha = 0.15f).compositeOver(darkBackground),
+            onTertiaryContainer = Color.White,
+            error = Color(0xFFCF6679),
+            onError = Color(0xFF690005),
+            errorContainer = Color(0xFF93000A),
+            onErrorContainer = Color(0xFFFFDAD6),
             background = tintedBackground,
+            onBackground = onSurface,
             surface = tintedSurface,
-            onSurface = Color.White.copy(alpha = 0.9f),
+            onSurface = onSurface,
             surfaceVariant = primary.copy(alpha = 0.16f).compositeOver(darkBackground),
             onSurfaceVariant = Color.White.copy(alpha = 0.7f),
             outline = primary.copy(alpha = 0.5f),
-            error = Color(0xFFCF6679)
+            outlineVariant = primary.copy(alpha = 0.2f),
+            scrim = Color.Black,
+            inverseSurface = Color.White,
+            inverseOnSurface = Color.Black,
+            inversePrimary = primary,
+            surfaceDim = primary.copy(alpha = 0.1f).compositeOver(darkBackground),
+            surfaceBright = primary.copy(alpha = 0.2f).compositeOver(darkBackground),
+            surfaceContainerLowest = Color(0xFF0F0F0F),
+            surfaceContainerLow = Color(0xFF1A1A1A),
+            surfaceContainer = Color(0xFF212121),
+            surfaceContainerHigh = Color(0xFF2B2B2B),
+            surfaceContainerHighest = Color(0xFF333333)
         )
     } else {
-
         val lightBackground = Color(0xFFF2F2F2)
         val tintedBackground = primary.copy(alpha = 0.05f).compositeOver(lightBackground)
         val tintedSurface = primary.copy(alpha = 0.08f).compositeOver(Color.White)
+        val onSurface = Color.Black.copy(alpha = 0.9f)
 
         lightColorScheme(
             primary = primary,
             onPrimary = onPrimary,
+            primaryContainer = primary.copy(alpha = 0.15f).compositeOver(Color.White),
+            onPrimaryContainer = Color.Black,
+            secondary = primary,
+            onSecondary = onPrimary,
+            secondaryContainer = primary.copy(alpha = 0.1f).compositeOver(Color.White),
+            onSecondaryContainer = Color.Black,
+            tertiary = primary,
+            onTertiary = onPrimary,
+            tertiaryContainer = primary.copy(alpha = 0.07f).compositeOver(Color.White),
+            onTertiaryContainer = Color.Black,
+            error = Color(0xFFB00020),
+            onError = Color.White,
+            errorContainer = Color(0xFFFFDAD6),
+            onErrorContainer = Color(0xFF410002),
             background = tintedBackground,
+            onBackground = onSurface,
             surface = tintedSurface,
-            onSurface = Color.Black.copy(alpha = 0.9f),
+            onSurface = onSurface,
             surfaceVariant = primary.copy(alpha = 0.12f).compositeOver(lightBackground),
             onSurfaceVariant = Color.Black.copy(alpha = 0.7f),
             outline = primary.copy(alpha = 0.4f),
-            error = Color(0xFFB00020)
+            outlineVariant = primary.copy(alpha = 0.15f),
+            scrim = Color.Black,
+            inverseSurface = Color(0xFF313033),
+            inverseOnSurface = Color(0xFFF4EFF4),
+            inversePrimary = primary,
+            surfaceDim = Color(0xFFDED8E1),
+            surfaceBright = Color(0xFFFEF7FF),
+            surfaceContainerLowest = Color.White,
+            surfaceContainerLow = Color(0xFFF7F2FA),
+            surfaceContainer = Color(0xFFF3EDF7),
+            surfaceContainerHigh = Color(0xFFECE6F0),
+            surfaceContainerHighest = Color(0xFFE6E0E9)
         )
     }
 }

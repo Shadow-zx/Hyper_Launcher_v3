@@ -11,6 +11,13 @@ public class ContextExecutor {
     private static WeakReference<Application> sApplication;
     private static WeakReference<Activity> sActivity;
 
+    /**
+     * @return the application context if available, or null.
+     */
+    public static android.content.Context getContext() {
+        return Tools.getWeakReference(sApplication);
+    }
+
 
     /**
      * Schedules a ContextExecutorTask to be executed. For more info on tasks, please read
