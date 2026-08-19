@@ -81,7 +81,7 @@ fun LoggerViewCompose(
 ) {
     val logs = remember { mutableStateListOf<String>() }
     var isAutoScrollOn by remember { mutableStateOf(true) }
-    
+
     val listState = rememberLazyListState()
     val handler = remember { Handler(Looper.getMainLooper()) }
 
@@ -100,7 +100,7 @@ fun LoggerViewCompose(
             Logger.setLogListener(null)
             logs.clear()
         }
-        
+
         onDispose {
             Logger.setLogListener(null)
         }
@@ -117,7 +117,7 @@ fun LoggerViewCompose(
             .fillMaxSize()
             .background(Color.Black.copy(alpha = 0.8f))
     ) {
-        // Top Bar
+
         Surface(
             modifier = Modifier
                 .fillMaxWidth()
@@ -138,7 +138,6 @@ fun LoggerViewCompose(
                     modifier = Modifier.weight(1f)
                 )
 
-                // Auto-scroll toggle
                 IconToggleButton(
                     checked = isAutoScrollOn,
                     onCheckedChange = { isAutoScrollOn = it },
@@ -147,7 +146,7 @@ fun LoggerViewCompose(
                     Icon(
                         imageVector = Icons.Rounded.VerticalAlignBottom,
                         contentDescription = stringResource(
-                            id = if (isAutoScrollOn) R.string.log_view_button_scroll_on 
+                            id = if (isAutoScrollOn) R.string.log_view_button_scroll_on
                                  else R.string.log_view_button_scroll_off
                         ),
                         tint = if (isAutoScrollOn) MaterialTheme.colorScheme.primary else Color.LightGray
@@ -156,7 +155,6 @@ fun LoggerViewCompose(
 
                 Spacer(modifier = Modifier.width(4.dp))
 
-                // Output toggle
                 IconToggleButton(
                     checked = isOutputOn,
                     onCheckedChange = { onOutputToggle(it) },
@@ -165,7 +163,7 @@ fun LoggerViewCompose(
                     Icon(
                         imageVector = Icons.Rounded.Terminal,
                         contentDescription = stringResource(
-                            id = if (isOutputOn) R.string.log_view_button_output_on 
+                            id = if (isOutputOn) R.string.log_view_button_output_on
                                  else R.string.log_view_button_output_off
                         ),
                         tint = if (isOutputOn) MaterialTheme.colorScheme.primary else Color.LightGray
@@ -184,7 +182,6 @@ fun LoggerViewCompose(
             }
         }
 
-        // Log Content
         LazyColumn(
             state = listState,
             modifier = Modifier

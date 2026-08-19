@@ -69,7 +69,7 @@ fun MineButton(
         if (isLightMode) {
             Color.White
         } else {
-            // Create a significantly darker version of the primary color for the text
+
             Color(
                 red = primaryColor.red * 0.3f,
                 green = primaryColor.green * 0.3f,

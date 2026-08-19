@@ -3,7 +3,7 @@ package net.kdt.pojavlaunch.lifecycle;
 import android.content.Context;
 
 /**
- * A ContextExecutorTask is a task that can dynamically change its behaviour, based on the context
+ * A ContextExecutorTask is a task that can dynamically change its behavior, based on the context
  * used for its execution. This can be used to implement for ex. error/finish notifications from
  * background threads that may live with the Service after the activity that started them died.
  */

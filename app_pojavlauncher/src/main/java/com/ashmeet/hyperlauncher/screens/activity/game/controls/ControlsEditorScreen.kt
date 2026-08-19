@@ -43,7 +43,7 @@ fun ControlsEditorScreen(
     drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 ) {
     val scope = rememberCoroutineScope()
-    
+
     PojavTheme {
         CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
             ModalNavigationDrawer(
@@ -65,23 +65,12 @@ fun ControlsEditorScreen(
             ) {
                 CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
                     Box(modifier = Modifier.fillMaxSize()) {
-                        // The main editor area
+
                         AndroidView(
                             factory = { controlLayout },
                             modifier = Modifier.fillMaxSize()
                         )
 
-                        // The "Hint" text
-                        Text(
-                            text = stringResource(id = R.string.hint_control_mapping),
-                            modifier = Modifier
-                                .align(Alignment.TopEnd)
-                                .padding(top = 24.dp, end = 16.dp),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-                        )
-
-                        // Compose version of DrawerPullButton
                         IconButton(
                             onClick = onDrawerButtonTap,
                             modifier = Modifier

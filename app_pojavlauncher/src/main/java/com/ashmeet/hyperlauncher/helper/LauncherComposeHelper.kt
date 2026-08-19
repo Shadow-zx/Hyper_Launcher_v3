@@ -11,7 +11,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.findViewTreeLifecycleOwner
+import androidx.lifecycle.setViewTreeLifecycleOwner
+import androidx.lifecycle.setViewTreeViewModelStoreOwner
+import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.ashmeet.hyperlauncher.components.SideNavigationRail
 import com.ashmeet.hyperlauncher.screens.activity.game.ExitScreen
 import com.ashmeet.hyperlauncher.screens.activity.game.LoggerView
@@ -46,11 +51,24 @@ object LauncherComposeHelper {
         isExport: Boolean,
         onAction: (Int) -> Unit
     ) {
+        ensureViewTreeOwners(composeView)
         composeView.setContent {
             PojavTheme {
                 SideNavigationRail(isEditor = isInEditor, onAction = onAction, isExport = isExport)
             }
         }
+    }
+
+    private fun ensureViewTreeOwners(view: ComposeView) {
+        if (view.findViewTreeLifecycleOwner() == null) {
+            val activity = view.context as? FragmentActivity
+            if (activity != null) {
+                view.setViewTreeLifecycleOwner(activity)
+                view.setViewTreeViewModelStoreOwner(activity)
+                view.setViewTreeSavedStateRegistryOwner(activity)
+            }
+        }
+        view.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
     }
 
     @JvmStatic
@@ -73,6 +91,7 @@ object LauncherComposeHelper {
         onRestartClick: () -> Unit,
         onOpenCrashReport: (String) -> Unit
     ) {
+        ensureViewTreeOwners(composeView)
         composeView.setContent {
             PojavTheme {
                 ExitScreen(
@@ -115,12 +134,12 @@ object LauncherComposeHelper {
     @JvmStatic
     fun setBaseMainContent(
         composeView: ComposeView,
-        isInEditor: Boolean,
         controlLayout: ControlLayout,
         loggerView: LoggerView,
         onDrawerControllerCreated: (DrawerController) -> Unit,
         onAction: (Int) -> Unit
     ) {
+        ensureViewTreeOwners(composeView)
         composeView.setContent {
             PojavTheme {
                 val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -160,6 +179,7 @@ object LauncherComposeHelper {
         controlLayout: ControlLayout,
         onAction: (Int) -> Unit
     ) {
+        ensureViewTreeOwners(composeView)
         composeView.setContent {
             PojavTheme {
                 val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -186,6 +206,7 @@ object LauncherComposeHelper {
         initialFileName: String,
         onImport: (String) -> Unit
     ) {
+        ensureViewTreeOwners(composeView)
         composeView.setContent {
             ImportControlScreen(
                 initialFileName = initialFileName,

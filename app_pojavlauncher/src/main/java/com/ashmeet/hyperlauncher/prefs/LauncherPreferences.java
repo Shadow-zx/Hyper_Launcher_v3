@@ -144,8 +144,7 @@ public class LauncherPreferences {
         PREF_SCREEN_TRANSITION = DEFAULT_PREF.getString("screen_transition", "none");
         PREF_THEME = DEFAULT_PREF.getString("app_theme", "system");
         PREF_CUSTOM_THEME = DEFAULT_PREF.getBoolean("app_custom_theme", false);
-        
-        // Migration
+
         if ("custom".equals(PREF_THEME)) {
             PREF_THEME = "system";
             PREF_CUSTOM_THEME = true;

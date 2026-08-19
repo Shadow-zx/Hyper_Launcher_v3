@@ -1,6 +1,5 @@
 package net.kdt.pojavlaunch;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -30,7 +29,7 @@ import java.io.OutputStream;
  * An activity dedicated to importing control files.
  */
 @SuppressWarnings("IOStreamConstructor")
-public class ImportControlActivity extends Activity {
+public class ImportControlActivity extends BaseActivity {
 
     private Uri mUriData;
     private boolean mHasIntentChanged = true;
@@ -70,6 +69,7 @@ public class ImportControlActivity extends Activity {
      */
     @Override
     protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
         if(intent != null) setIntent(intent);
         mHasIntentChanged = true;
     }

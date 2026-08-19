@@ -9,14 +9,13 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import net.ashmeet.hyperlauncher.R;
 import net.kdt.pojavlaunch.lifecycle.ContextExecutorTask;
 import net.kdt.pojavlaunch.utils.NotificationUtils;
 
 import java.io.Serializable;
 
-import net.ashmeet.hyperlauncher.R;
-
-public class ShowErrorActivity extends Activity {
+public class ShowErrorActivity extends BaseActivity {
 
     private static final String ERROR_ACTIVITY_REMOTE_TASK = "remoteTask";
 

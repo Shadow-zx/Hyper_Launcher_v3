@@ -42,7 +42,7 @@ fun GameControlsScreen(
     drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 ) {
     val scope = rememberCoroutineScope()
-    
+
     PojavTheme {
         CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
             ModalNavigationDrawer(
@@ -63,13 +63,12 @@ fun GameControlsScreen(
             ) {
                 CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
                     Box(modifier = Modifier.fillMaxSize()) {
-                        // Game Surface and Controls Layout
+
                         AndroidView(
                             factory = { controlLayout },
                             modifier = Modifier.fillMaxSize()
                         )
 
-                        // Compose version of DrawerPullButton
                         IconButton(
                             onClick = onDrawerButtonTap,
                             modifier = Modifier
@@ -85,13 +84,11 @@ fun GameControlsScreen(
                             )
                         }
 
-                        // Logger View (Overlay)
                         AndroidView(
                             factory = { loggerView },
                             modifier = Modifier.fillMaxSize()
                         )
 
-                        // If drawer is open, add a transparent click layer to close it
                         if (drawerState.isOpen) {
                             Box(
                                 modifier = Modifier

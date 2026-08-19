@@ -38,7 +38,7 @@ fun ImportControlScreen(
 
     PojavTheme {
         Box(modifier = Modifier.fillMaxSize()) {
-            // Background Image
+
             Image(
                 painter = painterResource(id = R.drawable.ic_setting_sign_in_background),
                 contentDescription = null,
@@ -46,7 +46,6 @@ fun ImportControlScreen(
                 contentScale = ContentScale.Crop
             )
 
-            // Content Card
             Box(
                 modifier = Modifier
                     .align(Alignment.Center)

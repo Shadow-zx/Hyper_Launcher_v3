@@ -1,7 +1,6 @@
 package net.kdt.pojavlaunch;
 
 import android.Manifest;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -15,11 +14,11 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.ashmeet.hyperlauncher.prefs.LauncherPreferences;
-import net.kdt.pojavlaunch.tasks.AsyncAssetManager;
 
 import net.ashmeet.hyperlauncher.R;
+import net.kdt.pojavlaunch.tasks.AsyncAssetManager;
 
-public class TestStorageActivity extends Activity {
+public class TestStorageActivity extends BaseActivity {
     private final int REQUEST_STORAGE_REQUEST_CODE = 1;
     private AlertDialog mPermissionRequestDialog;
     private boolean mPermsRequired = false;

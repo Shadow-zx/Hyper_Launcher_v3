@@ -21,7 +21,6 @@ import net.kdt.pojavlaunch.authenticator.AuthType
 import net.kdt.pojavlaunch.authenticator.accounts.Account
 import net.kdt.pojavlaunch.authenticator.accounts.SkinHeadRenderer
 
-
 object SkinUtils {
 
     private const val TAG = "SkinUtils"
@@ -107,7 +106,7 @@ object SkinUtils {
             val loader = context.imageLoader
             val request = ImageRequest.Builder(context)
                 .data(skinUrl)
-                .allowHardware(false) // Need software bitmap for rendering/recycling
+                .allowHardware(false)
                 .build()
             val result = loader.execute(request)
             (result.drawable as? BitmapDrawable)?.bitmap
