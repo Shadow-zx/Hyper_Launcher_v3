@@ -21,15 +21,14 @@ import android.widget.Toast;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 
+import com.ashmeet.hyperlauncher.prefs.LauncherPreferences;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.gson.JsonSyntaxException;
 import com.kdt.pickafile.FileListView;
 import com.kdt.pickafile.FileSelectedListener;
 
-import net.kdt.pojavlaunch.LauncherGLSurface;
-
-import git.artdeell.dnbootstrap.glfw.GLFW;
 import net.ashmeet.hyperlauncher.R;
+import net.kdt.pojavlaunch.LauncherGLSurface;
 import net.kdt.pojavlaunch.Tools;
 import net.kdt.pojavlaunch.customcontrols.buttons.ControlButton;
 import net.kdt.pojavlaunch.customcontrols.buttons.ControlDrawer;
@@ -39,13 +38,14 @@ import net.kdt.pojavlaunch.customcontrols.buttons.ControlSubButton;
 import net.kdt.pojavlaunch.customcontrols.handleview.ActionRow;
 import net.kdt.pojavlaunch.customcontrols.handleview.ControlHandleView;
 import net.kdt.pojavlaunch.customcontrols.handleview.EditControlSideDialog;
-import com.ashmeet.hyperlauncher.prefs.LauncherPreferences;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import git.artdeell.dnbootstrap.glfw.GLFW;
 
 public class ControlLayout extends FrameLayout {
 	protected CustomControls mLayout;
@@ -63,6 +63,15 @@ public class ControlLayout extends FrameLayout {
 	private ControlButtonMenuListener mMenuListener;
 	public ActionRow mActionRow = null;
 	public String mLayoutFileName;
+
+	public interface OnControlEditListener {
+		void onEditControl(ControlInterface button);
+		default boolean onDisappearLayer() { return false; }
+	}
+	private OnControlEditListener mOnControlEditListener;
+	public void setOnControlEditListener(OnControlEditListener listener) {
+		mOnControlEditListener = listener;
+	}
 
 	public ControlLayout(Context ctx) {
 		super(ctx);
@@ -308,9 +317,12 @@ public class ControlLayout extends FrameLayout {
     @Override
     public void onViewRemoved(View child) {
         super.onViewRemoved(child);
-        if(child instanceof ControlInterface && mControlDialog != null){
-			mControlDialog.disappearColor();
-            mControlDialog.disappear(false);
+        if(child instanceof ControlInterface){
+			if (mOnControlEditListener != null) mOnControlEditListener.onDisappearLayer();
+			if (mControlDialog != null) {
+				mControlDialog.disappearColor();
+				mControlDialog.disappear(false);
+			}
         }
     }
 
@@ -319,6 +331,16 @@ public class ControlLayout extends FrameLayout {
 	 * to the button at hand.
 	 */
 	public void editControlButton(ControlInterface button){
+		if (mOnControlEditListener != null) {
+			mOnControlEditListener.onEditControl(button);
+			if(mHandleView == null){
+				mHandleView = new ControlHandleView(getContext());
+				addView(mHandleView);
+			}
+			mHandleView.setControlButton(button);
+			return;
+		}
+
 		if(mControlDialog == null){
 			// When the panel is null, it needs to inflate first.
 			// So inflate it, then process it on the next frame
@@ -432,7 +454,14 @@ public class ControlLayout extends FrameLayout {
             isKeyboardHidden = !imm.hideSoftInputFromWindow(getWindowToken(), 0);
         }
         if(isKeyboardHidden){
-			if(mControlDialog.disappearLayer()){
+			boolean layerDisappeared = false;
+			if (mOnControlEditListener != null) {
+				layerDisappeared = mOnControlEditListener.onDisappearLayer();
+			} else if (mControlDialog != null) {
+				layerDisappeared = mControlDialog.disappearLayer();
+			}
+
+			if(layerDisappeared){
 				mActionRow.setFollowedButton(null);
 				mHandleView.hide();
 			}
@@ -445,6 +474,7 @@ public class ControlLayout extends FrameLayout {
 
 		// When the input window cannot be hidden, it returns false
 		imm.hideSoftInputFromWindow(getWindowToken(), 0);
+		if (mOnControlEditListener != null) mOnControlEditListener.onDisappearLayer();
 		if(mControlDialog != null) {
 			mControlDialog.disappearColor();
 			mControlDialog.disappear(true);

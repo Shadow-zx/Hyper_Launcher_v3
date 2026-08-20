@@ -68,6 +68,12 @@ class DrawerPullButton @JvmOverloads constructor(
         super.onAttachedToWindow()
         LauncherPreferences.DEFAULT_PREF.registerOnSharedPreferenceChangeListener(prefListener)
         updateAppearance()
+        
+        // Load saved position
+        if (LauncherPreferences.PREF_DRAWER_PULL_POS_X != -1f && LauncherPreferences.PREF_DRAWER_PULL_POS_Y != -1f) {
+            x = LauncherPreferences.PREF_DRAWER_PULL_POS_X
+            y = LauncherPreferences.PREF_DRAWER_PULL_POS_Y
+        }
     }
 
     override fun onDetachedFromWindow() {
@@ -83,8 +89,8 @@ class DrawerPullButton @JvmOverloads constructor(
         iconPath = LauncherPreferences.PREF_DRAWER_PULL_ICON_PATH
 
         val dm = resources.displayMetrics
-        // 10% -> 25dp, 100% -> 60dp. Doubled for the user request.
-        val dpSize = (25 + (pullSizePerc - 10) * (35f / 90f)) * 2
+        // 10% -> 25dp, 100% -> 60dp. Removed the * 2 that made it too big.
+        val dpSize = (25 + (pullSizePerc - 10) * (35f / 90f))
         val size = (dpSize * dm.density).toInt()
         
         layoutParams?.let {
@@ -110,7 +116,7 @@ class DrawerPullButton @JvmOverloads constructor(
             if (showBackground) {
                 Box(
                     modifier = Modifier
-                        .fillMaxSize(0.75f) // Reduced background size
+                        .fillMaxSize(0.85f)
                         .clip(CircleShape)
                         .background(Color.Black.copy(alpha = bgOpacity / 100f))
                 )
@@ -129,7 +135,7 @@ class DrawerPullButton @JvmOverloads constructor(
                     bitmap = customBitmap.asImageBitmap(),
                     contentDescription = null,
                     modifier = Modifier
-                        .fillMaxSize(0.5f)
+                        .fillMaxSize(0.55f)
                         .alpha(iconOpacity / 100f)
                 )
             } else {
@@ -137,7 +143,7 @@ class DrawerPullButton @JvmOverloads constructor(
                     imageVector = Icons.Rounded.Settings,
                     contentDescription = null,
                     modifier = Modifier
-                        .fillMaxSize(0.5f)
+                        .fillMaxSize(0.55f)
                         .alpha(iconOpacity / 100f),
                     tint = Color.White
                 )
@@ -150,7 +156,21 @@ class DrawerPullButton @JvmOverloads constructor(
     }
 
     override fun onInterceptTouchEvent(ev: MotionEvent): Boolean {
-        return LauncherPreferences.PREF_DRAWER_PULL_HOLD_TO_MOVE
+        if (!LauncherPreferences.PREF_DRAWER_PULL_HOLD_TO_MOVE) return false
+        
+        // Only intercept if we actually move a bit, to allow clicks to pass through if not held
+        when (ev.action) {
+            MotionEvent.ACTION_DOWN -> {
+                mInitialTouchX = ev.rawX
+                mInitialTouchY = ev.rawY
+            }
+            MotionEvent.ACTION_MOVE -> {
+                val dx = Math.abs(ev.rawX - mInitialTouchX)
+                val dy = Math.abs(ev.rawY - mInitialTouchY)
+                if (dx > 10 || dy > 10) return true
+            }
+        }
+        return false
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
@@ -165,19 +185,29 @@ class DrawerPullButton @JvmOverloads constructor(
                 mInitialTouchX = event.rawX
                 mInitialTouchY = event.rawY
                 mHasMoved = false
-                performClick()
                 return true
             }
             MotionEvent.ACTION_MOVE -> {
-                x = mInitialX + (event.rawX - mInitialTouchX)
-                y = mInitialY + (event.rawY - mInitialTouchY)
-                mHasMoved = true
+                val dx = event.rawX - mInitialTouchX
+                val dy = event.rawY - mInitialTouchY
+                
+                if (Math.abs(dx) > 10 || Math.abs(dy) > 10) {
+                    x = mInitialX + dx
+                    y = mInitialY + dy
+                    mHasMoved = true
+                }
                 return true
             }
             MotionEvent.ACTION_UP -> {
                 if (mHasMoved) {
                     savePosition()
+                } else {
+                    performClick()
                 }
+                return true
+            }
+            MotionEvent.ACTION_CANCEL -> {
+                if (mHasMoved) savePosition()
                 return true
             }
         }
@@ -196,14 +226,10 @@ class DrawerPullButton @JvmOverloads constructor(
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         super.onLayout(changed, left, top, right, bottom)
-        if (LauncherPreferences.PREF_DRAWER_PULL_POS_X != -1f && LauncherPreferences.PREF_DRAWER_PULL_POS_Y != -1f) {
+        // Only set initial position if not currently being moved
+        if (!mHasMoved && LauncherPreferences.PREF_DRAWER_PULL_POS_X != -1f && LauncherPreferences.PREF_DRAWER_PULL_POS_Y != -1f) {
             x = LauncherPreferences.PREF_DRAWER_PULL_POS_X
             y = LauncherPreferences.PREF_DRAWER_PULL_POS_Y
-        } else if (!LauncherPreferences.PREF_DRAWER_PULL_HOLD_TO_MOVE) {
-            val parentView = parent as? View
-            parentView?.let {
-                translationX = (it.width * 0.25f)
-            }
         }
     }
 }

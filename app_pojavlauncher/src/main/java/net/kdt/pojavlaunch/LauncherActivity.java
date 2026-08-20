@@ -1,7 +1,5 @@
 package net.kdt.pojavlaunch;
 
-import static android.content.res.Configuration.ORIENTATION_PORTRAIT;
-
 import android.Manifest;
 import android.app.NotificationManager;
 import android.content.Context;
@@ -174,11 +172,6 @@ public class LauncherActivity extends BaseActivity implements PreferenceFragment
         return false;
     };
    
-    @Override
-    protected boolean shouldIgnoreNotch() {
-        return getResources().getConfiguration().orientation == ORIENTATION_PORTRAIT;
-    }
-
     @Override
     public boolean setFullscreen() {
         return false;

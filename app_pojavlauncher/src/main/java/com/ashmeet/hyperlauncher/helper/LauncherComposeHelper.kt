@@ -1,10 +1,8 @@
 package com.ashmeet.hyperlauncher.helper
 
 import android.widget.FrameLayout
-import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.rememberDrawerState
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -17,7 +15,6 @@ import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.setViewTreeLifecycleOwner
 import androidx.lifecycle.setViewTreeViewModelStoreOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
-import com.ashmeet.hyperlauncher.components.SideNavigationRail
 import com.ashmeet.hyperlauncher.screens.activity.game.ExitScreen
 import com.ashmeet.hyperlauncher.screens.activity.game.LoggerView
 import com.ashmeet.hyperlauncher.screens.activity.game.controls.ControlsEditorScreen
@@ -42,21 +39,6 @@ object LauncherComposeHelper {
         fun close()
         fun toggle()
         fun isOpen(): Boolean
-    }
-
-    @JvmStatic
-    fun setMainDrawerContent(
-        composeView: ComposeView,
-        isInEditor: Boolean,
-        isExport: Boolean,
-        onAction: (Int) -> Unit
-    ) {
-        ensureViewTreeOwners(composeView)
-        composeView.setContent {
-            PojavTheme {
-                SideNavigationRail(isEditor = isInEditor, onAction = onAction, isExport = isExport)
-            }
-        }
     }
 
     private fun ensureViewTreeOwners(view: ComposeView) {
@@ -134,6 +116,7 @@ object LauncherComposeHelper {
     @JvmStatic
     fun setBaseMainContent(
         composeView: ComposeView,
+        isInEditor: Boolean,
         controlLayout: ControlLayout,
         loggerView: LoggerView,
         onDrawerControllerCreated: (DrawerController) -> Unit,
@@ -157,18 +140,22 @@ object LauncherComposeHelper {
                     override fun isOpen(): Boolean = drawerState.isOpen
                 })
 
-                GameControlsScreen(
-                    drawerState = drawerState,
-                    controlLayout = controlLayout,
-                    loggerView = loggerView,
-                    onDrawerButtonTap = {
-                        scope.launch {
-                            if (drawerState.isOpen) drawerState.close()
-                            else drawerState.open()
-                        }
-                    },
-                    onAction = onAction
-                )
+                if (isInEditor) {
+                    ControlsEditorScreen(
+                        controlLayout = controlLayout,
+                        onDrawerButtonTap = null,
+                        onAction = onAction,
+                        drawerState = drawerState
+                    )
+                } else {
+                    GameControlsScreen(
+                        drawerState = drawerState,
+                        controlLayout = controlLayout,
+                        loggerView = loggerView,
+                        onDrawerButtonTap = null,
+                        onAction = onAction
+                    )
+                }
             }
         }
     }

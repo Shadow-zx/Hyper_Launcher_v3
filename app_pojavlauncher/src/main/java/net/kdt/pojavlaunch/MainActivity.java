@@ -2,6 +2,7 @@ package net.kdt.pojavlaunch;
 
 
 import static com.ashmeet.hyperlauncher.prefs.LauncherPreferences.PREF_ENABLE_GYRO;
+import static com.ashmeet.hyperlauncher.prefs.LauncherPreferences.PREF_IGNORE_NOTCH;
 import static com.ashmeet.hyperlauncher.prefs.LauncherPreferences.PREF_SUSTAINED_PERFORMANCE;
 import static com.ashmeet.hyperlauncher.prefs.LauncherPreferences.PREF_USE_ALTERNATE_SURFACE;
 import static com.ashmeet.hyperlauncher.prefs.LauncherPreferences.PREF_VIRTUAL_MOUSE_START;
@@ -171,7 +172,7 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
                 return insets;
             mImeHeight = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom;
             int translationY;
-            // Autopanning (if keyboardPan wasn't clicked)
+            // Autopsying (if keyboardPan wasn't clicked)
             if(!mForceFullPanning) {
                 int cursorY = (int) (GLFW.cursorY * launcherGLView.mSurface.getHeight()) + 100;
                 translationY = Tools.getTranslationFromCursorY(
@@ -359,15 +360,18 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
         touchCharInput.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE | InputType.TYPE_TEXT_FLAG_AUTO_COMPLETE | InputType.TYPE_TEXT_FLAG_AUTO_CORRECT | InputType.TYPE_TEXT_VARIATION_FILTER);
         mControlLayout.addView(touchCharInput);
 
-        mDrawerPullButton = new DrawerPullButton(this);
-        mDrawerPullButton.setId(R.id.drawer_button);
-        FrameLayout.LayoutParams pullParams = new FrameLayout.LayoutParams((int)(40 * density), (int)(20 * density));
-        pullParams.gravity = Gravity.END;
-        mDrawerPullButton.setLayoutParams(pullParams);
-        int p = (int)(8 * density);
-        mDrawerPullButton.setPadding(p, p, p, p);
-        mDrawerPullButton.setElevation(10f * density);
-        mControlLayout.addView(mDrawerPullButton);
+        mDrawerPullButton = findViewById(R.id.drawer_button);
+        if (mDrawerPullButton == null) {
+            mDrawerPullButton = new DrawerPullButton(this);
+            mDrawerPullButton.setId(R.id.drawer_button);
+            FrameLayout.LayoutParams pullParams = new FrameLayout.LayoutParams((int)(40 * density), (int)(20 * density));
+            pullParams.gravity = Gravity.END;
+            mDrawerPullButton.setLayoutParams(pullParams);
+            int p = (int)(8 * density);
+            mDrawerPullButton.setPadding(p, p, p, p);
+            mDrawerPullButton.setElevation(10f * density);
+            mControlLayout.addView(mDrawerPullButton);
+        }
 
         mHotbarView = new HotbarView(this);
         mHotbarView.setId(R.id.hotbar_view);
@@ -444,6 +448,11 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
         super.onPostResume();
         if(launcherGLView != null)  // Useful when backing out of the app
             Tools.MAIN_HANDLER.postDelayed(() -> launcherGLView.refreshSize(), 500);
+    }
+
+    @Override
+    protected boolean shouldIgnoreNotch() {
+        return PREF_IGNORE_NOTCH;
     }
 
     @Override
@@ -633,7 +642,7 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
     }
 
     /*
-     * Android 14 (or some devices, at least) seems to dispatch the the captured mouse events as trackball events
+     * Android 14 (or some devices, at least) seems to dispatch the captured mouse events as trackball events
      * due to a bug(?) somewhere(????)
      */
     @RequiresApi(api = Build.VERSION_CODES.O)

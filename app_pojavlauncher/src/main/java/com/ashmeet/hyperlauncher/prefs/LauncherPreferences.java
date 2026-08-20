@@ -82,7 +82,7 @@ public class LauncherPreferences {
     public static int PREF_LAST_CONTENT_SOURCE = 0;
 
     public static boolean PREF_HIDE_SIDEBAR = false;
-    public static float PREF_DRAWER_PULL_SIZE_PERC = 50f;
+    public static float PREF_DRAWER_PULL_SIZE_PERC = 100f;
     public static float PREF_DRAWER_PULL_POS_X = -1f;
     public static float PREF_DRAWER_PULL_POS_Y = -1f;
     public static int PREF_DRAWER_PULL_BG_OPACITY = 65;
