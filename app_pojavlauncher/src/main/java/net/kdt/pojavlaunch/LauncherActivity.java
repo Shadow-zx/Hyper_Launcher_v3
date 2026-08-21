@@ -12,10 +12,10 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -27,7 +27,6 @@ import com.ashmeet.hyperlauncher.fragments.ContentInstallerFragment;
 import com.ashmeet.hyperlauncher.fragments.InstanceDirectoryFragment;
 import com.ashmeet.hyperlauncher.fragments.LauncherPreference.LauncherPreferenceFragment;
 import com.ashmeet.hyperlauncher.fragments.MainMenuFragment;
-import com.ashmeet.hyperlauncher.fragments.MicrosoftLoginFragment;
 import com.ashmeet.hyperlauncher.helper.LauncherComposeHelper;
 import com.ashmeet.hyperlauncher.prefs.LauncherPreferences;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -72,7 +71,7 @@ public class LauncherActivity extends BaseActivity implements PreferenceFragment
 
     /* Listener for the back button in settings */
     private final ExtraListener<String> mBackPreferenceListener = (key, value) -> {
-        if(value.equals("true")) onBackPressed();
+        if(value.equals("true")) getOnBackPressedDispatcher().onBackPressed();
         return false;
     };
 
@@ -178,11 +177,6 @@ public class LauncherActivity extends BaseActivity implements PreferenceFragment
     }
 
     @Override
-    protected boolean shouldEnableEdgeToEdge() {
-        return LauncherPreferences.PREF_FULLSCREEN_LAUNCHER;
-    }
-
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         LauncherComposeHelper.setContent(
@@ -198,8 +192,22 @@ public class LauncherActivity extends BaseActivity implements PreferenceFragment
                         .replace(R.id.container_fragment, MainMenuFragment.class, null, MainMenuFragment.TAG)
                         .commitAllowingStateLoss();
             } else {
-                fm.beginTransaction().detach(f).commitNowAllowingStateLoss();
-                fm.beginTransaction().attach(f).commitNowAllowingStateLoss();
+                fm.beginTransaction()
+                        .replace(R.id.container_fragment, f)
+                        .commitAllowingStateLoss();
+            }
+        });
+
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (getSupportFragmentManager().getBackStackEntryCount() > 0 && findViewById(R.id.container_fragment) == null) {
+                    Log.w("LauncherActivity", "onBackPressed: container not ready, ignoring");
+                    return;
+                }
+                setEnabled(false);
+                getOnBackPressedDispatcher().onBackPressed();
+                setEnabled(true);
             }
         });
 
@@ -265,20 +273,6 @@ public class LauncherActivity extends BaseActivity implements PreferenceFragment
         getSupportFragmentManager().unregisterFragmentLifecycleCallbacks(mFragmentCallbackListener);
     }
 
-    /** Custom implementation to feel more natural when a backstack isn't present */
-    @Override
-    public void onBackPressed() {
-        MicrosoftLoginFragment fragment = (MicrosoftLoginFragment) getVisibleFragment(MicrosoftLoginFragment.TAG);
-        if(fragment != null){
-            if(fragment.canGoBack()){
-                fragment.goBack();
-                return;
-            }
-        }
-
-        super.onBackPressed();
-    }
-
     @Override
     public boolean onPreferenceStartFragment(@NonNull PreferenceFragmentCompat caller, @NonNull Preference pref) {
         String fragmentName = pref.getFragment();
@@ -294,24 +288,6 @@ public class LauncherActivity extends BaseActivity implements PreferenceFragment
         }
     }
 
-    @SuppressWarnings("SameParameterValue")
-    private Fragment getVisibleFragment(String tag){
-        Fragment fragment = getSupportFragmentManager().findFragmentByTag(tag);
-        if(fragment != null && fragment.isVisible()) {
-            return fragment;
-        }
-        return null;
-    }
-
-    @SuppressWarnings("unused")
-    private Fragment getVisibleFragment(int id){
-        Fragment fragment = getSupportFragmentManager().findFragmentById(id);
-        if(fragment != null && fragment.isVisible()) {
-            return fragment;
-        }
-        return null;
-    }
-
     public void askForPermission(int minApi, final String permission) {
         if(Build.VERSION.SDK_INT < minApi) return;
         mRequestPermissionLauncher.launch(permission);
@@ -319,9 +295,6 @@ public class LauncherActivity extends BaseActivity implements PreferenceFragment
     public boolean checkForPermission(int minApi, final String permission) {
         return Build.VERSION.SDK_INT < minApi ||
                 ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_DENIED;
-    }
-    public boolean checkForPermissionRationale(int minApi, final String permission) {
-        return checkForPermission(minApi, permission) || ActivityCompat.shouldShowRequestPermissionRationale(this, permission);
     }
 
     private void checkNotificationPermission() {
@@ -353,13 +326,15 @@ public class LauncherActivity extends BaseActivity implements PreferenceFragment
     }
 
     private void showNotificationPermissionReasoning() {
-        new MaterialAlertDialogBuilder(this)
-                .setTitle(R.string.notification_permission_dialog_title)
-                .setMessage(R.string.notification_permission_dialog_text)
-                .setPositiveButton(android.R.string.ok, (d, w) ->
-                        askForPermission(33, Manifest.permission.POST_NOTIFICATIONS))
-                .setNegativeButton(android.R.string.cancel, (d, w)-> handleNoNotificationPermission())
-                .show();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            new MaterialAlertDialogBuilder(this)
+                    .setTitle(R.string.notification_permission_dialog_title)
+                    .setMessage(R.string.notification_permission_dialog_text)
+                    .setPositiveButton(android.R.string.ok, (d, w) ->
+                            askForPermission(33, Manifest.permission.POST_NOTIFICATIONS))
+                    .setNegativeButton(android.R.string.cancel, (d, w)-> handleNoNotificationPermission())
+                    .show();
+        }
     }
 
     private void handleNoNotificationPermission() {

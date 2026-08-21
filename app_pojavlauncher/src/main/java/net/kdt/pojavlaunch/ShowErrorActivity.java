@@ -20,6 +20,11 @@ public class ShowErrorActivity extends BaseActivity {
     private static final String ERROR_ACTIVITY_REMOTE_TASK = "remoteTask";
 
     @Override
+    protected boolean shouldEnableEdgeToEdge() {
+        return false;
+    }
+
+    @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Intent intent = getIntent();

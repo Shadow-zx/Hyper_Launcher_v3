@@ -33,13 +33,12 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 public class PojavApplication extends Application {
-	public static final String CRASH_REPORT_TAG = "PojavCrashReport";
+	public static final String CRASH_REPORT_TAG = "HyperCrashReport";
 	public static final ExecutorService sExecutorService = new ThreadPoolExecutor(4, 4, 500, TimeUnit.MILLISECONDS,  new LinkedBlockingQueue<>());
 
 	private void installFatalErrorHandler() {
 		Thread.setDefaultUncaughtExceptionHandler((thread, th) -> {
-			boolean storagePermAllowed = (Build.VERSION.SDK_INT < 23 || Build.VERSION.SDK_INT >= 29 ||
-					ActivityCompat.checkSelfPermission(PojavApplication.this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) && Tools.checkStorageRoot(PojavApplication.this);
+			boolean storagePermAllowed = (Build.VERSION.SDK_INT >= 29 || ActivityCompat.checkSelfPermission(PojavApplication.this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) && Tools.checkStorageRoot(PojavApplication.this);
 			File crashFile = new File(storagePermAllowed ? Tools.DIR_GAME_HOME : Tools.DIR_DATA, "latestcrash.txt");
 			try {
 				// Write to file, since some devices may not able to show error
@@ -66,8 +65,8 @@ public class PojavApplication extends Application {
 	@Override
 	public void onCreate() {
 		ContextExecutor.setApplication(this);
-		// Disable fatal errors on gplay. This is necessary so that google can collect crash report data and send it to me
-		// (where i can find the cause and fix it)
+		// Disable fatal errors on gplay. This is necessary so that Google can collect crash report data and send it to me
+		// (where I can find the cause and fix it)
         //noinspection ConstantValue
         if(!BuildConfig.BUILD_TYPE.equals("gplay")) installFatalErrorHandler();
 		
@@ -78,7 +77,7 @@ public class PojavApplication extends Application {
 				// Required to run the main activity properly.
 				LauncherPreferences.loadPreferences(this);
 			} else {
-				// In other cases, only initialize enough for the basicmost basics to work
+				// In other cases, only initialize enough for the basic most basics to work
 				// and not explode.
 				Tools.initEarlyConstants(this);
 			}

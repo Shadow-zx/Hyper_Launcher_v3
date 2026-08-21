@@ -85,7 +85,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         Tools.getDisplayMetrics(this);
     }
 
-    /** @return Whether or not the notch should be ignored */
+    /** @return Whether the notch should be ignored */
     protected boolean shouldIgnoreNotch(){
         return true;
     }

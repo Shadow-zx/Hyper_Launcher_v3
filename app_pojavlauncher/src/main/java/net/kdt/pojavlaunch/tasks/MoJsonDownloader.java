@@ -8,31 +8,30 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.ashmeet.hyperlauncher.prefs.LauncherPreferences;
 import com.google.gson.JsonParseException;
 import com.kdt.mcgui.ProgressLayout;
 
+import net.ashmeet.hyperlauncher.R;
 import net.kdt.pojavlaunch.Architecture;
 import net.kdt.pojavlaunch.JAssetInfo;
 import net.kdt.pojavlaunch.JAssets;
 import net.kdt.pojavlaunch.JVersionList;
 import net.kdt.pojavlaunch.NewJREUtil;
-import net.ashmeet.hyperlauncher.R;
-
 import net.kdt.pojavlaunch.Tools;
 import net.kdt.pojavlaunch.downloader.Downloader;
 import net.kdt.pojavlaunch.downloader.TaskMetadata;
 import net.kdt.pojavlaunch.mirrors.DownloadMirror;
 import net.kdt.pojavlaunch.mirrors.MirrorTamperedException;
-import com.ashmeet.hyperlauncher.prefs.LauncherPreferences;
 import net.kdt.pojavlaunch.utils.DownloadUtils;
 import net.kdt.pojavlaunch.utils.FileUtils;
 import net.kdt.pojavlaunch.utils.JSONUtils;
 import net.kdt.pojavlaunch.utils.MavenNameUtils;
 import net.kdt.pojavlaunch.utils.jre.RuntimeSelectionException;
-import net.kdt.pojavlaunch.value.DependentLibrary;
-import net.kdt.pojavlaunch.value.LibrarySubstitution;
 import net.kdt.pojavlaunch.value.ClientInfo;
+import net.kdt.pojavlaunch.value.DependentLibrary;
 import net.kdt.pojavlaunch.value.LibraryArtifact;
+import net.kdt.pojavlaunch.value.LibrarySubstitution;
 import net.kdt.pojavlaunch.value.MoJsonRule;
 import net.kdt.pojavlaunch.value.NativeLibraryExtractable;
 import net.kdt.pojavlaunch.value.SubstitutionMap;
@@ -145,8 +144,14 @@ public class MoJsonDownloader extends Downloader {
 
         runDownloads(mScheduledDownloadTasks);
 
+        mScheduledDownloadTasks.clear();
+        mScheduledDownloadTasks = null;
+
         ensureJarFileCopy();
         extractNatives(mVersionName);
+
+        mDeclaredNatives.clear();
+        mDeclaredNatives = null;
     }
 
     private File createGameJsonPath(String versionId) {

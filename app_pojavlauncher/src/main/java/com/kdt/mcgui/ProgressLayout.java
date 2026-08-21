@@ -148,8 +148,12 @@ public class ProgressLayout extends ConstraintLayout implements View.OnClickList
             });
         }
 
+        private long lastUpdate = 0L;
         @Override
         public void onProgressUpdated(int progress, int resid, Object... va) {
+            long now = System.currentTimeMillis();
+            if (now - lastUpdate < 50 && progress != 100) return;
+            lastUpdate = now;
             post(()-> {
                 textView.setProgress(progress);
                 if(resid != -1) textView.setText(getContext().getString(resid, va));

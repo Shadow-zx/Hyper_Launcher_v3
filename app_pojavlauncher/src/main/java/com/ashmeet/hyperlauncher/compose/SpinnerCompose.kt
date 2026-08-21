@@ -102,17 +102,30 @@ fun AccountSpinnerCompose(
     }
 
     val refreshAccount: (Account) -> Unit = { account ->
-        ProgressKeeper.waitUntilDone {
-            val refreshAccount = account.reload() ?: return@waitUntilDone
-            val authType = refreshAccount.authType
-            if (authType.requiresLogin() && System.currentTimeMillis() > refreshAccount.expiresAt) {
-                isAuthenticating = true
-                authType.createAuth().refreshAccount(loginListener, refreshAccount)
+        if (ProgressKeeper.getTaskCount() == 0) {
+            PojavApplication.sExecutorService.execute {
+                val refreshAccount = account.reload() ?: return@execute
+                val authType = refreshAccount.authType
+                if (authType.requiresLogin() && System.currentTimeMillis() > refreshAccount.expiresAt) {
+                    Tools.runOnUiThread { isAuthenticating = true }
+                    authType.createAuth().refreshAccount(loginListener, refreshAccount)
+                }
+            }
+        } else {
+            ProgressKeeper.waitUntilDone {
+                PojavApplication.sExecutorService.execute {
+                    val refreshAccount = account.reload() ?: return@execute
+                    val authType = refreshAccount.authType
+                    if (authType.requiresLogin() && System.currentTimeMillis() > refreshAccount.expiresAt) {
+                        Tools.runOnUiThread { isAuthenticating = true }
+                        authType.createAuth().refreshAccount(loginListener, refreshAccount)
+                    }
+                }
             }
         }
     }
 
-    val reloadAccounts: () -> Unit = {
+    val reloadAccounts: (Boolean) -> Unit = { notifyOthers ->
         PojavApplication.sExecutorService.execute {
             try {
                 val loadedAccounts = Accounts.load()
@@ -123,7 +136,9 @@ fun AccountSpinnerCompose(
                     if (selectedIndex >= 0 && selectedIndex < accounts.size) {
                         refreshAccount(accounts[selectedIndex])
                     }
-                    ExtraCore.setValue(ExtraConstants.REFRESH_ACCOUNT_SPINNER, true)
+                    if (notifyOthers) {
+                        ExtraCore.setValue(ExtraConstants.REFRESH_ACCOUNT_SPINNER, true)
+                    }
                 }
             } catch (e: IOException) {
                 e.printStackTrace()
@@ -132,13 +147,13 @@ fun AccountSpinnerCompose(
     }
 
     LaunchedEffect(Unit) {
-        reloadAccounts()
+        reloadAccounts(true)
     }
 
     DisposableEffect(Unit) {
         val refreshListener = object : ExtraListener<Any> {
             override fun onValueSet(key: String, value: Any): Boolean {
-                reloadAccounts()
+                reloadAccounts(false)
                 return false
             }
         }
@@ -166,7 +181,7 @@ fun AccountSpinnerCompose(
                 try {
                     val account = Accounts.create { acc: Account -> acc.username = value[0] }
                     loginListener.onLoginDone(account)
-                    reloadAccounts()
+                    reloadAccounts(true)
                 } catch (e: IOException) {
                     loginListener.onLoginError(e)
                 }
@@ -203,7 +218,7 @@ fun AccountSpinnerCompose(
         onAccountSelected = { account ->
             expanded = false
             Accounts.setCurrent(account)
-            reloadAccounts()
+            reloadAccounts(true)
         },
         onAccountDelete = { account ->
             expanded = false
@@ -212,7 +227,7 @@ fun AccountSpinnerCompose(
                 .setPositiveButton(android.R.string.cancel, null)
                 .setNeutralButton(R.string.global_delete) { _, _ ->
                     Accounts.delete(account)
-                    reloadAccounts()
+                    reloadAccounts(true)
                 }
                 .show()
         },

@@ -1,103 +1,133 @@
 package net.kdt.pojavlaunch.progresskeeper;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
+import android.util.Log;
+
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ProgressKeeper {
-    private static final HashMap<String, List<ProgressListener>> sProgressListeners = new HashMap<>();
-    private static final HashMap<String, ProgressState> sProgressStates = new HashMap<>();
-    private static final List<TaskCountListener> sTaskCountListeners = new ArrayList<>();
+    private static final Map<String, List<ProgressListener>> sProgressListeners = new ConcurrentHashMap<>();
+    private static final Map<String, ProgressState> sProgressStates = new ConcurrentHashMap<>();
+    private static final CopyOnWriteArrayList<TaskCountListener> sTaskCountListeners = new CopyOnWriteArrayList<>();
+    private static final AtomicInteger sTaskCount = new AtomicInteger(0);
+    private static final Object sListenerLock = new Object();
 
-    public static synchronized void submitProgress(String progressRecord, int progress, int resid, Object... va) {
-        ProgressState progressState = sProgressStates.get(progressRecord);
-        boolean shouldCallStarted = progressState == null;
-        boolean shouldCallEnded = resid == -1 && progress == -1;
-        if(shouldCallEnded) {
-            shouldCallStarted = false;
-            sProgressStates.remove(progressRecord);
-        }else if(shouldCallStarted){
-            sProgressStates.put(progressRecord, (progressState = new ProgressState()));
+    public static void submitProgress(String progressRecord, int progress, int resid, Object... va) {
+        boolean isNewTask = false;
+        boolean isFinished = false;
+
+        synchronized (sProgressStates) {
+            ProgressState progressState = sProgressStates.get(progressRecord);
+            boolean alreadyExists = progressState != null;
+            boolean finishRequested = resid == -1 && progress == -1;
+
+            if (finishRequested) {
+                if (alreadyExists) {
+                    sProgressStates.remove(progressRecord);
+                    isFinished = true;
+                }
+            } else {
+                if (!alreadyExists) {
+                    progressState = new ProgressState();
+                    sProgressStates.put(progressRecord, progressState);
+                    isNewTask = true;
+                }
+                progressState.progress = progress;
+                progressState.resid = resid;
+                progressState.varArg = va;
+            }
         }
-        if(shouldCallEnded || shouldCallStarted) updateTaskCount(sProgressStates.size());
-        if(progressState != null) {
-            progressState.progress = progress;
-            progressState.resid = resid;
-            progressState.varArg = va;
+
+        if (isNewTask) {
+            updateTaskCount(sTaskCount.incrementAndGet());
+        } else if (isFinished) {
+            updateTaskCount(sTaskCount.decrementAndGet());
         }
 
         List<ProgressListener> progressListeners = sProgressListeners.get(progressRecord);
-        if(progressListeners != null)
-            for(ProgressListener listener : progressListeners) {
-                    if(shouldCallStarted) listener.onProgressStarted();
-                    else if(shouldCallEnded) listener.onProgressEnded();
-                    else listener.onProgressUpdated(progress, resid, va);
+        if (progressListeners != null) {
+            for (ProgressListener listener : progressListeners) {
+                if (isNewTask) listener.onProgressStarted();
+                else if (isFinished) listener.onProgressEnded();
+                else listener.onProgressUpdated(progress, resid, va);
             }
+        }
     }
 
     private static void updateTaskCount(int count) {
-        synchronized (sTaskCountListeners) {
-            Iterator<TaskCountListener> iterator = sTaskCountListeners.iterator();
-            while(iterator.hasNext()) {
-                if(iterator.next().onUpdateTaskCount(count)) iterator.remove();
+        for (TaskCountListener listener : sTaskCountListeners) {
+            if (listener.onUpdateTaskCount(count)) {
+                sTaskCountListeners.remove(listener);
             }
         }
     }
 
-    public static synchronized boolean hasProgressKey(String key) {
-        return sProgressStates.get(key) != null;
+    public static boolean hasProgressKey(String key) {
+        return sProgressStates.containsKey(key);
     }
 
-    public static synchronized void addListener(String progressRecord, ProgressListener listener) {
-        ProgressState state = sProgressStates.get(progressRecord);
-        if(state != null && (state.resid != -1 || state.progress != -1)) {
+    public static void addListener(String progressRecord, ProgressListener listener) {
+        ProgressState state;
+        synchronized (sProgressStates) {
+            state = sProgressStates.get(progressRecord);
+        }
+
+        if (state != null && (state.resid != -1 || state.progress != -1)) {
             listener.onProgressStarted();
             listener.onProgressUpdated(state.progress, state.resid, state.varArg);
-        }else{
+        } else {
             listener.onProgressEnded();
         }
-        List<ProgressListener> listenerWeakReferenceList = sProgressListeners.get(progressRecord);
-        if(listenerWeakReferenceList == null) sProgressListeners.put(progressRecord, (listenerWeakReferenceList = new ArrayList<>()));
-        listenerWeakReferenceList.add(listener);
+        
+        List<ProgressListener> listenerList = sProgressListeners.get(progressRecord);
+        if (listenerList == null) {
+            synchronized (sListenerLock) {
+                listenerList = sProgressListeners.get(progressRecord);
+                if (listenerList == null) {
+                    listenerList = new CopyOnWriteArrayList<>();
+                    sProgressListeners.put(progressRecord, listenerList);
+                }
+            }
+        }
+        listenerList.add(listener);
     }
 
-    public static synchronized void removeListener(String progressRecord, ProgressListener listener) {
-        List<ProgressListener> listenerWeakReferenceList = sProgressListeners.get(progressRecord);
-        if(listenerWeakReferenceList != null) listenerWeakReferenceList.remove(listener);
+    public static void removeListener(String progressRecord, ProgressListener listener) {
+        List<ProgressListener> listenerList = sProgressListeners.get(progressRecord);
+        if (listenerList != null) listenerList.remove(listener);
     }
 
     public static void addTaskCountListener(TaskCountListener listener) {
         addTaskCountListener(listener, true);
     }
+
     public static void addTaskCountListener(TaskCountListener listener, boolean runUpdate) {
-        if(runUpdate) synchronized (ProgressKeeper.class) {
-            listener.onUpdateTaskCount(sProgressStates.size());
+        if (runUpdate) {
+            if (listener.onUpdateTaskCount(sTaskCount.get())) return;
         }
-        synchronized (sTaskCountListeners) {
-            if(!sTaskCountListeners.contains(listener)) sTaskCountListeners.add(listener);
-        }
+        sTaskCountListeners.addIfAbsent(listener);
     }
+
     public static void removeTaskCountListener(TaskCountListener listener) {
-        synchronized (sTaskCountListeners) {
-            sTaskCountListeners.remove(listener);
-        }
+        sTaskCountListeners.remove(listener);
     }
 
     /**
      * Waits until all tasks are done and runs the runnable, or if there were no pending process remaining
      * The runnable runs from the thread that updated the task count last, and it might be the UI thread,
-     * so don't put long running processes in it
+     * so don't put long-running processes in it
      * @param runnable the runnable to run when no tasks are remaining
      */
     public static void waitUntilDone(final Runnable runnable) {
-        // If we do it the other way the listener would be removed before it was added, which will cause a listener object leak
-        if(getTaskCount() == 0) {
+        if (getTaskCount() == 0) {
             runnable.run();
             return;
         }
         TaskCountListener listener = taskCount -> {
-            if(taskCount == 0) {
+            if (taskCount == 0) {
                 runnable.run();
                 return true;
             }
@@ -106,8 +136,14 @@ public class ProgressKeeper {
         addTaskCountListener(listener);
     }
 
-    public static synchronized int getTaskCount() {
-        return sProgressStates.size();
+    public static int getTaskCount() {
+        int count = sTaskCount.get();
+        if (count < 0) {
+            Log.w("ProgressKeeper", "Task count is negative: " + count + ". Resetting to 0.");
+            sTaskCount.set(0);
+            return 0;
+        }
+        return count;
     }
 
     public static boolean hasOngoingTasks() {

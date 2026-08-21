@@ -1,26 +1,26 @@
 package net.kdt.pojavlaunch.authenticator.accounts;
 
 
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
 
-import net.kdt.pojavlaunch.*;
+import androidx.annotation.Keep;
+
+import com.ashmeet.hyperlauncher.skin.model.SkinModelType;
+import com.google.gson.JsonParseException;
+
+import net.kdt.pojavlaunch.Tools;
 import net.kdt.pojavlaunch.authenticator.AuthType;
 import net.kdt.pojavlaunch.utils.FileUtils;
 import net.kdt.pojavlaunch.utils.JSONUtils;
 
-import com.ashmeet.hyperlauncher.skin.model.SkinModelType;
-
-import java.io.*;
-import java.net.URL;
-
-import android.graphics.Bitmap;
-
-import androidx.annotation.Keep;
-
-import com.google.gson.JsonParseException;
-
 import org.apache.commons.io.IOUtils;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.URL;
 
 @Keep
 public class Account {
@@ -37,7 +37,6 @@ public class Account {
     public String capePath;
     public SkinModelType skinModel;
     private transient Bitmap mFaceCache;
-    private transient Bitmap mFaceCache3D;
     private transient boolean mIsUpdatingSkin = false;
 
     public Account() {}
@@ -123,20 +122,6 @@ public class Account {
             mFaceCache = BitmapFactory.decodeFile(skinFaceFile.getAbsolutePath());
         }
         return mFaceCache;
-    }
-
-    public Bitmap getSkinFace3D(){
-        if(isLocal()) return null;
-        File skinFaceFile3D = getSkinFaceFile3D();
-        if(!skinFaceFile3D.exists()) {
-            // Trigger an update in the background if 3D face is missing
-            PojavApplication.sExecutorService.execute(this::updateSkinFace);
-            return null;
-        }
-        if(mFaceCache3D == null) {
-            mFaceCache3D = BitmapFactory.decodeFile(skinFaceFile3D.getAbsolutePath());
-        }
-        return mFaceCache3D;
     }
 
     private File getSkinFaceFile() {

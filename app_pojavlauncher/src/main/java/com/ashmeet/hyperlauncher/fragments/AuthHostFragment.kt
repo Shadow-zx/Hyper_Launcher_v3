@@ -19,6 +19,7 @@ class AuthHostFragment : Fragment() {
         requireActivity().onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 if (childFragmentManager.backStackEntryCount > 0) {
+                    if (view?.findViewById<View>(R.id.container_fragment_auth) == null) return
                     childFragmentManager.popBackStack()
                 } else {
                     isEnabled = false

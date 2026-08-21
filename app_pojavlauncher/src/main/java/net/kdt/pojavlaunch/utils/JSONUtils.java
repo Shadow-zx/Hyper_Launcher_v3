@@ -3,12 +3,13 @@ package net.kdt.pojavlaunch.utils;
 import net.kdt.pojavlaunch.Tools;
 
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 
 public class JSONUtils {
     public static List<String> insertJSONValueList(List<String> args, Map<String, String> keyValueMap) {
@@ -39,8 +40,9 @@ public class JSONUtils {
     }
 
     public static <T> T readFromFile(File file, Class<T> clazs) throws IOException {
-        try(FileReader fileReader = new FileReader(file)) {
-            return Tools.GLOBAL_GSON.fromJson(fileReader, clazs);
+        try(FileInputStream fileInputStream = new FileInputStream(file);
+            InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream)) {
+            return Tools.GLOBAL_GSON.fromJson(inputStreamReader, clazs);
         }
     }
 }

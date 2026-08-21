@@ -2,6 +2,7 @@ package net.kdt.pojavlaunch.downloader;
 
 import com.kdt.mcgui.ProgressLayout;
 
+import net.ashmeet.hyperlauncher.R;
 import net.kdt.pojavlaunch.tasks.SpeedCalculator;
 import net.kdt.pojavlaunch.utils.DownloadUtils;
 
@@ -23,8 +24,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
-
-import net.ashmeet.hyperlauncher.R;
 
 public class Downloader {
     private static final double ONE_MEGABYTE = (1024d * 1024d);
@@ -60,20 +59,20 @@ public class Downloader {
             thread.setName("verify thread");
             return thread;
         });
-        long totalSize = 0;
+        long currentTotalSize = 0;
         int totalCount = metadata.size();
         boolean sizeCounter = mUseSizeProgress.get();
         for(TaskMetadata element : metadata) {
-            totalSize += element.size;
+            currentTotalSize += element.size;
             mVerifyService.submit(new CheckFileOnDiskTask(element, this));
         }
-        double totalMegabytes = totalSize / ONE_MEGABYTE;
+        double totalMegabytes = currentTotalSize / ONE_MEGABYTE;
         while(mDownloadedFileCounter.get() < totalCount) {
             IOException exception = mThreadException.get();
             if(exception != null) throw exception;
             if(sizeCounter) reportSizeProgress(totalMegabytes);
             else reportCountProgress(R.string.newerdl_downloading_files_count, totalCount);
-            Thread.sleep(33);
+            Thread.sleep(250);
         }
         mDownloadService.shutdown();
         mVerifyService.shutdown();
@@ -95,7 +94,7 @@ public class Downloader {
         try (ExecutorService executorService = Executors.newFixedThreadPool(4)) {
             for(TaskMetadata element : reducedList) executorService.submit(new CompleteMetadataTask(element, this));
             executorService.shutdown();
-            while (!executorService.awaitTermination(33, TimeUnit.MILLISECONDS)) {
+            while (!executorService.awaitTermination(250, TimeUnit.MILLISECONDS)) {
                 IOException exception = mThreadException.get();
                 if(exception != null) throw exception;
                 reportCountProgress(R.string.newerdl_inserting_metadata_count, reducedList.size());

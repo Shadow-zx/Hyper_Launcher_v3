@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import android.webkit.WebView
+import androidx.activity.OnBackPressedCallback
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import com.ashmeet.hyperlauncher.screens.layouts.auth.methods.MicrosoftLoginScreen
@@ -27,6 +28,21 @@ class MicrosoftLoginFragment : Fragment() {
             "&scope=service%3A%3Auser.auth.xboxlive.com%3A%3AMBI_SSL" +
             "&redirect_url=https%3A%2F%2Flogin.live.com%2Foauth20_desktop.srf"
     private val mExtraCoreConstant = ExtraConstants.MICROSOFT_LOGIN_TODO
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        requireActivity().onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (canGoBack()) {
+                    goBack()
+                } else {
+                    isEnabled = false
+                    requireActivity().onBackPressedDispatcher.onBackPressed()
+                    isEnabled = true
+                }
+            }
+        })
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return ComposeView(requireContext()).apply {

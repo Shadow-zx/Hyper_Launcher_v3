@@ -49,9 +49,9 @@ public class JREUtils {
                     java.lang.Process p = logcatPb.start();
 
                     byte[] buf = new byte[1024];
-                    int len;
-                    while ((len = p.getInputStream().read(buf)) != -1) {
-                        String currStr = new String(buf, 0, len);
+                    int readLen;
+                    while ((readLen = p.getInputStream().read(buf)) != -1) {
+                        String currStr = new String(buf, 0, readLen);
                         Logger.appendToLog(currStr);
                     }
 
@@ -120,13 +120,31 @@ public class JREUtils {
         // Fix white color on banner and sheep, since GL4ES 1.1.5
         envMap.put("LIBGL_NORMALIZE", "1");
 
+        // Common fixes for EGL initialization issues, especially with modern Minecraft/Fabric
+        envMap.put("LIBGL_FB", "0");
+        envMap.put("LIBGL_GLLOOKUP", "0");
+        envMap.put("LIBGL_WRAPEGL", "0");
+        envMap.put("LIBGL_NOTEST", "1");
+
         if(PREF_DUMP_SHADERS)
             envMap.put("LIBGL_VGPU_DUMP", "1");
         if(PREF_VSYNC_IN_ZINK)
             envMap.put("POJAV_VSYNC_IN_ZINK", "1");
 
-        // The OPEN GL version is changed according
-        envMap.put("LIBGL_ES", (String) ExtraCore.getValue(ExtraConstants.OPEN_GL_VERSION));
+        // Set GLES backend version (2 for GLES2, 3 for GLES3)
+        int glesVersion = getDetectedVersion();
+        envMap.put("LIBGL_ES", glesVersion >= 3 ? "3" : "2");
+
+        // Set the OpenGL version to expose to the game
+        String exposedGl = (String) ExtraCore.getValue(ExtraConstants.OPEN_GL_VERSION, "2");
+        if ("1".equals(exposedGl)) envMap.put("LIBGL_GL", "15");
+        else if ("3".equals(exposedGl)) envMap.put("LIBGL_GL", "30");
+        else if ("32".equals(exposedGl)) envMap.put("LIBGL_GL", "32");
+        else envMap.put("LIBGL_GL", "21");
+
+        // Default EGL and GLES libraries for GL4ES
+        if (!envMap.containsKey("LIBGL_EGL")) envMap.put("LIBGL_EGL", "libEGL.so");
+        if (!envMap.containsKey("LIBGL_GLES")) envMap.put("LIBGL_GLES", "libGLESv2.so");
 
         envMap.put("FORCE_VSYNC", String.valueOf(LauncherPreferences.PREF_FORCE_VSYNC));
 
@@ -180,7 +198,6 @@ public class JREUtils {
         // Force LWJGL to use the Freetype library intended for it, instead of using the one
         // that we ship with Java (since it may be older than what's needed)
         //
-        Tools.fullyExit();
     }
 
     /**
@@ -188,12 +205,11 @@ public class JREUtils {
      * It supports multi line and absence of spaces between arguments
      * The function also supports auto-removal of improper arguments, although it may miss some.
      *
-     * @param args The un-parsed argument list.
      * @return Parsed args as an ArrayList
      */
-    public static ArrayList<String> parseJavaArguments(String args){
+    public static ArrayList<String> parseJavaArguments(String argsIn){
         ArrayList<String> parsedArguments = new ArrayList<>(0);
-        args = args.trim().replace(" ", "");
+        String args = argsIn.trim().replace(" ", "");
         //For each prefixes, we separate args.
         String[] separators = new String[]{"-XX:-","-XX:+", "-XX:","--", "-D", "-X", "-javaagent:", "-verbose"};
         for(String prefix : separators){
@@ -245,6 +261,7 @@ public class JREUtils {
      */
     public static String loadGraphicsLibrary(String renderer){
         String renderLibrary;
+        String eglLibrary;
         boolean useGles;
         boolean bypassNamespace = false;
         boolean preloadVk = true;
@@ -254,6 +271,7 @@ public class JREUtils {
                 preloadVk = false;
             case "vulkan_zink":
                 renderLibrary = MesaUtils.getPreferredEGL();
+                eglLibrary = renderLibrary;
                 useGles = false;
                 bypassNamespace = true; // Mesa is linked to a bunch of libraries not available in the pojavexec namespace
                 glesVersion = 3;
@@ -261,11 +279,13 @@ public class JREUtils {
                 break;
             case "mobileglues" :
                 renderLibrary = "libmobileglues.so";
+                eglLibrary = renderLibrary;
                 useGles = true;
                 glesVersion = 3;
                 break;
             case "opengles3_ltw" :
                 renderLibrary = "libltw.so";
+                eglLibrary = renderLibrary;
                 useGles = true;
                 glesVersion = 3;
                 break;
@@ -274,13 +294,18 @@ public class JREUtils {
             case "opengles3":
             default:
                 renderLibrary = "libng_gl4es.so";
+                if (!new File(Tools.NATIVE_LIB_DIR, renderLibrary).exists()) {
+                    renderLibrary = "libgl4es_114.so";
+                }
+                eglLibrary = "libEGL.so"; // GL4ES needs the system EGL for context creation
                 useGles = true;
+                bypassNamespace = true;
                 glesVersion = Integer.parseInt((String) ExtraCore.getValue(ExtraConstants.OPEN_GL_VERSION));
                 break;
         }
 
-        if (!configureRenderspec(renderLibrary, bypassNamespace, useGles, glesVersion)) {
-            Log.e("RENDER_LIBRARY","Failed to load renderer " + renderLibrary );
+        if (!configureRenderspec(eglLibrary, bypassNamespace, useGles, glesVersion)) {
+            Log.e("RENDER_LIBRARY","Failed to load renderer " + eglLibrary );
             return null;
         }
         MesaUtils.destroyZink(); // Not needed anymore
