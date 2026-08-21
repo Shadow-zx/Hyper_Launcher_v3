@@ -177,7 +177,7 @@ public class GameRunner {
             instance.write();
         }
 
-        boolean isGl4es = rendererName.equals("opengles2");
+        boolean isGl4es = rendererName.equals("opengles2") || rendererName.equals("holy");
         boolean ltwSupported = RendererCompatUtil.getCompatibleRenderers(activity).rendererIds.contains("opengles3_ltw");
         boolean hasKrypton = new File(Tools.NATIVE_LIB_DIR, "libng_gl4es.so").exists();
 

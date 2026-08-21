@@ -91,11 +91,15 @@ class ProfileTypeSelectFragment : Fragment() {
                                 )
                             },
                             onModpackClick = {
+                                val args = Bundle().apply {
+                                    putString("type", "MODPACKS")
+                                    putBoolean("bypass", true)
+                                }
                                 Tools.swapFragment(
                                     requireActivity(),
                                     ContentInstallerFragment::class.java,
                                     ContentInstallerFragment.Companion.TAG,
-                                    null
+                                    args
                                 )
                             },
                             onQuiltClick = {

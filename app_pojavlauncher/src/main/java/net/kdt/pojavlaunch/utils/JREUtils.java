@@ -283,6 +283,13 @@ public class JREUtils {
                 useGles = true;
                 glesVersion = 3;
                 break;
+            case "holy":
+                renderLibrary = "libgl4es_114.so";
+                eglLibrary = renderLibrary;
+                useGles = true;
+                bypassNamespace = true;
+                glesVersion = Integer.parseInt((String) ExtraCore.getValue(ExtraConstants.OPEN_GL_VERSION));
+                break;
             case "opengles3_ltw" :
                 renderLibrary = "libltw.so";
                 eglLibrary = renderLibrary;

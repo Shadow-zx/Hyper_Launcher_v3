@@ -40,11 +40,15 @@ class InstanceSelectionFragment : Fragment() {
                             )
                         },
                         onImportModpack = {
+                            val args = Bundle().apply {
+                                putString("type", "MODPACKS")
+                                putBoolean("bypass", true)
+                            }
                             Tools.swapFragment(
                                 requireActivity(),
                                 ContentInstallerFragment::class.java,
                                 ContentInstallerFragment.TAG,
-                                null
+                                args
                             )
                         },
                         onEditInstance = { instance ->

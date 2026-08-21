@@ -26,6 +26,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Event
 import androidx.compose.material.icons.rounded.Extension
 import androidx.compose.material.icons.rounded.Check
+import androidx.compose.material.icons.rounded.FileUpload
 import androidx.compose.material.icons.rounded.Language
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material.icons.rounded.Warning
@@ -69,6 +70,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.ashmeet.hyperlauncher.screens.layouts.installer.models.ContentInstallerType
 import com.ashmeet.hyperlauncher.screens.layouts.installer.models.ContentSource
 import com.ashmeet.hyperlauncher.screens.layouts.installer.models.ModrinthProject
 import com.ashmeet.hyperlauncher.screens.layouts.installer.models.ModrinthVersion
@@ -371,9 +373,11 @@ fun SearchFiltersSidebar(
     selectedLoader: String?,
     selectedSource: ContentSource = ContentSource.MODRINTH,
     showLoaderFilter: Boolean = true,
+    selectedType: ContentInstallerType = ContentInstallerType.MODS,
     onVersionChange: (String?) -> Unit,
     onLoaderChange: (String?) -> Unit,
-    onSourceChange: (ContentSource) -> Unit
+    onSourceChange: (ContentSource) -> Unit,
+    onImportModpack: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -418,6 +422,25 @@ fun SearchFiltersSidebar(
                         current = selectedLoader ?: instanceLoader ?: "Any",
                         onValueChange = onLoaderChange,
                         icon = Icons.Rounded.Settings
+                    )
+                }
+            }
+        }
+
+        if (selectedType == ContentInstallerType.MODPACKS) {
+            Spacer(modifier = Modifier.height(24.dp))
+            Column(
+                modifier = Modifier.padding(horizontal = 16.dp)
+            ) {
+                SettingsCard(
+                    position = CardPosition.SINGLE,
+                    useSurface = true
+                ) {
+                    SettingsActionItem(
+                        title = "Import Modpack",
+                        summary = "Install a local modpack file (.zip, .mrpack)",
+                        icon = Icons.Rounded.FileUpload,
+                        onClick = onImportModpack
                     )
                 }
             }

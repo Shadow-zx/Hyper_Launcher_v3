@@ -30,7 +30,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.ashmeet.hyperlauncher.components.DefaultSwitch
 import com.ashmeet.hyperlauncher.components.MineButton
-import com.ashmeet.hyperlauncher.utils.rememberDrawablePainter
+import com.ashmeet.hyperlauncher.utils.drawable.rememberDrawablePainter
 import net.ashmeet.hyperlauncher.R
 import net.kdt.pojavlaunch.multirt.Runtime
 

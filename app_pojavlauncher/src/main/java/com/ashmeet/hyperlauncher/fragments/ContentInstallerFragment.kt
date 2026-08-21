@@ -67,7 +67,15 @@ class ContentInstallerFragment : Fragment() {
                     var isSearching by remember { mutableStateOf(false) }
                     var isProjectLoading by remember { mutableStateOf(false) }
                     var viewingProject by remember { mutableStateOf<ModrinthProject?>(null) }
-                    var selectedType by remember { mutableStateOf(ContentInstallerType.MODS) }
+                    
+                    val initialType = remember {
+                        arguments?.getString("type")?.let { typeStr ->
+                            ContentInstallerType.entries.find { it.name == typeStr }
+                        } ?: ContentInstallerType.MODS
+                    }
+                    val initialBypass = remember { arguments?.getBoolean("bypass", false) ?: false }
+                    
+                    var selectedType by remember { mutableStateOf(initialType) }
                     var selectedSource by remember {
                         mutableStateOf(if (LauncherPreferences.PREF_LAST_CONTENT_SOURCE == 1) ContentSource.CURSEFORGE else ContentSource.MODRINTH)
                     }
@@ -286,6 +294,7 @@ class ContentInstallerFragment : Fragment() {
                         projectVersions = projectVersions,
                         availableProjectMCVersions = availableProjectMCVersions,
                         selectedProjectMCVersion = selectedProjectMCVersion,
+                        initialBypassWarning = initialBypass,
                         onProjectMCVersionClick = { selectedProjectMCVersion = it.ifEmpty { null } },
                         onBackToProjects = {
                             viewingProject = null

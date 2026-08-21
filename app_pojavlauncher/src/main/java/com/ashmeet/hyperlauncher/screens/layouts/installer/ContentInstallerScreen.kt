@@ -97,12 +97,13 @@ fun ContentInstallerScreen(
     projectVersions: List<ModrinthVersion> = emptyList(),
     availableProjectMCVersions: List<String> = emptyList(),
     selectedProjectMCVersion: String? = null,
+    initialBypassWarning: Boolean = false,
     onProjectMCVersionClick: (String) -> Unit = {},
     onBackToProjects: () -> Unit = {}
 ) {
     var searchQuery by remember { mutableStateOf("") }
     var isSearchActive by remember { mutableStateOf(false) }
-    var bypassWarning by remember { mutableStateOf(false) }
+    var bypassWarning by remember { mutableStateOf(initialBypassWarning) }
 
     val isUnsupported = remember(instanceLoader, selectedType) {
         (selectedType == ContentInstallerType.MODS || selectedType == ContentInstallerType.MODPACKS) &&
@@ -397,9 +398,11 @@ fun ContentInstallerScreen(
                         selectedLoader = selectedLoader,
                         selectedSource = selectedSource,
                         showLoaderFilter = (selectedType == ContentInstallerType.MODS || selectedType == ContentInstallerType.MODPACKS),
+                        selectedType = selectedType,
                         onVersionChange = { onSearch(searchQuery, selectedType, it, selectedLoader, selectedSource) },
                         onLoaderChange = { onSearch(searchQuery, selectedType, selectedVersion, it, selectedSource) },
-                        onSourceChange = { onSearch(searchQuery, selectedType, selectedVersion, selectedLoader, it) }
+                        onSourceChange = { onSearch(searchQuery, selectedType, selectedVersion, selectedLoader, it) },
+                        onImportModpack = onImportModpack
                     )
                 }
             }

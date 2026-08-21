@@ -1,4 +1,4 @@
-package com.ashmeet.hyperlauncher.utils
+package com.ashmeet.hyperlauncher.utils.drawable
 
 import android.graphics.drawable.Drawable
 import androidx.compose.runtime.Composable

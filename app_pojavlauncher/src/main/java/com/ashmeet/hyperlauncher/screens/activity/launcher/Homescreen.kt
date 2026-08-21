@@ -80,7 +80,7 @@ import com.ashmeet.hyperlauncher.screens.layouts.settings.layouts.CardPosition
 import com.ashmeet.hyperlauncher.screens.layouts.settings.layouts.SettingsCard
 import com.ashmeet.hyperlauncher.utils.SkinUtils
 import com.ashmeet.hyperlauncher.theme.PojavTheme
-import com.ashmeet.hyperlauncher.utils.rememberDrawablePainter
+import com.ashmeet.hyperlauncher.utils.drawable.rememberDrawablePainter
 import com.ashmeet.hyperlauncher.components.MineButton
 
 @Composable

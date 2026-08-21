@@ -56,7 +56,8 @@ import net.ashmeet.hyperlauncher.R
 import net.kdt.pojavlaunch.instances.DisplayInstance
 import net.kdt.pojavlaunch.instances.InstanceIconProvider
 import com.ashmeet.hyperlauncher.theme.PojavTheme
-import com.ashmeet.hyperlauncher.utils.rememberDrawablePainter
+import com.ashmeet.hyperlauncher.utils.drawable.rememberDrawablePainter
+
 
 @Composable
 fun InstanceListItem(
