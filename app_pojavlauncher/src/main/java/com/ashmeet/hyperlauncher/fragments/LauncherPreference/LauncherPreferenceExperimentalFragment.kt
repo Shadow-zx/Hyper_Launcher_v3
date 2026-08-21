@@ -24,7 +24,7 @@ class LauncherPreferenceExperimentalFragment : Fragment(), SharedPreferences.OnS
             setContent {
                 PojavTheme {
                     ExperimentalSettingsScreen(
-                        onBack = { requireActivity().onBackPressed() },
+                        onBack = { requireActivity().onBackPressedDispatcher.onBackPressed() },
                         isFreedrenoAvailable = hasFreedreno
                     )
                 }

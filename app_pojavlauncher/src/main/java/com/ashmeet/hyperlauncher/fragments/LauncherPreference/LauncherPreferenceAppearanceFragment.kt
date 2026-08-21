@@ -22,7 +22,7 @@ class LauncherPreferenceAppearanceFragment : Fragment(), SharedPreferences.OnSha
             setContent {
                 PojavTheme {
                     AppearanceSettingsScreen(
-                        onBack = { requireActivity().onBackPressed() }
+                        onBack = { requireActivity().onBackPressedDispatcher.onBackPressed() }
                     )
                 }
             }

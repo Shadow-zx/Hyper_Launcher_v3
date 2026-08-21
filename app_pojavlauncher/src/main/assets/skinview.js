@@ -1,16 +1,13 @@
 const container = document.getElementById("skin-container");
 
-const getWidth = () => container.clientWidth || window.innerWidth || 300;
-const getHeight = () => container.clientHeight || window.innerHeight || 400;
-
 // Handle URL query parameters for instant loading
 const urlParams = new URLSearchParams(window.location.search);
 const initialSkin = urlParams.get('skin') || "steve.png";
 
 const skinViewer = new skinview3d.SkinViewer({
     canvas: document.createElement("canvas"),
-    width: getWidth(),
-    height: getHeight(),
+    width: container.clientWidth || 300,
+    height: container.clientHeight || 400,
     skin: initialSkin,
     alpha: true
 });
@@ -18,7 +15,7 @@ const skinViewer = new skinview3d.SkinViewer({
 container.appendChild(skinViewer.canvas);
 
 // Center the camera on the player (approx 32 units tall)
-skinViewer.controls.target.set(0, -4, 0);
+skinViewer.controls.target.set(0, -12, 0);
 
 //参考 Modrinth 启动器默认的 idle 动画
 //https://github.com/modrinth/code/blob/e71a8c10fac3eda05ff9bc34381178f3d11c41de/packages/assets/models/slim-player.gltf#L1653-L1755
@@ -163,7 +160,9 @@ function setAzimuthAndPitch(azimuthDeg, pitchDeg, distance = 60) {
     updateDefaultCameraPosition();
 }
 
-setAzimuthAndPitch(0, 10);
+skinViewer.fov = 20;
+
+setAzimuthAndPitch(0, 10, 190);
 
 // 确保 OrbitControls 也有相同的目标点，覆盖默认的 lookAt
 if (skinViewer.controls) {
@@ -277,17 +276,31 @@ if (skinViewer.controls) {
 }
 
 function resize() {
-    const w = getWidth();
-    const h = getHeight();
+    const w = container.clientWidth;
+    const h = container.clientHeight;
     if (w > 0 && h > 0) {
-        skinViewer.width = w;
-        skinViewer.height = h;
+        if (skinViewer.width !== w || skinViewer.height !== h) {
+            skinViewer.width = w;
+            skinViewer.height = h;
+        }
     }
 }
 
 window.addEventListener('resize', resize);
-setTimeout(resize, 100);
-setTimeout(resize, 500);
+
+// Use ResizeObserver for more reliable size tracking
+if (window.ResizeObserver) {
+    const ro = new ResizeObserver(() => {
+        resize();
+    });
+    ro.observe(container);
+}
+
+// Polling as a fallback for early initialization
+const resizeInterval = setInterval(resize, 100);
+setTimeout(() => clearInterval(resizeInterval), 2000);
+
+resize();
 
 function loadSkin(skinUrl, model = "auto-detect") {
     if (!skinUrl || skinUrl === "null" || skinUrl === "undefined") {

@@ -57,9 +57,9 @@ fun AuthLayout(
             ) {
                 SkinPreview(
                     modifier = Modifier
-                        .weight(0.5f)
+                        .weight(1.0f)
                         .fillMaxHeight()
-                        .padding(vertical = 46.dp)
+                        .padding(vertical = 16.dp)
                         .clip(RoundedCornerShape(16.dp)),
                     skinUrl = SkinUtils.getSkinUrl(currentAccount),
                     model = SkinUtils.getModelType(currentAccount),

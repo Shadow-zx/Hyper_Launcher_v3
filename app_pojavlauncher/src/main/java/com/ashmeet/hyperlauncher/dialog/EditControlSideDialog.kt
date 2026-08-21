@@ -34,6 +34,8 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.ashmeet.hyperlauncher.screens.layouts.settings.layouts.CardPosition
+import com.ashmeet.hyperlauncher.screens.layouts.settings.layouts.SettingsCard
 import com.ashmeet.hyperlauncher.screens.layouts.settings.preferences.SettingsActionItem
 import com.ashmeet.hyperlauncher.screens.layouts.settings.preferences.SettingsSliderItem
 import com.ashmeet.hyperlauncher.screens.layouts.settings.preferences.SettingsSwitchItem
@@ -284,30 +286,36 @@ private fun EditControlContent(
 
         // Switches
         if (!isJoystick && !isDrawer) {
-            SettingsSwitchItem(
-                title = stringResource(R.string.customctrl_toggle),
-                checked = isToggle,
-                onCheckedChange = {
-                    isToggle = it
-                    properties.isToggle = it
-                }
-            )
-            SettingsSwitchItem(
-                title = stringResource(R.string.customctrl_passthru),
-                checked = passThruEnabled,
-                onCheckedChange = {
-                    passThruEnabled = it
-                    properties.passThruEnabled = it
-                }
-            )
-            SettingsSwitchItem(
-                title = stringResource(R.string.customctrl_swipeable),
-                checked = isSwipeable,
-                onCheckedChange = {
-                    isSwipeable = it
-                    properties.isSwipeable = it
-                }
-            )
+            SettingsCard(position = CardPosition.TOP, useSurface = true) {
+                SettingsSwitchItem(
+                    title = stringResource(R.string.customctrl_toggle),
+                    checked = isToggle,
+                    onCheckedChange = {
+                        isToggle = it
+                        properties.isToggle = it
+                    }
+                )
+            }
+            SettingsCard(position = CardPosition.MIDDLE, useSurface = true) {
+                SettingsSwitchItem(
+                    title = stringResource(R.string.customctrl_passthru),
+                    checked = passThruEnabled,
+                    onCheckedChange = {
+                        passThruEnabled = it
+                        properties.passThruEnabled = it
+                    }
+                )
+            }
+            SettingsCard(position = CardPosition.BOTTOM, useSurface = true) {
+                SettingsSwitchItem(
+                    title = stringResource(R.string.customctrl_swipeable),
+                    checked = isSwipeable,
+                    onCheckedChange = {
+                        isSwipeable = it
+                        properties.isSwipeable = it
+                    }
+                )
+            }
         }
 
         if (isJoystick) {
@@ -315,22 +323,26 @@ private fun EditControlContent(
             var forwardLock by remember(joystickData) { mutableStateOf(joystickData.forwardLock) }
             var absolute by remember(joystickData) { mutableStateOf(joystickData.absolute) }
 
-            SettingsSwitchItem(
-                title = stringResource(R.string.customctrl_forward_lock),
-                checked = forwardLock,
-                onCheckedChange = {
-                    forwardLock = it
-                    properties.forwardLock = it
-                }
-            )
-            SettingsSwitchItem(
-                title = stringResource(R.string.customctrl_absolute_tracking),
-                checked = absolute,
-                onCheckedChange = {
-                    absolute = it
-                    properties.absolute = it
-                }
-            )
+            SettingsCard(position = CardPosition.TOP, useSurface = true) {
+                SettingsSwitchItem(
+                    title = stringResource(R.string.customctrl_forward_lock),
+                    checked = forwardLock,
+                    onCheckedChange = {
+                        forwardLock = it
+                        properties.forwardLock = it
+                    }
+                )
+            }
+            SettingsCard(position = CardPosition.BOTTOM, useSurface = true) {
+                SettingsSwitchItem(
+                    title = stringResource(R.string.customctrl_absolute_tracking),
+                    checked = absolute,
+                    onCheckedChange = {
+                        absolute = it
+                        properties.absolute = it
+                    }
+                )
+            }
         }
 
         // Appearance Section
@@ -418,22 +430,26 @@ private fun EditControlContent(
                 style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.primary
             )
-            SettingsSwitchItem(
-                title = stringResource(R.string.customctrl_visibility_ingame),
-                checked = displayInGame,
-                onCheckedChange = {
-                    displayInGame = it
-                    properties.displayInGame = it
-                }
-            )
-            SettingsSwitchItem(
-                title = stringResource(R.string.customctrl_visibility_in_menus),
-                checked = displayInMenu,
-                onCheckedChange = {
-                    displayInMenu = it
-                    properties.displayInMenu = it
-                }
-            )
+            SettingsCard(position = CardPosition.TOP, useSurface = true) {
+                SettingsSwitchItem(
+                    title = stringResource(R.string.customctrl_visibility_ingame),
+                    checked = displayInGame,
+                    onCheckedChange = {
+                        displayInGame = it
+                        properties.displayInGame = it
+                    }
+                )
+            }
+            SettingsCard(position = CardPosition.BOTTOM, useSurface = true) {
+                SettingsSwitchItem(
+                    title = stringResource(R.string.customctrl_visibility_in_menus),
+                    checked = displayInMenu,
+                    onCheckedChange = {
+                        displayInMenu = it
+                        properties.displayInMenu = it
+                    }
+                )
+            }
         }
     }
 }

@@ -37,6 +37,10 @@ fun SkinPreview(
         modifier = modifier,
         factory = { context ->
             WebView(context).apply {
+                // Clear any existing state
+                stopLoading()
+                loadUrl("about:blank")
+
                 settings.javaScriptEnabled = true
                 settings.allowFileAccess = true
                 @Suppress("DEPRECATION")
@@ -44,13 +48,13 @@ fun SkinPreview(
                 @Suppress("DEPRECATION")
                 settings.allowUniversalAccessFromFileURLs = true
                 settings.cacheMode = WebSettings.LOAD_DEFAULT
-                settings.domStorageEnabled = true
                 settings.textZoom = 100
-                settings.useWideViewPort = true
-                settings.loadWithOverviewMode = true
-                settings.setSupportZoom(true)
-                settings.builtInZoomControls = true
+                settings.useWideViewPort = false
+                settings.loadWithOverviewMode = false
+                settings.setSupportZoom(false)
+                settings.builtInZoomControls = false
                 settings.displayZoomControls = false
+                overScrollMode = android.view.View.OVER_SCROLL_NEVER
                 setBackgroundColor(0)
 
                 webViewClient = object : WebViewClient() {

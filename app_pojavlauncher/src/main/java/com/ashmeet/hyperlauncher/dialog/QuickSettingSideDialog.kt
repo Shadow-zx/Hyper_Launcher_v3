@@ -22,6 +22,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.ashmeet.hyperlauncher.prefs.LauncherPreferences
 import com.ashmeet.hyperlauncher.prefs.LauncherPreferences.*
+import com.ashmeet.hyperlauncher.screens.layouts.settings.layouts.CardPosition
+import com.ashmeet.hyperlauncher.screens.layouts.settings.layouts.SettingsCard
 import com.ashmeet.hyperlauncher.screens.layouts.settings.preferences.SettingsSliderItem
 import com.ashmeet.hyperlauncher.screens.layouts.settings.preferences.SettingsSwitchItem
 import com.ashmeet.hyperlauncher.theme.PojavTheme
@@ -164,38 +166,44 @@ private fun QuickSettingContent(
         )
 
         if (isGyroAvailable) {
-            SettingsSwitchItem(
-                title = stringResource(R.string.preference_enable_gyro_title),
-                checked = enableGyro,
-                onCheckedChange = {
-                    enableGyro = it
-                    PREF_ENABLE_GYRO = it
-                    onPreferenceChanged("enableGyro", it)
-                    onGyroStateChanged()
-                }
-            )
+            SettingsCard(position = CardPosition.TOP, useSurface = true) {
+                SettingsSwitchItem(
+                    title = stringResource(R.string.preference_enable_gyro_title),
+                    checked = enableGyro,
+                    onCheckedChange = {
+                        enableGyro = it
+                        PREF_ENABLE_GYRO = it
+                        onPreferenceChanged("enableGyro", it)
+                        onGyroStateChanged()
+                    }
+                )
+            }
 
             if (enableGyro) {
-                SettingsSwitchItem(
-                    title = stringResource(R.string.preference_gyro_invert_x_axis),
-                    checked = gyroInvertX,
-                    onCheckedChange = {
-                        gyroInvertX = it
-                        PREF_GYRO_INVERT_X = it
-                        onPreferenceChanged("gyroInvertX", it)
-                        onGyroStateChanged()
-                    }
-                )
-                SettingsSwitchItem(
-                    title = stringResource(R.string.preference_gyro_invert_y_axis),
-                    checked = gyroInvertY,
-                    onCheckedChange = {
-                        gyroInvertY = it
-                        PREF_GYRO_INVERT_Y = it
-                        onPreferenceChanged("gyroInvertY", it)
-                        onGyroStateChanged()
-                    }
-                )
+                SettingsCard(position = CardPosition.MIDDLE, useSurface = true) {
+                    SettingsSwitchItem(
+                        title = stringResource(R.string.preference_gyro_invert_x_axis),
+                        checked = gyroInvertX,
+                        onCheckedChange = {
+                            gyroInvertX = it
+                            PREF_GYRO_INVERT_X = it
+                            onPreferenceChanged("gyroInvertX", it)
+                            onGyroStateChanged()
+                        }
+                    )
+                }
+                SettingsCard(position = CardPosition.BOTTOM, useSurface = true) {
+                    SettingsSwitchItem(
+                        title = stringResource(R.string.preference_gyro_invert_y_axis),
+                        checked = gyroInvertY,
+                        onCheckedChange = {
+                            gyroInvertY = it
+                            PREF_GYRO_INVERT_Y = it
+                            onPreferenceChanged("gyroInvertY", it)
+                            onGyroStateChanged()
+                        }
+                    )
+                }
                 SettingsSliderItem(
                     title = stringResource(R.string.preference_gyro_sensitivity_title),
                     value = gyroSensitivity,
@@ -223,15 +231,17 @@ private fun QuickSettingContent(
             }
         )
 
-        SettingsSwitchItem(
-            title = stringResource(R.string.mcl_disable_gestures),
-            checked = disableGestures,
-            onCheckedChange = {
-                disableGestures = it
-                PREF_DISABLE_GESTURES = it
-                onPreferenceChanged("disableGestures", it)
-            }
-        )
+        SettingsCard(position = CardPosition.SINGLE, useSurface = true) {
+            SettingsSwitchItem(
+                title = stringResource(R.string.mcl_disable_gestures),
+                checked = disableGestures,
+                onCheckedChange = {
+                    disableGestures = it
+                    PREF_DISABLE_GESTURES = it
+                    onPreferenceChanged("disableGestures", it)
+                }
+            )
+        }
 
         if (!disableGestures) {
             SettingsSliderItem(

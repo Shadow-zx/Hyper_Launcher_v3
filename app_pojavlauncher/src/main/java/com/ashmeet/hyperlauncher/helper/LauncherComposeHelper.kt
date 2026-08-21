@@ -1,20 +1,33 @@
 package com.ashmeet.hyperlauncher.helper
 
 import android.widget.FrameLayout
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.rememberDrawerState
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.setViewTreeLifecycleOwner
 import androidx.lifecycle.setViewTreeViewModelStoreOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
+import com.ashmeet.hyperlauncher.components.SideNavigationRail
 import com.ashmeet.hyperlauncher.screens.activity.game.ExitScreen
 import com.ashmeet.hyperlauncher.screens.activity.game.LoggerView
 import com.ashmeet.hyperlauncher.screens.activity.game.controls.ControlsEditorScreen
@@ -140,21 +153,56 @@ object LauncherComposeHelper {
                     override fun isOpen(): Boolean = drawerState.isOpen
                 })
 
-                if (isInEditor) {
-                    ControlsEditorScreen(
-                        controlLayout = controlLayout,
-                        onDrawerButtonTap = null,
-                        onAction = onAction,
-                        drawerState = drawerState
-                    )
-                } else {
-                    GameControlsScreen(
+                CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                    ModalNavigationDrawer(
                         drawerState = drawerState,
-                        controlLayout = controlLayout,
-                        loggerView = loggerView,
-                        onDrawerButtonTap = null,
-                        onAction = onAction
-                    )
+                        drawerContent = {
+                            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+                                SideNavigationRail(
+                                    isEditor = isInEditor,
+                                    onAction = { action ->
+                                        onAction(action)
+                                        scope.launch { drawerState.close() }
+                                    },
+                                    isExport = isInEditor
+                                )
+                            }
+                        },
+                        gesturesEnabled = false
+                    ) {
+                        CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+                            Box(modifier = Modifier.fillMaxSize()) {
+                                if (isInEditor) {
+                                    ControlsEditorScreen(
+                                        controlLayout = controlLayout,
+                                        onDrawerButtonTap = null,
+                                        drawerState = drawerState
+                                    )
+                                } else {
+                                    GameControlsScreen(
+                                        drawerState = drawerState,
+                                        controlLayout = controlLayout,
+                                        loggerView = loggerView,
+                                        onDrawerButtonTap = null
+                                    )
+                                }
+
+                                if (drawerState.targetValue != DrawerValue.Closed) {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .background(Color.Black.copy(alpha = 0.01f))
+                                            .clickable(
+                                                interactionSource = remember { MutableInteractionSource() },
+                                                indication = null
+                                            ) {
+                                                scope.launch { drawerState.close() }
+                                            }
+                                    )
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -172,17 +220,53 @@ object LauncherComposeHelper {
                 val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
                 val scope = rememberCoroutineScope()
 
-                ControlsEditorScreen(
-                    controlLayout = controlLayout,
-                    onDrawerButtonTap = {
-                        scope.launch {
-                            if (drawerState.isOpen) drawerState.close()
-                            else drawerState.open()
+                CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                    ModalNavigationDrawer(
+                        drawerState = drawerState,
+                        drawerContent = {
+                            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+                                SideNavigationRail(
+                                    isEditor = true,
+                                    onAction = { action ->
+                                        onAction(action)
+                                        scope.launch { drawerState.close() }
+                                    },
+                                    isExport = true
+                                )
+                            }
+                        },
+                        gesturesEnabled = false
+                    ) {
+                        CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+                            Box(modifier = Modifier.fillMaxSize()) {
+                                ControlsEditorScreen(
+                                    controlLayout = controlLayout,
+                                    onDrawerButtonTap = {
+                                        scope.launch {
+                                            if (drawerState.isOpen) drawerState.close()
+                                            else drawerState.open()
+                                        }
+                                    },
+                                    drawerState = drawerState
+                                )
+
+                                if (drawerState.targetValue != DrawerValue.Closed) {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .background(Color.Black.copy(alpha = 0.01f))
+                                            .clickable(
+                                                interactionSource = remember { MutableInteractionSource() },
+                                                indication = null
+                                            ) {
+                                                scope.launch { drawerState.close() }
+                                            }
+                                    )
+                                }
+                            }
                         }
-                    },
-                    onAction = onAction,
-                    drawerState = drawerState
-                )
+                    }
+                }
             }
         }
     }

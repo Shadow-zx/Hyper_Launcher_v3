@@ -23,10 +23,14 @@ fun DefaultSwitch(
     colors: SwitchColors = SwitchDefaults.colors(
         checkedThumbColor = MaterialTheme.colorScheme.onPrimary,
         checkedTrackColor = MaterialTheme.colorScheme.primary,
-        uncheckedThumbColor = MaterialTheme.colorScheme.outline,
+        uncheckedThumbColor = MaterialTheme.colorScheme.surface,
         uncheckedTrackColor = MaterialTheme.colorScheme.surfaceVariant,
         checkedIconColor = MaterialTheme.colorScheme.primary,
-        uncheckedIconColor = MaterialTheme.colorScheme.onSurfaceVariant
+        uncheckedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+        disabledCheckedThumbColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.5f),
+        disabledUncheckedThumbColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.8f),
+        uncheckedBorderColor = MaterialTheme.colorScheme.outline,
+        disabledUncheckedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)
     ),
     interactionSource: MutableInteractionSource? = null
 ) {

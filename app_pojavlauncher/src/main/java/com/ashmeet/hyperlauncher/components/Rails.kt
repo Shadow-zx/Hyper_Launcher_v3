@@ -46,6 +46,12 @@ fun SideNavigationRail(
             .width(200.dp),
         header = {
             Column(horizontalAlignment = Alignment.Start) {
+                SidebarRailButton(
+                    icon = Icons.Rounded.Close,
+                    label = stringResource(R.string.close),
+                    onClick = { onAction(-1) },
+                    isExpanded = true
+                )
                 Spacer(modifier = Modifier.height(8.dp))
             }
         }

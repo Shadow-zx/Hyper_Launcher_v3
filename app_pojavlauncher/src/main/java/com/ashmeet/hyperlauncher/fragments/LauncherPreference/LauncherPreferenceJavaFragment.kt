@@ -46,7 +46,7 @@ class LauncherPreferenceJavaFragment : Fragment(), SharedPreferences.OnSharedPre
             setContent {
                 PojavTheme {
                     JavaSettingsScreen(
-                        onBack = { requireActivity().onBackPressed() },
+                        onBack = { requireActivity().onBackPressedDispatcher.onBackPressed() },
                         onAddRuntime = { mVmInstallLauncher.launch(null) },
                         onDeleteRuntime = { runtime -> deleteRuntime(runtime) },
                         maxRam = maxRAM

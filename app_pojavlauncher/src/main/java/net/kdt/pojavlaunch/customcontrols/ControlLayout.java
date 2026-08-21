@@ -35,7 +35,6 @@ import net.kdt.pojavlaunch.customcontrols.buttons.ControlDrawer;
 import net.kdt.pojavlaunch.customcontrols.buttons.ControlInterface;
 import net.kdt.pojavlaunch.customcontrols.buttons.ControlJoystick;
 import net.kdt.pojavlaunch.customcontrols.buttons.ControlSubButton;
-import net.kdt.pojavlaunch.customcontrols.handleview.ActionRow;
 import net.kdt.pojavlaunch.customcontrols.handleview.ControlHandleView;
 import net.kdt.pojavlaunch.customcontrols.handleview.EditControlSideDialog;
 
@@ -61,7 +60,6 @@ public class ControlLayout extends FrameLayout {
 	private EditControlSideDialog mControlDialog = null;
 	private ControlHandleView mHandleView;
 	private ControlButtonMenuListener mMenuListener;
-	public ActionRow mActionRow = null;
 	public String mLayoutFileName;
 
 	public interface OnControlEditListener {
@@ -101,10 +99,6 @@ public class ControlLayout extends FrameLayout {
 		boolean sanitizedModified = false;
 		if(controlLayout != null) {
 			sanitizedModified = LayoutSanitizer.sanitizeLayout(controlLayout);
-		}
-		if(mActionRow == null){
-			mActionRow = new ActionRow(getContext());
-			addView(mActionRow);
 		}
 
 		removeAllButtons();
@@ -462,7 +456,6 @@ public class ControlLayout extends FrameLayout {
 			}
 
 			if(layerDisappeared){
-				mActionRow.setFollowedButton(null);
 				mHandleView.hide();
 			}
 		}
@@ -480,7 +473,6 @@ public class ControlLayout extends FrameLayout {
 			mControlDialog.disappear(true);
 		}
 
-		if(mActionRow != null) mActionRow.setFollowedButton(null);
 		if(mHandleView != null) mHandleView.hide();
 	}
 

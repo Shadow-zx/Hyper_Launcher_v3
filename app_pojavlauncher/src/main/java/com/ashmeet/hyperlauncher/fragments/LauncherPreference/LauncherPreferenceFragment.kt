@@ -25,7 +25,7 @@ open class LauncherPreferenceFragment : Fragment(), SharedPreferences.OnSharedPr
             setContent {
                 PojavTheme {
                     MainSettingsScreen(
-                        onBack = { requireActivity().onBackPressed() },
+                        onBack = { requireActivity().onBackPressedDispatcher.onBackPressed() },
                         onNavigateToVideo = { navigateTo(LauncherPreferenceVideoFragment::class.java) },
                         onNavigateToControl = { navigateTo(LauncherPreferenceControlFragment::class.java) },
                         onNavigateToJava = { navigateTo(LauncherPreferenceJavaFragment::class.java) },

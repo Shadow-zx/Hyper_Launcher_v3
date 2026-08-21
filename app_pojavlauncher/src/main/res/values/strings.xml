@@ -4,7 +4,7 @@
     <string name="app_short_name">Hyper Launcher</string>
 
     <!-- Action bar part -->
-
+    <string name="close">close</string>
     <!-- Languages list part -->
 
     <!-- Login strings -->

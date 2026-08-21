@@ -45,6 +45,7 @@ class OptiFineInstallFragment : ModVersionListFragment<OptiFineUtils.OptiFineVer
             val instanceInstaller = OptiFineUtils.createInstaller(version)
             Instances.createInstance({ instance ->
                 instance.name = "OptiFine"
+                instance.icon = "optifine"
                 instance.installer = instanceInstaller
                 instance.sharedData = true
             }, "OptiFine")
