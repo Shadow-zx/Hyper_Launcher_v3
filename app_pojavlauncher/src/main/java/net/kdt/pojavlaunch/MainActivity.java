@@ -482,6 +482,7 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
             renderer = firstCompatibleRenderer;
         }
         Logger.appendToLog("--------- Starting game with Launcher Debug!");
+        LauncherPreferences.PREF_RENDERER = renderer;
         Tools.printLauncherInfo(versionId, instance.getLaunchArgs(), renderer, this);
         JREUtils.redirectAndPrintJRELog();
         GameRunner.launchGame(this, account, instance, versionId, classpath, renderer);

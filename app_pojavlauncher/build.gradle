@@ -357,7 +357,6 @@ dependencies {
     implementation project(":ColorPicker")
 
     implementation files('libs/MobileGlues-release.aar')
-    implementation files('libs/krypton-wrapper-release.aar')
 
     def composeBom = platform('androidx.compose:compose-bom:2024.12.01')
     implementation composeBom
@@ -371,7 +370,7 @@ dependencies {
 
     // implementation 'net.sourceforge.streamsupport:streamsupport-cfuture:1.7.0'
 
-    implementation fileTree(dir: 'libs', include: ['*.jar', '*.aar'], exclude: ['krypton-wrapper-release.aar'])
+    implementation fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
 }
 
 tasks.register("prepareKotlinBuildScriptModel") {}

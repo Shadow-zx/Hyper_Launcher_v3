@@ -120,8 +120,16 @@ public class JREUtils {
         // Fix white color on banner and sheep, since GL4ES 1.1.5
         envMap.put("LIBGL_NORMALIZE", "1");
 
-        // Common fixes for EGL initialization issues, especially with modern Minecraft/Fabric
-        envMap.put("LIBGL_FB", "0");
+        if ("holy".equals(renderer)) {
+            envMap.put("LIBGL_FB", "1");
+            envMap.put("LIBGL_DEPTH", "24");
+            envMap.put("LIBGL_STENCIL", "8");
+            envMap.put("LIBGL_ALPHA", "1");
+            envMap.put("LIBGL_RGB888", "1");
+        } else {
+            envMap.put("LIBGL_FB", "0");
+        }
+
         envMap.put("LIBGL_GLLOOKUP", "0");
         envMap.put("LIBGL_WRAPEGL", "0");
         envMap.put("LIBGL_NOTEST", "1");
@@ -283,27 +291,18 @@ public class JREUtils {
                 useGles = true;
                 glesVersion = 3;
                 break;
-            case "holy":
-                renderLibrary = "libgl4es_114.so";
-                eglLibrary = renderLibrary;
-                useGles = true;
-                bypassNamespace = true;
-                glesVersion = Integer.parseInt((String) ExtraCore.getValue(ExtraConstants.OPEN_GL_VERSION));
-                break;
             case "opengles3_ltw" :
                 renderLibrary = "libltw.so";
                 eglLibrary = renderLibrary;
                 useGles = true;
                 glesVersion = 3;
                 break;
+            case "holy":
             case "opengles2":
             case "opengles2_5":
             case "opengles3":
             default:
-                renderLibrary = "libng_gl4es.so";
-                if (!new File(Tools.NATIVE_LIB_DIR, renderLibrary).exists()) {
-                    renderLibrary = "libgl4es_114.so";
-                }
+                renderLibrary = "libgl4es_114.so";
                 eglLibrary = renderLibrary;
                 useGles = true;
                 bypassNamespace = true;

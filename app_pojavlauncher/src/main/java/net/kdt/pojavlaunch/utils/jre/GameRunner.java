@@ -173,21 +173,20 @@ public class GameRunner {
 
         // Switch renderer to GL4ES when running a compat context version on LTW
         if(isCompatContext(versionInfo) && !hasAngelica(gamedir) && rendererName.equals("opengles3_ltw")) {
-            instance.renderer = rendererName = "opengles2";
+            instance.renderer = rendererName = "holy";
             instance.write();
         }
 
         boolean isGl4es = rendererName.equals("opengles2") || rendererName.equals("holy");
         boolean ltwSupported = RendererCompatUtil.getCompatibleRenderers(activity).rendererIds.contains("opengles3_ltw");
-        boolean hasKrypton = new File(Tools.NATIVE_LIB_DIR, "libng_gl4es.so").exists();
 
         // Block Sodium from running with GL4ES on 1.17+
-        if(!isCompatContext(versionInfo) && isGl4es && hasSodium(gamedir) && !hasKrypton) {
+        if(!isCompatContext(versionInfo) && isGl4es && hasSodium(gamedir)) {
             rendererName = switchLtw(ltwSupported, instance, activity, R.string.compat_sodium_not_supported);
         }
 
         // Switch renderer to LTW when running 1.21.5
-        if(!isGl4esCompatible(versionInfo) && isGl4es && !hasKrypton) {
+        if(!isGl4esCompatible(versionInfo) && isGl4es) {
             rendererName = switchLtw(ltwSupported, instance, activity, R.string.compat_version_not_supported);
         }
         RendererCompatUtil.releaseRenderersCache();
@@ -290,8 +289,8 @@ public class GameRunner {
 
         String rendererLibrary = JREUtils.loadGraphicsLibrary(rendererName);
         if(rendererLibrary == null) {
-            Log.i("GameRunner", "Falling back to Krypton");
-            rendererName = "opengles2";
+            Log.i("GameRunner", "Falling back to GL4ES 1.1.4");
+            rendererName = "holy";
             rendererLibrary = JREUtils.loadGraphicsLibrary(rendererName);
         }
         if(rendererLibrary == null) {

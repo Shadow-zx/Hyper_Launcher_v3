@@ -27,19 +27,6 @@ public class NativePluginManager {
                 return new HashMap<>();
             }
         });
-
-        // Krypton
-        registerPlugin(new NativePlugin() {
-            @Override
-            public String[] getPaths() {
-                return new String[]{context.getApplicationInfo().nativeLibraryDir};
-            }
-
-            @Override
-            public Map<String, String> getJVMEnv() {
-                return new HashMap<>();
-            }
-        });
     }
 
     public static String getRuntimeLibraryPath() {

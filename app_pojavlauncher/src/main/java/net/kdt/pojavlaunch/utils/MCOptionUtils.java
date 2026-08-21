@@ -168,16 +168,4 @@ public class MCOptionUtils {
         sOptionListeners.add(new WeakReference<>(listener));
     }
 
-    /** Remove a listener from existence, or at least, its reference here */
-    public static void removeMCOptionListener(MCOptionListener listener){
-        for(WeakReference<MCOptionListener> weakReference : sOptionListeners){
-            MCOptionListener optionListener = weakReference.get();
-            if(optionListener == null) continue;
-            if(optionListener == listener){
-                sOptionListeners.remove(weakReference);
-                return;
-            }
-        }
-    }
-
 }
