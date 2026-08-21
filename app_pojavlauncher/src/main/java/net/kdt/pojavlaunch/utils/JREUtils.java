@@ -297,7 +297,7 @@ public class JREUtils {
                 if (!new File(Tools.NATIVE_LIB_DIR, renderLibrary).exists()) {
                     renderLibrary = "libgl4es_114.so";
                 }
-                eglLibrary = "libEGL.so"; // GL4ES needs the system EGL for context creation
+                eglLibrary = renderLibrary;
                 useGles = true;
                 bypassNamespace = true;
                 glesVersion = Integer.parseInt((String) ExtraCore.getValue(ExtraConstants.OPEN_GL_VERSION));
