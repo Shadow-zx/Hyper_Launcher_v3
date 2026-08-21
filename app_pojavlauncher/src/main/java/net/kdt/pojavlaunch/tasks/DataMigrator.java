@@ -175,7 +175,13 @@ public class DataMigrator {
                 }
                 // Assuming file
                 else {
-                    File destFile = new File(dest, file);
+                    final String destFileName;
+                    if (file.equals("mojo_instance.json") || file.equals("mj_instance.json")) {
+                        destFileName = "hyper_instance.json";
+                    } else {
+                        destFileName = file;
+                    }
+                    File destFile = new File(dest, destFileName);
                     // Ignore files with the same size
                     // I mean this check may trigger for non-equal files, but this is designed only for clean import anyway
                     if(destFile.length() == size) continue;

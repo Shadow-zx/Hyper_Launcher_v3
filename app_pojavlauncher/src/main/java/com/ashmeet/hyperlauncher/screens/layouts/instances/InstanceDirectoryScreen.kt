@@ -630,7 +630,7 @@ fun FileListItem(
                 )
             }
 
-            if (file.name == "hyper_instance.json") {
+            if (file.name == "hyper_instance.json" || file.name == "mojo_instance.json" || file.name == "mj_instance.json") {
                 val tooltipState = rememberTooltipState()
                 TooltipBox(
                     positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),

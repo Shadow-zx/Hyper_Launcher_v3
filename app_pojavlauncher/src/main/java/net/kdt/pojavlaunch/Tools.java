@@ -3,6 +3,7 @@ package net.kdt.pojavlaunch;
 import static android.os.Build.VERSION.SDK_INT;
 import static net.kdt.pojavlaunch.PojavApplication.sExecutorService;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.NotificationChannel;
@@ -41,6 +42,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationManagerCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
@@ -102,6 +104,7 @@ public final class Tools {
 
     // New since 3.3.1
     public static String DIR_ACCOUNT_NEW;
+    @SuppressLint("SdCardPath")
     public static String DIR_GAME_HOME = (Environment.getExternalStorageDirectory() != null ? Environment.getExternalStorageDirectory().getAbsolutePath() : "/sdcard") + "/games/Hyper";
     public static String DIR_GAME_NEW;
 
@@ -200,12 +203,13 @@ public final class Tools {
 
 
     public static DisplayMetrics getDisplayMetrics(Activity activity) {
-        DisplayMetrics displayMetrics = new DisplayMetrics();
+        DisplayMetrics displayMetrics;
 
         if(SDK_INT >= Build.VERSION_CODES.N && (activity.isInMultiWindowMode() || activity.isInPictureInPictureMode())){
             //For devices with free form/split screen, we need window size, not screen size.
             displayMetrics = activity.getResources().getDisplayMetrics();
         }else{
+            displayMetrics = new DisplayMetrics();
             if (SDK_INT >= Build.VERSION_CODES.R) {
                 Objects.requireNonNull(activity.getDisplay()).getRealMetrics(displayMetrics);
             } else { // Removed the clause for devices with unofficial notch support, since it also ruins all devices with virtual nav bars before P
@@ -248,13 +252,14 @@ public final class Tools {
     public static void setInsetsMode(Activity activity, boolean noSystemBars, boolean ignoreNotch) {
         Window window = activity.getWindow();
         View insetView = activity.findViewById(android.R.id.content);
+
         // Don't ignore system bars in window mode (will put game behind window button bar)
-        if(SDK_INT >= Build.VERSION_CODES.N && activity.isInMultiWindowMode()) noSystemBars = false;
+        boolean finalNoSystemBars = noSystemBars && !(SDK_INT >= Build.VERSION_CODES.N && activity.isInMultiWindowMode());
 
         int bgColor;
         // The status bars are completely transparent and will take their color from the inset view
         // background drawable.
-        if(!noSystemBars) bgColor = activity.getResources().getColor(R.color.background_status_bar);
+        if(!finalNoSystemBars) bgColor = ContextCompat.getColor(activity, R.color.background_status_bar);
         else bgColor = Color.BLACK;
 
         // On API 35 onwards, apps are edge-to-edge by default and are controlled entirely though the
@@ -264,7 +269,7 @@ public final class Tools {
         // The AppCompat APIs don't work well, and break when opening alert dialogs on older Android
         // versions. Use the legacy fullscreen flags for lower APIs. (notch is already handled above)
         if(SDK_INT < Build.VERSION_CODES.R) {
-            setLegacyFullscreen(insetView, noSystemBars);
+            setLegacyFullscreen(insetView, finalNoSystemBars);
             return;
         }
         // Code below expects this to be set to false, since that's the SDK 35 default.
@@ -275,22 +280,17 @@ public final class Tools {
         WindowInsetsController insetsController = window.getInsetsController();
         if(insetsController != null) {
             insetsController.setSystemBarsBehavior(WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
-            if (noSystemBars) insetsController.hide(WindowInsets.Type.systemBars());
+            if (finalNoSystemBars) insetsController.hide(WindowInsets.Type.systemBars());
             else {
                 insetsController.show(WindowInsets.Type.systemBars());
-                int appearance = 0;
-                if (bgColor == Color.WHITE) {
-                    appearance = WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS | WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS;
-                }
+                int appearance = (bgColor == Color.WHITE) ? (WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS | WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS) : 0;
                 insetsController.setSystemBarsAppearance(appearance, WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS | WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS);
             }
         }
 
-        boolean fFullscreen = noSystemBars;
         insetView.setOnApplyWindowInsetsListener((v, windowInsets) -> {
-            int insetMask = 0;
-            if(!fFullscreen) insetMask |= WindowInsets.Type.systemBars();
-            if(!ignoreNotch) insetMask |= WindowInsets.Type.displayCutout();
+            int insetMask = (!finalNoSystemBars ? WindowInsets.Type.systemBars() : 0) |
+                            (!ignoreNotch ? WindowInsets.Type.displayCutout() : 0);
             if(insetMask != 0) {
                 Insets insets = windowInsets.getInsets(insetMask);
                 v.setBackground(new InsetBackground(insets,bgColor));
@@ -317,7 +317,6 @@ public final class Tools {
 
     public static void copyAssetFile(Context ctx, String assetPath, String output, boolean overwrite) throws IOException {
         String fileName = FileUtils.getFileName(assetPath);
-        if(fileName == null) fileName = assetPath;
         File outputFile = new File(output, fileName);
         copyAssetFile(ctx.getAssets(), assetPath, outputFile, overwrite);
     }
@@ -463,11 +462,6 @@ public final class Tools {
         }catch (ActivityNotFoundException e) {
             Tools.showError(act, e);
         }
-    }
-
-    public static boolean shouldSkipLibrary(DependentLibrary library) {
-        // Don't use lwjgl from libraries, we have our own bundled in.
-        return library.name.startsWith("org.lwjgl");
     }
 
     public static void preProcessLibraries(DependentLibrary[] libraries) {
@@ -777,9 +771,9 @@ public final class Tools {
     }
 
     public static int getDisplayFriendlyRes(int displaySideRes, float scaling){
-        displaySideRes = (int)(displaySideRes * scaling);
-        if(displaySideRes % 2 != 0) displaySideRes --;
-        return displaySideRes;
+        int res = (int)(displaySideRes * scaling);
+        if(res % 2 != 0) res --;
+        return res;
     }
 
     public static String getFileName(Context ctx, Uri uri) {
@@ -969,11 +963,13 @@ public final class Tools {
         } catch (IllegalAccessException | NoSuchFieldException e) {
             throw new RuntimeException();
         }
+        if (hash == null) throw new RuntimeException();
         byte[] ret = new byte[hash.length];
         for (int i = 0; i < hash.length; i++){
             ret[i] = (byte)(hash[i] ^ w);
         }
-        if(!provider.getCallingPackage().equals(new String(ret))) {
+        String callingPackage = provider.getCallingPackage();
+        if(callingPackage == null || !callingPackage.equals(new String(ret))) {
             return false;
         }
         waitOnObj();

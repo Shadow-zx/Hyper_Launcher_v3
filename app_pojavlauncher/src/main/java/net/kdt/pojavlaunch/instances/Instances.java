@@ -1,9 +1,9 @@
 package net.kdt.pojavlaunch.instances;
 
+import com.ashmeet.hyperlauncher.prefs.LauncherPreferences;
 import com.google.gson.JsonSyntaxException;
 
 import net.kdt.pojavlaunch.Tools;
-import com.ashmeet.hyperlauncher.prefs.LauncherPreferences;
 import net.kdt.pojavlaunch.utils.FileUtils;
 import net.kdt.pojavlaunch.utils.JSONUtils;
 
@@ -38,7 +38,13 @@ public class Instances {
     }
 
     protected static File metadataLocation(File instanceDir) {
-        return new File(instanceDir, "hyper_instance.json");
+        File hyperFile = new File(instanceDir, "hyper_instance.json");
+        if (hyperFile.exists()) return hyperFile;
+        File mojoFile = new File(instanceDir, "mojo_instance.json");
+        if (mojoFile.exists()) return mojoFile;
+        File mjFile = new File(instanceDir, "mj_instance.json");
+        if (mjFile.exists()) return mjFile;
+        return hyperFile;
     }
 
     private static File selectedInstanceLocation() {
