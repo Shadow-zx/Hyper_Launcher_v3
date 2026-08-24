@@ -77,6 +77,20 @@ import com.ashmeet.hyperlauncher.screens.layouts.installer.models.ModrinthProjec
 import com.ashmeet.hyperlauncher.screens.layouts.installer.models.ModrinthVersion
 import com.ashmeet.hyperlauncher.theme.PojavTheme
 import kotlinx.coroutines.delay
+
+private fun isMcVersionCompatible(v1: String, v2: String): Boolean {
+    if (v1 == v2) return true
+
+    val parts1 = v1.split(".")
+    val parts2 = v2.split(".")
+
+    if (parts1.size >= 2 && parts2.size >= 2 && parts1[0] == "1" && parts2[0] == "1") {
+        if (parts1[1] == parts2[1]) return true
+    }
+
+    return v1.contains(v2) || v2.contains(v1)
+}
+
 @Composable
 fun ContentInstallerScreen(
     onBack: () -> Unit,
@@ -437,7 +451,7 @@ private fun VersionList(
             LaunchedEffect(availableProjectMCVersions, instanceVersion) {
                 if (availableProjectMCVersions.isNotEmpty()) {
                     val compatibleIndex = availableProjectMCVersions.indexOfFirst { v ->
-                        instanceVersion != null && (instanceVersion.contains(v) || v.contains(instanceVersion))
+                        instanceVersion != null && isMcVersionCompatible(instanceVersion, v)
                     }
                     if (compatibleIndex > 5) {
                         delay(200)
@@ -453,7 +467,7 @@ private fun VersionList(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(availableProjectMCVersions, key = { it }) { v ->
-                    val isCompatible = instanceVersion != null && (instanceVersion.contains(v) || v.contains(instanceVersion))
+                    val isCompatible = instanceVersion != null && isMcVersionCompatible(instanceVersion, v)
                     SubVersionItemView(
                         text = v,
                         isCompatible = isCompatible,
@@ -470,7 +484,7 @@ private fun VersionList(
             LaunchedEffect(filteredVersions, instanceVersion, instanceLoader) {
                 if (filteredVersions.isNotEmpty()) {
                     val compatibleIndex = filteredVersions.indexOfFirst { version ->
-                        instanceVersion != null && version.gameVersions.any { it.contains(instanceVersion) || instanceVersion.contains(it) } &&
+                        instanceVersion != null && version.gameVersions.any { isMcVersionCompatible(instanceVersion, it) } &&
                                 (instanceLoader == null || version.loaders.any { it.equals(instanceLoader, ignoreCase = true) })
                     }
                     if (compatibleIndex > 5) {
@@ -487,7 +501,7 @@ private fun VersionList(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(filteredVersions, key = { it.id }) { version ->
-                    val isMCCompatible = instanceVersion != null && version.gameVersions.any { it.contains(instanceVersion) || instanceVersion.contains(it) }
+                    val isMCCompatible = instanceVersion != null && version.gameVersions.any { isMcVersionCompatible(instanceVersion, it) }
                     val isLoaderCompatible = instanceLoader == null || version.loaders.any { it.equals(instanceLoader, ignoreCase = true) }
 
                     VersionItemView(
