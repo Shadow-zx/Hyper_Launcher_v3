@@ -8,33 +8,55 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.KeyboardArrowDown
 import androidx.compose.material.icons.rounded.KeyboardArrowUp
+import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import net.ashmeet.hyperlauncher.R
 import net.kdt.pojavlaunch.modloaders.FabricVersion
 import com.ashmeet.hyperlauncher.components.DefaultSwitch
+import com.ashmeet.hyperlauncher.screens.layouts.installer.models.ModrinthVersion
+import net.kdt.pojavlaunch.modloaders.modpacks.api.ModrinthService
 
 @Composable
 fun FabriclikeInstallScreen(
-    title: String,
     loaderName: String,
     isLoading: Boolean,
     isInstalling: Boolean,
     gameVersions: List<FabricVersion>,
     loaderVersions: List<FabricVersion>,
     onBack: () -> Unit,
-    onInstall: (gameVersion: String, loaderVersion: String, isHyperClientEnabled: Boolean) -> Unit
+    onInstall: (gameVersion: String, loaderVersion: String, isHyperClientEnabled: Boolean, hyperClientVersionId: String?) -> Unit
 ) {
     var selectedGameVersion by remember { mutableStateOf<FabricVersion?>(null) }
     var selectedLoaderVersion by remember { mutableStateOf<FabricVersion?>(null) }
     var onlyStable by remember { mutableStateOf(true) }
     var isHyperClientEnabled by remember { mutableStateOf(false) }
+
+    var hyperClientVersions by remember { mutableStateOf<List<ModrinthVersion>>(emptyList()) }
+    var selectedHyperClientVersion by remember { mutableStateOf<ModrinthVersion?>(null) }
+    var isHyperClientLoading by remember { mutableStateOf(false) }
+
+    LaunchedEffect(selectedGameVersion) {
+        val gv = selectedGameVersion?.version ?: return@LaunchedEffect
+        isHyperClientLoading = true
+        try {
+            val allVersions = ModrinthService.getProjectVersions("hyperclient")
+            val compatible = allVersions.filter { it.gameVersions.contains(gv) && it.loaders.any { l -> l.equals("fabric", ignoreCase = true) } }
+            hyperClientVersions = compatible
+            selectedHyperClientVersion = compatible.firstOrNull()
+        } catch (e: Exception) {
+            hyperClientVersions = emptyList()
+            selectedHyperClientVersion = null
+        } finally {
+            isHyperClientLoading = false
+        }
+    }
 
     val filteredGameVersions = remember(gameVersions, onlyStable) {
         if (onlyStable) gameVersions.filter { it.stable } else gameVersions
@@ -65,40 +87,12 @@ fun FabriclikeInstallScreen(
                 .fillMaxSize()
                 .padding(horizontal = 16.dp)
         ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 16.dp),
-                contentAlignment = Alignment.CenterStart
-            ) {
-                IconButton(onClick = onBack) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
-                        contentDescription = stringResource(android.R.string.cancel)
-                    )
-                }
-
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.headlineMedium,
-                    modifier = Modifier.fillMaxWidth(),
-                    textAlign = TextAlign.Center,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-
-            HorizontalDivider(
-                modifier = Modifier.padding(bottom = 16.dp),
-                thickness = 2.dp,
-                color = MaterialTheme.colorScheme.outline
-            )
-
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
                     .verticalScroll(rememberScrollState())
-                    .padding(vertical = 8.dp),
+                    .padding(vertical = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(24.dp)
             ) {
 
@@ -106,6 +100,16 @@ fun FabriclikeInstallScreen(
                     modifier = Modifier.weight(1f),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
+                    IconButton(
+                        onClick = onBack,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                            contentDescription = stringResource(android.R.string.cancel)
+                        )
+                    }
+
                     VersionSpinner(
                         label = stringResource(R.string.fabric_dl_game_version),
                         versions = filteredGameVersions,
@@ -119,6 +123,16 @@ fun FabriclikeInstallScreen(
                         selectedVersion = selectedLoaderVersion,
                         onVersionSelected = { selectedLoaderVersion = it }
                     )
+
+                    if (loaderName.lowercase() == "fabric" && isHyperClientEnabled && hyperClientVersions.isNotEmpty()) {
+                        VersionSpinnerGeneric(
+                            label = "Hyper Client Version",
+                            items = hyperClientVersions,
+                            selectedItem = selectedHyperClientVersion,
+                            itemLabel = { it.name },
+                            onItemSelected = { selectedHyperClientVersion = it }
+                        )
+                    }
                 }
 
                 Column(
@@ -146,29 +160,49 @@ fun FabriclikeInstallScreen(
                     }
 
                     if (loaderName.lowercase() == "fabric") {
+                        val isAvailable = hyperClientVersions.isNotEmpty() || isHyperClientLoading
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.SpaceBetween,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .clickable { isHyperClientEnabled = !isHyperClientEnabled }
+                                .clickable(enabled = isAvailable) { isHyperClientEnabled = !isHyperClientEnabled }
                                 .padding(8.dp)
+                                .alpha(if (isAvailable) 1f else 0.5f)
                         ) {
                             Column(modifier = Modifier.weight(1f)) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text(
+                                        text = "Hyper Client",
+                                        style = MaterialTheme.typography.bodyLarge
+                                    )
+                                    if (!isAvailable && !isHyperClientLoading) {
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Icon(
+                                            imageVector = Icons.Rounded.Warning,
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colorScheme.error,
+                                            modifier = Modifier.size(20.dp)
+                                        )
+                                    }
+                                }
                                 Text(
-                                    text = "Hyper Client",
-                                    style = MaterialTheme.typography.bodyLarge
-                                )
-                                Text(
-                                    text = "Installs Hyper Client",
+                                    text = if (!isAvailable && !isHyperClientLoading)
+                                        "Not available for ${selectedGameVersion?.version ?: "this version"}"
+                                    else "Installs Hyper Client, Fabric API and Mod Menu",
                                     style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    color = if (!isAvailable && !isHyperClientLoading) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
-                            DefaultSwitch(
-                                checked = isHyperClientEnabled,
-                                onCheckedChange = { isHyperClientEnabled = it }
-                            )
+                            if (isHyperClientLoading) {
+                                CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
+                            } else {
+                                DefaultSwitch(
+                                    checked = isHyperClientEnabled && isAvailable,
+                                    enabled = isAvailable,
+                                    onCheckedChange = { isHyperClientEnabled = it }
+                                )
+                            }
                         }
                     }
 
@@ -179,7 +213,7 @@ fun FabriclikeInstallScreen(
                             val gv = selectedGameVersion?.version
                             val lv = selectedLoaderVersion?.version
                             if (gv != null && lv != null) {
-                                onInstall(gv, lv, isHyperClientEnabled)
+                                onInstall(gv, lv, isHyperClientEnabled, selectedHyperClientVersion?.id)
                             }
                         },
                         enabled = !isLoading && !isInstalling && selectedGameVersion != null && selectedLoaderVersion != null,
@@ -260,6 +294,64 @@ private fun VersionSpinner(
                     text = { Text(version.version) },
                     onClick = {
                         onVersionSelected(version)
+                        expanded = false
+                    }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun <T> VersionSpinnerGeneric(
+    label: String,
+    items: List<T>,
+    selectedItem: T?,
+    itemLabel: (T) -> String,
+    onItemSelected: (T) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp)) {
+        OutlinedTextField(
+            value = selectedItem?.let { itemLabel(it) } ?: "",
+            onValueChange = {},
+            label = { Text(label) },
+            readOnly = true,
+            trailingIcon = {
+                Icon(
+                    imageVector = if (expanded) Icons.Rounded.KeyboardArrowUp else Icons.Rounded.KeyboardArrowDown,
+                    contentDescription = null
+                )
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { expanded = true },
+            enabled = true,
+            colors = OutlinedTextFieldDefaults.colors(
+                disabledTextColor = MaterialTheme.colorScheme.onSurface,
+                disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                disabledTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                disabledBorderColor = MaterialTheme.colorScheme.outline
+            )
+        )
+
+        Box(
+            modifier = Modifier
+                .matchParentSize()
+                .clickable { expanded = true }
+        )
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier.fillMaxWidth(0.4f)
+        ) {
+            items.forEach { item ->
+                DropdownMenuItem(
+                    text = { Text(itemLabel(item)) },
+                    onClick = {
+                        onItemSelected(item)
                         expanded = false
                     }
                 )

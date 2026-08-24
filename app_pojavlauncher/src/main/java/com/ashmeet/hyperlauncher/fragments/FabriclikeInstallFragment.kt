@@ -49,15 +49,14 @@ abstract class FabriclikeInstallFragment(
             setContent {
                 PojavTheme {
                     FabriclikeInstallScreen(
-                        title = getString(R.string.fabric_dl_loader_title),
                         loaderName = mFabriclikeUtils.name,
                         isLoading = isLoading,
                         isInstalling = isInstalling,
                         gameVersions = gameVersions,
                         loaderVersions = loaderVersions,
                         onBack = { parentFragmentManager.popBackStack() },
-                        onInstall = { gameVersion, loaderVersion, isHyperClientEnabled ->
-                            performInstallation(gameVersion, loaderVersion, isHyperClientEnabled)
+                        onInstall = { gameVersion, loaderVersion, isHyperClientEnabled, hyperClientVersionId ->
+                            performInstallation(gameVersion, loaderVersion, isHyperClientEnabled, hyperClientVersionId)
                         }
                     )
                 }
@@ -95,7 +94,7 @@ abstract class FabriclikeInstallFragment(
         }
     }
 
-    private fun performInstallation(gameVersion: String, loaderVersion: String, isHyperClientEnabled: Boolean) {
+    private fun performInstallation(gameVersion: String, loaderVersion: String, isHyperClientEnabled: Boolean, hyperClientVersionId: String?) {
         if (ProgressKeeper.hasOngoingTasks()) {
             Toast.makeText(requireContext(), R.string.tasks_ongoing, Toast.LENGTH_LONG).show()
             return
@@ -121,7 +120,7 @@ abstract class FabriclikeInstallFragment(
                 }, versionId)
 
                 if (isHyperClientEnabled && mFabriclikeUtils.name.lowercase() == "fabric") {
-                    installHyperClientMods(instance, gameVersion)
+                    installHyperClientMods(instance, gameVersion, hyperClientVersionId)
                 }
 
                 withContext(Dispatchers.Main) {
@@ -135,7 +134,7 @@ abstract class FabriclikeInstallFragment(
         }
     }
 
-    private suspend fun installHyperClientMods(instance: net.kdt.pojavlaunch.instances.Instance, gameVersion: String) {
+    private suspend fun installHyperClientMods(instance: net.kdt.pojavlaunch.instances.Instance, gameVersion: String, hyperClientVersionId: String?) {
         val modsFolder = File(instance.gameDirectory, "mods")
         modsFolder.mkdirs()
 
@@ -143,8 +142,12 @@ abstract class FabriclikeInstallFragment(
         modsToInstall.forEach { modId ->
             try {
                 val versions = ModrinthService.getProjectVersions(modId)
-                val compatibleVersion = versions.firstOrNull { v ->
-                    v.gameVersions.contains(gameVersion) && v.loaders.any { it.equals("fabric", ignoreCase = true) }
+                val compatibleVersion = if (modId == "hyperclient" && hyperClientVersionId != null) {
+                    versions.find { it.id == hyperClientVersionId }
+                } else {
+                    versions.firstOrNull { v ->
+                        v.gameVersions.contains(gameVersion) && v.loaders.any { it.equals("fabric", ignoreCase = true) }
+                    }
                 }
 
                 if (compatibleVersion != null) {
