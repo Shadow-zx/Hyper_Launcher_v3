@@ -1,11 +1,11 @@
 package net.kdt.pojavlaunch;
 
 
-import static com.ashmeet.hyperlauncher.prefs.LauncherPreferences.PREF_ENABLE_GYRO;
-import static com.ashmeet.hyperlauncher.prefs.LauncherPreferences.PREF_IGNORE_NOTCH;
-import static com.ashmeet.hyperlauncher.prefs.LauncherPreferences.PREF_SUSTAINED_PERFORMANCE;
-import static com.ashmeet.hyperlauncher.prefs.LauncherPreferences.PREF_USE_ALTERNATE_SURFACE;
-import static com.ashmeet.hyperlauncher.prefs.LauncherPreferences.PREF_VIRTUAL_MOUSE_START;
+import static com.ashmeet.hyperlauncher.LauncherPreference.Preference.LauncherPreferences.PREF_ENABLE_GYRO;
+import static com.ashmeet.hyperlauncher.LauncherPreference.Preference.LauncherPreferences.PREF_IGNORE_NOTCH;
+import static com.ashmeet.hyperlauncher.LauncherPreference.Preference.LauncherPreferences.PREF_SUSTAINED_PERFORMANCE;
+import static com.ashmeet.hyperlauncher.LauncherPreference.Preference.LauncherPreferences.PREF_USE_ALTERNATE_SURFACE;
+import static com.ashmeet.hyperlauncher.LauncherPreference.Preference.LauncherPreferences.PREF_VIRTUAL_MOUSE_START;
 import static net.kdt.pojavlaunch.Tools.dialogForceClose;
 
 import android.app.Activity;
@@ -44,7 +44,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.ashmeet.hyperlauncher.dialog.QuickSettingSideDialog;
 import com.ashmeet.hyperlauncher.helper.LauncherComposeHelper;
-import com.ashmeet.hyperlauncher.prefs.LauncherPreferences;
+import com.ashmeet.hyperlauncher.LauncherPreference.Preference.LauncherPreferences;
 import com.ashmeet.hyperlauncher.screens.activity.game.LoggerView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 

@@ -14,6 +14,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 
+import androidx.compose.ui.graphics.Color
+
 @Composable
 fun DefaultSwitch(
     checked: Boolean,
@@ -29,8 +31,10 @@ fun DefaultSwitch(
         uncheckedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
         disabledCheckedThumbColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.5f),
         disabledUncheckedThumbColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.8f),
-        uncheckedBorderColor = MaterialTheme.colorScheme.outline,
-        disabledUncheckedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)
+        checkedBorderColor = Color.Transparent,
+        uncheckedBorderColor = Color.Transparent,
+        disabledCheckedBorderColor = Color.Transparent,
+        disabledUncheckedBorderColor = Color.Transparent
     ),
     interactionSource: MutableInteractionSource? = null
 ) {

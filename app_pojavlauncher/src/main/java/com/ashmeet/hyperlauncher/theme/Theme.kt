@@ -18,7 +18,7 @@ import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.colorResource
 import net.ashmeet.hyperlauncher.R
-import com.ashmeet.hyperlauncher.prefs.LauncherPreferences
+import com.ashmeet.hyperlauncher.LauncherPreference.Preference.LauncherPreferences
 
 @Composable
 fun PojavTheme(
@@ -40,14 +40,14 @@ fun PojavTheme(
         DisposableEffect(Unit) {
             val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
                 when (key) {
-                    "app_theme" -> themePref = LauncherPreferences.DEFAULT_PREF.getString("app_theme", "system") ?: "system"
-                    "app_custom_theme" -> isCustomTheme = LauncherPreferences.DEFAULT_PREF.getBoolean("app_custom_theme", false)
-                    "app_theme_color" -> themeColor = LauncherPreferences.DEFAULT_PREF.getInt("app_theme_color", 0xFF3F51B5.toInt())
+                    "app_theme" -> themePref = LauncherPreferences.prefs.getString("app_theme", "system") ?: "system"
+                    "app_custom_theme" -> isCustomTheme = LauncherPreferences.prefs.getBoolean("app_custom_theme", false)
+                    "app_theme_color" -> themeColor = LauncherPreferences.prefs.getInt("app_theme_color", 0xFF3F51B5.toInt())
                 }
             }
-            LauncherPreferences.DEFAULT_PREF.registerOnSharedPreferenceChangeListener(listener)
+            LauncherPreferences.prefs.registerOnSharedPreferenceChangeListener(listener)
             onDispose {
-                LauncherPreferences.DEFAULT_PREF.unregisterOnSharedPreferenceChangeListener(listener)
+                LauncherPreferences.prefs.unregisterOnSharedPreferenceChangeListener(listener)
             }
         }
     }

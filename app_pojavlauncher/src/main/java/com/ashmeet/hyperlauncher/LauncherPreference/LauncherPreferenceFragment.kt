@@ -1,4 +1,4 @@
-package com.ashmeet.hyperlauncher.fragments.LauncherPreference
+package com.ashmeet.hyperlauncher.LauncherPreference
 
 import android.Manifest
 import android.content.SharedPreferences
@@ -12,7 +12,7 @@ import com.ashmeet.hyperlauncher.screens.layouts.settings.MainSettingsScreen
 import com.ashmeet.hyperlauncher.theme.PojavTheme
 import net.kdt.pojavlaunch.LauncherActivity
 import net.kdt.pojavlaunch.Tools
-import com.ashmeet.hyperlauncher.prefs.LauncherPreferences
+import com.ashmeet.hyperlauncher.LauncherPreference.Preference.LauncherPreferences
 
 open class LauncherPreferenceFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListener {
 

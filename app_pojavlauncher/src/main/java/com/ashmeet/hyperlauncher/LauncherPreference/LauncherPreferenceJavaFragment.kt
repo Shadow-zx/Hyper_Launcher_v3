@@ -1,4 +1,4 @@
-package com.ashmeet.hyperlauncher.fragments.LauncherPreference
+package com.ashmeet.hyperlauncher.LauncherPreference
 
 import android.content.SharedPreferences
 import android.os.Bundle
@@ -18,7 +18,7 @@ import net.kdt.pojavlaunch.Tools
 import net.kdt.pojavlaunch.contracts.OpenDocumentWithExtension
 import net.kdt.pojavlaunch.multirt.MultiRTUtils
 import net.kdt.pojavlaunch.multirt.Runtime
-import com.ashmeet.hyperlauncher.prefs.LauncherPreferences
+import com.ashmeet.hyperlauncher.LauncherPreference.Preference.LauncherPreferences
 
 class LauncherPreferenceJavaFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListener {
 
@@ -75,7 +75,7 @@ class LauncherPreferenceJavaFragment : Fragment(), SharedPreferences.OnSharedPre
                         val remaining = MultiRTUtils.getRuntimes()
                         if (remaining.isNotEmpty()) {
                             val newDefault = remaining[0].name
-                            LauncherPreferences.DEFAULT_PREF.edit().putString("defaultRuntime", newDefault).apply()
+                            LauncherPreferences.prefs.edit().putString("defaultRuntime", newDefault).apply()
                             LauncherPreferences.loadPreferences(context)
                         }
                     }
@@ -89,11 +89,11 @@ class LauncherPreferenceJavaFragment : Fragment(), SharedPreferences.OnSharedPre
 
     override fun onResume() {
         super.onResume()
-        LauncherPreferences.DEFAULT_PREF?.registerOnSharedPreferenceChangeListener(this)
+        LauncherPreferences.prefs.registerOnSharedPreferenceChangeListener(this)
     }
 
     override fun onPause() {
-        LauncherPreferences.DEFAULT_PREF?.unregisterOnSharedPreferenceChangeListener(this)
+        LauncherPreferences.prefs.unregisterOnSharedPreferenceChangeListener(this)
         super.onPause()
     }
 

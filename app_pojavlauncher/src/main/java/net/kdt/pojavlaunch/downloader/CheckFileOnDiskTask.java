@@ -1,6 +1,6 @@
 package net.kdt.pojavlaunch.downloader;
 
-import com.ashmeet.hyperlauncher.prefs.LauncherPreferences;
+import com.ashmeet.hyperlauncher.LauncherPreference.Preference.LauncherPreferences;
 import net.kdt.pojavlaunch.utils.HashUtils;
 
 import java.io.File;

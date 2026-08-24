@@ -5,7 +5,6 @@ import android.content.SharedPreferences
 import android.graphics.BitmapFactory
 import android.util.AttributeSet
 import android.view.MotionEvent
-import android.view.View
 import android.widget.FrameLayout
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -23,7 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.content.edit
-import com.ashmeet.hyperlauncher.prefs.LauncherPreferences
+import com.ashmeet.hyperlauncher.LauncherPreference.Preference.LauncherPreferences
 import java.io.File
 
 class DrawerPullButton @JvmOverloads constructor(
@@ -66,7 +65,7 @@ class DrawerPullButton @JvmOverloads constructor(
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        LauncherPreferences.DEFAULT_PREF.registerOnSharedPreferenceChangeListener(prefListener)
+        LauncherPreferences.prefs.registerOnSharedPreferenceChangeListener(prefListener)
         updateAppearance()
         
         // Load saved position
@@ -77,7 +76,7 @@ class DrawerPullButton @JvmOverloads constructor(
     }
 
     override fun onDetachedFromWindow() {
-        LauncherPreferences.DEFAULT_PREF.unregisterOnSharedPreferenceChangeListener(prefListener)
+        LauncherPreferences.prefs.unregisterOnSharedPreferenceChangeListener(prefListener)
         super.onDetachedFromWindow()
     }
 
@@ -151,10 +150,6 @@ class DrawerPullButton @JvmOverloads constructor(
         }
     }
 
-    override fun performClick(): Boolean {
-        return super.performClick()
-    }
-
     override fun onInterceptTouchEvent(ev: MotionEvent): Boolean {
         if (!LauncherPreferences.PREF_DRAWER_PULL_HOLD_TO_MOVE) return false
         
@@ -218,7 +213,7 @@ class DrawerPullButton @JvmOverloads constructor(
         LauncherPreferences.PREF_DRAWER_PULL_POS_X = x
         LauncherPreferences.PREF_DRAWER_PULL_POS_Y = y
         
-        LauncherPreferences.DEFAULT_PREF.edit {
+        LauncherPreferences.prefs.edit {
             putFloat("drawer_pull_pos_x", x)
             putFloat("drawer_pull_pos_y", y)
         }

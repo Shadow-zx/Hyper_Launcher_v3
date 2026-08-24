@@ -3,7 +3,7 @@ package net.kdt.pojavlaunch.customcontrols.mouse;
 import android.view.MotionEvent;
 import android.view.View;
 
-import com.ashmeet.hyperlauncher.prefs.LauncherPreferences;
+import com.ashmeet.hyperlauncher.LauncherPreference.Preference.LauncherPreferences;
 
 import git.artdeell.dnbootstrap.glfw.GLFW;
 

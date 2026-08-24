@@ -6,7 +6,7 @@ import android.os.Handler;
 
 import net.kdt.pojavlaunch.LwjglGlfwKeycode;
 import net.kdt.pojavlaunch.Tools;
-import com.ashmeet.hyperlauncher.prefs.LauncherPreferences;
+import com.ashmeet.hyperlauncher.LauncherPreference.Preference.LauncherPreferences;
 import net.kdt.pojavlaunch.utils.MathUtils;
 
 public class LeftClickGesture extends DistanceGesture {

@@ -26,7 +26,7 @@ import com.ashmeet.hyperlauncher.screens.layouts.settings.preferences.Preference
 import com.ashmeet.hyperlauncher.screens.layouts.settings.preferences.SettingsActionItem
 import com.ashmeet.hyperlauncher.screens.layouts.settings.preferences.SettingsSwitchItem
 import net.ashmeet.hyperlauncher.R
-import com.ashmeet.hyperlauncher.prefs.LauncherPreferences
+import com.ashmeet.hyperlauncher.LauncherPreference.Preference.LauncherPreferences
 
 @Composable
 fun MainSettingsScreen(
@@ -114,7 +114,7 @@ fun MainSettingsScreen(
                     checked = forceEnglish,
                     onCheckedChange = {
                         forceEnglish = it
-                        LauncherPreferences.DEFAULT_PREF.edit().putBoolean("force_english", it).apply()
+                        LauncherPreferences.prefs.edit().putBoolean("force_english", it).apply()
                         LauncherPreferences.loadPreferences(context)
                     }
                 )

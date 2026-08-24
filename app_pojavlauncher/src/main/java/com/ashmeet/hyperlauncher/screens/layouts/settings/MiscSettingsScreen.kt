@@ -27,7 +27,7 @@ import com.ashmeet.hyperlauncher.screens.layouts.settings.preferences.SettingsAc
 import com.ashmeet.hyperlauncher.screens.layouts.settings.preferences.SettingsSwitchItem
 import com.ashmeet.hyperlauncher.screens.layouts.settings.preferences.SingleChoiceDialog
 import net.ashmeet.hyperlauncher.R
-import com.ashmeet.hyperlauncher.prefs.LauncherPreferences
+import com.ashmeet.hyperlauncher.LauncherPreference.Preference.LauncherPreferences
 
 @Composable
 fun MiscSettingsScreen(
@@ -56,7 +56,7 @@ fun MiscSettingsScreen(
             selectedValue = downloadSource,
             onValueChange = { newValue ->
                 downloadSource = newValue
-                LauncherPreferences.DEFAULT_PREF.edit { putString("downloadSource", newValue) }
+                LauncherPreferences.prefs.edit { putString("downloadSource", newValue) }
                 LauncherPreferences.loadPreferences(context)
             },
             onDismiss = { showDownloadSourceDialog = false }
@@ -77,7 +77,7 @@ fun MiscSettingsScreen(
                     checked = checkGameFiles,
                     onCheckedChange = {
                         checkGameFiles = it
-                        LauncherPreferences.DEFAULT_PREF.edit { putBoolean("checkGameFiles", it) }
+                        LauncherPreferences.prefs.edit { putBoolean("checkGameFiles", it) }
                         LauncherPreferences.loadPreferences(context)
                     }
                 )
@@ -91,7 +91,7 @@ fun MiscSettingsScreen(
                     checked = fastStartupCheck,
                     onCheckedChange = {
                         fastStartupCheck = it
-                        LauncherPreferences.DEFAULT_PREF.edit { putBoolean("fastStartupCheck", it) }
+                        LauncherPreferences.prefs.edit { putBoolean("fastStartupCheck", it) }
                         LauncherPreferences.loadPreferences(context)
                     }
                 )
@@ -114,7 +114,7 @@ fun MiscSettingsScreen(
                     checked = verifyManifest,
                     onCheckedChange = {
                         verifyManifest = it
-                        LauncherPreferences.DEFAULT_PREF.edit { putBoolean("verifyManifest", it) }
+                        LauncherPreferences.prefs.edit { putBoolean("verifyManifest", it) }
                         LauncherPreferences.loadPreferences(context)
                     }
                 )
@@ -133,7 +133,7 @@ fun MiscSettingsScreen(
                         checked = zinkPreferSystemDriver,
                         onCheckedChange = {
                             zinkPreferSystemDriver = it
-                            LauncherPreferences.DEFAULT_PREF.edit { putBoolean("zinkPreferSystemDriver", it) }
+                            LauncherPreferences.prefs.edit { putBoolean("zinkPreferSystemDriver", it) }
                             LauncherPreferences.loadPreferences(context)
                         }
                     )

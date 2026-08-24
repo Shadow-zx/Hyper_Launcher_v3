@@ -5,7 +5,7 @@ import android.os.Build;
 import android.util.Log;
 
 import net.kdt.pojavlaunch.Tools;
-import com.ashmeet.hyperlauncher.prefs.LauncherPreferences;
+import com.ashmeet.hyperlauncher.LauncherPreference.Preference.LauncherPreferences;
 import net.kdt.pojavlaunch.utils.JSONUtils;
 
 import java.io.File;

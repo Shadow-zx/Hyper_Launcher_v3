@@ -20,8 +20,7 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.ashmeet.hyperlauncher.prefs.LauncherPreferences
-import com.ashmeet.hyperlauncher.prefs.LauncherPreferences.*
+import com.ashmeet.hyperlauncher.LauncherPreference.Preference.LauncherPreferences
 import com.ashmeet.hyperlauncher.screens.layouts.settings.layouts.CardPosition
 import com.ashmeet.hyperlauncher.screens.layouts.settings.layouts.SettingsCard
 import com.ashmeet.hyperlauncher.screens.layouts.settings.preferences.SettingsSliderItem
@@ -56,17 +55,17 @@ abstract class QuickSettingSideDialog(context: Context, parent: ViewGroup) :
     }
 
     override fun onInflate() {
-        mEditor = DEFAULT_PREF.edit()
+        mEditor = LauncherPreferences.prefs.edit()
 
-        mOriginalGyroEnabled = PREF_ENABLE_GYRO
-        mOriginalGyroXEnabled = PREF_GYRO_INVERT_X
-        mOriginalGyroYEnabled = PREF_GYRO_INVERT_Y
-        mOriginalGestureDisabled = PREF_DISABLE_GESTURES
+        mOriginalGyroEnabled = LauncherPreferences.PREF_ENABLE_GYRO
+        mOriginalGyroXEnabled = LauncherPreferences.PREF_GYRO_INVERT_X
+        mOriginalGyroYEnabled = LauncherPreferences.PREF_GYRO_INVERT_Y
+        mOriginalGestureDisabled = LauncherPreferences.PREF_DISABLE_GESTURES
 
-        mOriginalGyroSensitivity = PREF_GYRO_SENSITIVITY
-        mOriginalMouseSpeed = PREF_MOUSESPEED
-        mOriginalGestureDelay = PREF_LONGPRESS_TRIGGER
-        mOriginalResolution = PREF_SCALE_FACTOR
+        mOriginalGyroSensitivity = LauncherPreferences.PREF_GYRO_SENSITIVITY
+        mOriginalMouseSpeed = LauncherPreferences.PREF_MOUSESPEED
+        mOriginalGestureDelay = LauncherPreferences.PREF_LONGPRESS_TRIGGER
+        mOriginalResolution = LauncherPreferences.PREF_SCALE_FACTOR
 
         val composeView = mDialogContent.findViewById<ComposeView>(R.id.compose_view)
         composeView.setContent {
@@ -101,14 +100,14 @@ abstract class QuickSettingSideDialog(context: Context, parent: ViewGroup) :
     /** Resets all settings to their original values */
     fun cancel() {
         if (isDisplaying) {
-            PREF_ENABLE_GYRO = mOriginalGyroEnabled
-            PREF_GYRO_INVERT_X = mOriginalGyroXEnabled
-            PREF_GYRO_INVERT_Y = mOriginalGyroYEnabled
-            PREF_DISABLE_GESTURES = mOriginalGestureDisabled
-            PREF_GYRO_SENSITIVITY = mOriginalGyroSensitivity
-            PREF_MOUSESPEED = mOriginalMouseSpeed
-            PREF_LONGPRESS_TRIGGER = mOriginalGestureDelay
-            PREF_SCALE_FACTOR = mOriginalResolution
+            LauncherPreferences.PREF_ENABLE_GYRO = mOriginalGyroEnabled
+            LauncherPreferences.PREF_GYRO_INVERT_X = mOriginalGyroXEnabled
+            LauncherPreferences.PREF_GYRO_INVERT_Y = mOriginalGyroYEnabled
+            LauncherPreferences.PREF_DISABLE_GESTURES = mOriginalGestureDisabled
+            LauncherPreferences.PREF_GYRO_SENSITIVITY = mOriginalGyroSensitivity
+            LauncherPreferences.PREF_MOUSESPEED = mOriginalMouseSpeed
+            LauncherPreferences.PREF_LONGPRESS_TRIGGER = mOriginalGestureDelay
+            LauncherPreferences.PREF_SCALE_FACTOR = mOriginalResolution
             onGyroStateChanged()
             onResolutionChanged()
         }
@@ -133,17 +132,17 @@ private fun QuickSettingContent(
     onPreferenceChanged: (String, Any) -> Unit
 ) {
     val context = LocalContext.current
-    var enableGyro by remember { mutableStateOf(PREF_ENABLE_GYRO) }
-    var gyroInvertX by remember { mutableStateOf(PREF_GYRO_INVERT_X) }
-    var gyroInvertY by remember { mutableStateOf(PREF_GYRO_INVERT_Y) }
-    var gyroSensitivity by remember { mutableFloatStateOf(PREF_GYRO_SENSITIVITY * 100f) }
+    var enableGyro by remember { mutableStateOf(LauncherPreferences.PREF_ENABLE_GYRO) }
+    var gyroInvertX by remember { mutableStateOf(LauncherPreferences.PREF_GYRO_INVERT_X) }
+    var gyroInvertY by remember { mutableStateOf(LauncherPreferences.PREF_GYRO_INVERT_Y) }
+    var gyroSensitivity by remember { mutableFloatStateOf(LauncherPreferences.PREF_GYRO_SENSITIVITY * 100f) }
 
-    var mouseSpeed by remember { mutableFloatStateOf(PREF_MOUSESPEED * 100f) }
+    var mouseSpeed by remember { mutableFloatStateOf(LauncherPreferences.PREF_MOUSESPEED * 100f) }
 
-    var disableGestures by remember { mutableStateOf(PREF_DISABLE_GESTURES) }
-    var gestureDelay by remember { mutableFloatStateOf(PREF_LONGPRESS_TRIGGER.toFloat()) }
+    var disableGestures by remember { mutableStateOf(LauncherPreferences.PREF_DISABLE_GESTURES) }
+    var gestureDelay by remember { mutableFloatStateOf(LauncherPreferences.PREF_LONGPRESS_TRIGGER.toFloat()) }
 
-    var resolutionScaler by remember { mutableFloatStateOf(PREF_SCALE_FACTOR * 100f) }
+    var resolutionScaler by remember { mutableFloatStateOf(LauncherPreferences.PREF_SCALE_FACTOR * 100f) }
 
     val isGyroAvailable = remember { Tools.deviceSupportsGyro(context) }
 
@@ -159,7 +158,7 @@ private fun QuickSettingContent(
             valueSuffix = "%",
             onValueChange = {
                 resolutionScaler = it
-                PREF_SCALE_FACTOR = it / 100f
+                LauncherPreferences.PREF_SCALE_FACTOR = it / 100f
                 onPreferenceChanged("resolutionRatio", it.toInt())
                 onResolutionChanged()
             }
@@ -172,7 +171,7 @@ private fun QuickSettingContent(
                     checked = enableGyro,
                     onCheckedChange = {
                         enableGyro = it
-                        PREF_ENABLE_GYRO = it
+                        LauncherPreferences.PREF_ENABLE_GYRO = it
                         onPreferenceChanged("enableGyro", it)
                         onGyroStateChanged()
                     }
@@ -186,7 +185,7 @@ private fun QuickSettingContent(
                         checked = gyroInvertX,
                         onCheckedChange = {
                             gyroInvertX = it
-                            PREF_GYRO_INVERT_X = it
+                            LauncherPreferences.PREF_GYRO_INVERT_X = it
                             onPreferenceChanged("gyroInvertX", it)
                             onGyroStateChanged()
                         }
@@ -198,7 +197,7 @@ private fun QuickSettingContent(
                         checked = gyroInvertY,
                         onCheckedChange = {
                             gyroInvertY = it
-                            PREF_GYRO_INVERT_Y = it
+                            LauncherPreferences.PREF_GYRO_INVERT_Y = it
                             onPreferenceChanged("gyroInvertY", it)
                             onGyroStateChanged()
                         }
@@ -211,7 +210,7 @@ private fun QuickSettingContent(
                     valueSuffix = "%",
                     onValueChange = {
                         gyroSensitivity = it
-                        PREF_GYRO_SENSITIVITY = it / 100f
+                        LauncherPreferences.PREF_GYRO_SENSITIVITY = it / 100f
                         onPreferenceChanged("gyroSensitivity", it.toInt())
                         onGyroStateChanged()
                     }
@@ -226,7 +225,7 @@ private fun QuickSettingContent(
             valueSuffix = "%",
             onValueChange = {
                 mouseSpeed = it
-                PREF_MOUSESPEED = it / 100f
+                LauncherPreferences.PREF_MOUSESPEED = it / 100f
                 onPreferenceChanged("mousespeed", it.toInt())
             }
         )
@@ -237,7 +236,7 @@ private fun QuickSettingContent(
                 checked = disableGestures,
                 onCheckedChange = {
                     disableGestures = it
-                    PREF_DISABLE_GESTURES = it
+                    LauncherPreferences.PREF_DISABLE_GESTURES = it
                     onPreferenceChanged("disableGestures", it)
                 }
             )
@@ -251,7 +250,7 @@ private fun QuickSettingContent(
                 valueSuffix = " ms",
                 onValueChange = {
                     gestureDelay = it
-                    PREF_LONGPRESS_TRIGGER = it.toInt()
+                    LauncherPreferences.PREF_LONGPRESS_TRIGGER = it.toInt()
                     onPreferenceChanged("timeLongPressTrigger", it.toInt())
                 }
             )

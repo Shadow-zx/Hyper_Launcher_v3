@@ -18,7 +18,7 @@ import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.Keep;
 import androidx.appcompat.app.AlertDialog;
 
-import com.ashmeet.hyperlauncher.prefs.LauncherPreferences;
+import com.ashmeet.hyperlauncher.LauncherPreference.Preference.LauncherPreferences;
 import com.ashmeet.hyperlauncher.screens.activity.game.LoggerView;
 
 import net.ashmeet.hyperlauncher.R;

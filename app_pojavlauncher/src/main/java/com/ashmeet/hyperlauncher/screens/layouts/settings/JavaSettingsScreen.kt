@@ -29,7 +29,7 @@ import com.ashmeet.hyperlauncher.screens.layouts.settings.preferences.TextInputD
 import net.ashmeet.hyperlauncher.R
 import net.kdt.pojavlaunch.multirt.MultiRTUtils
 import net.kdt.pojavlaunch.multirt.Runtime
-import com.ashmeet.hyperlauncher.prefs.LauncherPreferences
+import com.ashmeet.hyperlauncher.LauncherPreference.Preference.LauncherPreferences
 
 @Composable
 fun JavaSettingsScreen(
@@ -93,7 +93,7 @@ fun JavaSettingsScreen(
                     valueRange = integerResource(R.integer.memory_seekbar_min).toFloat()..maxRam.toFloat(),
                     onValueChange = {
                         ramAllocation = it
-                        LauncherPreferences.DEFAULT_PREF.edit { putInt("allocation", it.toInt()) }
+                        LauncherPreferences.prefs.edit { putInt("allocation", it.toInt()) }
                         LauncherPreferences.loadPreferences(context)
                     },
                     valueSuffix = " MB"
@@ -108,7 +108,7 @@ fun JavaSettingsScreen(
                     checked = javaSandbox,
                     onCheckedChange = {
                         javaSandbox = it
-                        LauncherPreferences.DEFAULT_PREF.edit { putBoolean("java_sandbox", it) }
+                        LauncherPreferences.prefs.edit { putBoolean("java_sandbox", it) }
                         LauncherPreferences.loadPreferences(context)
                     }
                 )
@@ -124,7 +124,7 @@ fun JavaSettingsScreen(
             isDeleting = isDeletingRuntimes,
             onRuntimeSelected = { runtime ->
                 defaultRuntimeName = runtime.name
-                LauncherPreferences.DEFAULT_PREF.edit { putString("defaultRuntime", runtime.name) }
+                LauncherPreferences.prefs.edit { putString("defaultRuntime", runtime.name) }
                 LauncherPreferences.loadPreferences(context)
                 showRuntimeDialog = false
             },
@@ -146,7 +146,7 @@ fun JavaSettingsScreen(
             initialValue = javaArgs,
             onConfirm = { newValue ->
                 javaArgs = newValue
-                LauncherPreferences.DEFAULT_PREF.edit { putString("javaArgs", newValue) }
+                LauncherPreferences.prefs.edit { putString("javaArgs", newValue) }
                 LauncherPreferences.loadPreferences(context)
                 showJavaArgsDialog = false
             },

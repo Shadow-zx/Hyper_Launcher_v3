@@ -18,13 +18,13 @@
     *;
  }
 # Option screens
--keep class com.ashmeet.hyperlauncher.fragments.LauncherPreference.LauncherPreferenceFragment { *; }
--keep class com.ashmeet.hyperlauncher.fragments.LauncherPreference.LauncherPreferenceJavaFragment { *; }
--keep class com.ashmeet.hyperlauncher.fragments.LauncherPreference.LauncherPreferenceVideoFragment { *; }
--keep class com.ashmeet.hyperlauncher.fragments.LauncherPreference.LauncherPreferenceControlFragment { *; }
--keep class com.ashmeet.hyperlauncher.fragments.LauncherPreference.LauncherPreferenceAppearanceFragment { *; }
--keep class com.ashmeet.hyperlauncher.fragments.LauncherPreference.LauncherPreferenceExperimentalFragment { *; }
--keep class com.ashmeet.hyperlauncher.fragments.LauncherPreference.LauncherPreferenceMiscellaneousFragment { *; }
+-keep class com.ashmeet.hyperlauncher.LauncherPreference.LauncherPreferenceFragment { *; }
+-keep class com.ashmeet.hyperlauncher.LauncherPreference.LauncherPreferenceJavaFragment { *; }
+-keep class com.ashmeet.hyperlauncher.LauncherPreference.LauncherPreferenceVideoFragment { *; }
+-keep class com.ashmeet.hyperlauncher.LauncherPreference.LauncherPreferenceControlFragment { *; }
+-keep class com.ashmeet.hyperlauncher.LauncherPreference.LauncherPreferenceAppearanceFragment { *; }
+-keep class com.ashmeet.hyperlauncher.LauncherPreference.LauncherPreferenceExperimentalFragment { *; }
+-keep class com.ashmeet.hyperlauncher.LauncherPreference.LauncherPreferenceMiscellaneousFragment { *; }
 
 # Minecraft JSON classes (GSON mapping and Reflection)
 -keep class net.kdt.pojavlaunch.JVersionList** { *; }

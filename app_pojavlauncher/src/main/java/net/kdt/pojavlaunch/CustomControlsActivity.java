@@ -5,13 +5,12 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.DocumentsContract;
-import android.view.View;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.compose.ui.platform.ComposeView;
 
 import com.ashmeet.hyperlauncher.helper.LauncherComposeHelper;
-import com.ashmeet.hyperlauncher.prefs.LauncherPreferences;
+import com.ashmeet.hyperlauncher.LauncherPreference.Preference.LauncherPreferences;
 import com.google.gson.JsonSyntaxException;
 
 import net.ashmeet.hyperlauncher.R;

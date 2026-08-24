@@ -1,4 +1,4 @@
-package com.ashmeet.hyperlauncher.fragments.LauncherPreference
+package com.ashmeet.hyperlauncher.LauncherPreference
 
 import android.content.Context
 import android.content.Intent
@@ -19,7 +19,7 @@ import net.kdt.pojavlaunch.Tools
 import com.ashmeet.hyperlauncher.fragments.GamepadMapperFragment
 import com.ashmeet.hyperlauncher.screens.layouts.settings.ControlSettingsScreen
 import com.ashmeet.hyperlauncher.theme.PojavTheme
-import com.ashmeet.hyperlauncher.prefs.LauncherPreferences
+import com.ashmeet.hyperlauncher.LauncherPreference.Preference.LauncherPreferences
 
 class LauncherPreferenceControlFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListener {
 

@@ -1,6 +1,6 @@
 package net.kdt.pojavlaunch;
 
-import static com.ashmeet.hyperlauncher.prefs.LauncherPreferences.PREF_FULLSCREEN_LAUNCHER;
+import static com.ashmeet.hyperlauncher.LauncherPreference.Preference.LauncherPreferences.PREF_FULLSCREEN_LAUNCHER;
 
 import android.content.Context;
 import android.graphics.Color;

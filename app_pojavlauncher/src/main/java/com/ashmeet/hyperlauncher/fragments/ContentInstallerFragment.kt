@@ -31,7 +31,7 @@ import net.kdt.pojavlaunch.PojavApplication
 import net.kdt.pojavlaunch.Tools
 import net.kdt.pojavlaunch.instances.Instance
 import net.kdt.pojavlaunch.instances.Instances
-import com.ashmeet.hyperlauncher.prefs.LauncherPreferences
+import com.ashmeet.hyperlauncher.LauncherPreference.Preference.LauncherPreferences
 import net.kdt.pojavlaunch.modloaders.modpacks.api.CommonApi
 import net.kdt.pojavlaunch.modloaders.modpacks.api.CurseForgeService
 import net.kdt.pojavlaunch.modloaders.modpacks.api.ModrinthService
@@ -222,7 +222,7 @@ class ContentInstallerFragment : Fragment() {
                             }
 
                             if (selectedSource != source) {
-                                LauncherPreferences.DEFAULT_PREF.edit {
+                                LauncherPreferences.prefs.edit {
                                     putInt("last_content_source", if (source == ContentSource.CURSEFORGE) 1 else 0)
                                 }
                                 LauncherPreferences.PREF_LAST_CONTENT_SOURCE = if (source == ContentSource.CURSEFORGE) 1 else 0

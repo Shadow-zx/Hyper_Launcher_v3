@@ -12,7 +12,7 @@ import android.view.ViewParent;
 import androidx.annotation.Nullable;
 
 import net.kdt.pojavlaunch.LwjglGlfwKeycode;
-import com.ashmeet.hyperlauncher.prefs.LauncherPreferences;
+import com.ashmeet.hyperlauncher.LauncherPreference.Preference.LauncherPreferences;
 import net.kdt.pojavlaunch.utils.MCOptionUtils;
 import net.kdt.pojavlaunch.utils.MathUtils;
 

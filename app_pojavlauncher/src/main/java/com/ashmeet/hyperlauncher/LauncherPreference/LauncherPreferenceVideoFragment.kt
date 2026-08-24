@@ -1,4 +1,4 @@
-package com.ashmeet.hyperlauncher.fragments.LauncherPreference
+package com.ashmeet.hyperlauncher.LauncherPreference
 
 import android.content.SharedPreferences
 import android.os.Bundle
@@ -7,22 +7,25 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
-import com.ashmeet.hyperlauncher.screens.layouts.settings.AppearanceSettingsScreen
+import com.ashmeet.hyperlauncher.screens.layouts.settings.VideoSettingsScreen
 import com.ashmeet.hyperlauncher.theme.PojavTheme
-import com.ashmeet.hyperlauncher.prefs.LauncherPreferences
+import net.kdt.pojavlaunch.plugins.LibraryPlugin
+import com.ashmeet.hyperlauncher.LauncherPreference.Preference.LauncherPreferences
 
-class LauncherPreferenceAppearanceFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListener {
+class LauncherPreferenceVideoFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListener {
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        val isAngleAvailable = LibraryPlugin.discoverPlugin(requireContext(), LibraryPlugin.ID_ANGLE_PLUGIN) != null
         return ComposeView(requireContext()).apply {
             setContent {
                 PojavTheme {
-                    AppearanceSettingsScreen(
-                        onBack = { requireActivity().onBackPressedDispatcher.onBackPressed() }
+                    VideoSettingsScreen(
+                        onBack = { requireActivity().onBackPressedDispatcher.onBackPressed() },
+                        isAngleAvailable = isAngleAvailable
                     )
                 }
             }

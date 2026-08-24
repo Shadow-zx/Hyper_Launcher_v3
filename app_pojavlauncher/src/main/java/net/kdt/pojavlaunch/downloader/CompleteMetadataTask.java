@@ -3,7 +3,7 @@ package net.kdt.pojavlaunch.downloader;
 import android.util.Log;
 
 import net.kdt.pojavlaunch.mirrors.DownloadMirror;
-import com.ashmeet.hyperlauncher.prefs.LauncherPreferences;
+import com.ashmeet.hyperlauncher.LauncherPreference.Preference.LauncherPreferences;
 
 import java.io.IOException;
 import java.net.URL;

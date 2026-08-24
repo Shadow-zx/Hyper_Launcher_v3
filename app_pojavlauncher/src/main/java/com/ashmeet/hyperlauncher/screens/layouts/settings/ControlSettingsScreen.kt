@@ -35,7 +35,7 @@ import com.ashmeet.hyperlauncher.screens.layouts.settings.preferences.SettingsAc
 import com.ashmeet.hyperlauncher.screens.layouts.settings.preferences.SettingsSliderItem
 import com.ashmeet.hyperlauncher.screens.layouts.settings.preferences.SettingsSwitchItem
 import net.ashmeet.hyperlauncher.R
-import com.ashmeet.hyperlauncher.prefs.LauncherPreferences
+import com.ashmeet.hyperlauncher.LauncherPreference.Preference.LauncherPreferences
 
 @Composable
 fun ControlSettingsScreen(
@@ -88,7 +88,7 @@ fun ControlSettingsScreen(
                     checked = disableGestures,
                     onCheckedChange = {
                         disableGestures = it
-                        LauncherPreferences.DEFAULT_PREF.edit { putBoolean("disableGestures", it) }
+                        LauncherPreferences.prefs.edit { putBoolean("disableGestures", it) }
                         LauncherPreferences.loadPreferences(context)
                     }
                 )
@@ -102,7 +102,7 @@ fun ControlSettingsScreen(
                     checked = disableDoubleTap,
                     onCheckedChange = {
                         disableDoubleTap = it
-                        LauncherPreferences.DEFAULT_PREF.edit { putBoolean("disableDoubleTap", it) }
+                        LauncherPreferences.prefs.edit { putBoolean("disableDoubleTap", it) }
                         LauncherPreferences.loadPreferences(context)
                     }
                 )
@@ -117,7 +117,7 @@ fun ControlSettingsScreen(
                     valueRange = integerResource(R.integer.gesture_delay_seekbar_min).toFloat()..integerResource(R.integer.gesture_delay_seekbar_max).toFloat(),
                     onValueChange = {
                         longPressTrigger = it
-                        LauncherPreferences.DEFAULT_PREF.edit { putInt("timeLongPressTrigger", it.toInt()) }
+                        LauncherPreferences.prefs.edit { putInt("timeLongPressTrigger", it.toInt()) }
                         LauncherPreferences.loadPreferences(context)
                     },
                     valueSuffix = "ms"
@@ -137,7 +137,7 @@ fun ControlSettingsScreen(
                     valueRange = integerResource(R.integer.button_scale_seekbar_min).toFloat()..integerResource(R.integer.button_scale_seekbar_max).toFloat(),
                     onValueChange = {
                         buttonScale = it
-                        LauncherPreferences.DEFAULT_PREF.edit { putInt("buttonscale", it.toInt()) }
+                        LauncherPreferences.prefs.edit { putInt("buttonscale", it.toInt()) }
                         LauncherPreferences.loadPreferences(context)
                     },
                     valueSuffix = "%"
@@ -152,7 +152,7 @@ fun ControlSettingsScreen(
                     checked = buttonAllCaps,
                     onCheckedChange = {
                         buttonAllCaps = it
-                        LauncherPreferences.DEFAULT_PREF.edit { putBoolean("buttonAllCaps", it) }
+                        LauncherPreferences.prefs.edit { putBoolean("buttonAllCaps", it) }
                         LauncherPreferences.loadPreferences(context)
                     }
                 )
@@ -171,7 +171,7 @@ fun ControlSettingsScreen(
                     valueRange = integerResource(R.integer.mouse_scale_seekbar_min).toFloat()..integerResource(R.integer.mouse_scale_seekbar_max).toFloat(),
                     onValueChange = {
                         mouseScale = it
-                        LauncherPreferences.DEFAULT_PREF.edit { putInt("mousescale", it.toInt()) }
+                        LauncherPreferences.prefs.edit { putInt("mousescale", it.toInt()) }
                         LauncherPreferences.loadPreferences(context)
                     },
                     valueSuffix = "%"
@@ -187,7 +187,7 @@ fun ControlSettingsScreen(
                     valueRange = integerResource(R.integer.mouse_speed_seekbar_min).toFloat()..integerResource(R.integer.mouse_speed_seekbar_max).toFloat(),
                     onValueChange = {
                         mouseSpeed = it
-                        LauncherPreferences.DEFAULT_PREF.edit { putInt("mousespeed", it.toInt()) }
+                        LauncherPreferences.prefs.edit { putInt("mousespeed", it.toInt()) }
                         LauncherPreferences.loadPreferences(context)
                     },
                     valueSuffix = "%"
@@ -202,7 +202,7 @@ fun ControlSettingsScreen(
                     checked = mouseStart,
                     onCheckedChange = {
                         mouseStart = it
-                        LauncherPreferences.DEFAULT_PREF.edit { putBoolean("mouse_start", it) }
+                        LauncherPreferences.prefs.edit { putBoolean("mouse_start", it) }
                         LauncherPreferences.loadPreferences(context)
                     }
                 )
@@ -221,7 +221,7 @@ fun ControlSettingsScreen(
                         checked = enableGyro,
                         onCheckedChange = {
                             enableGyro = it
-                            LauncherPreferences.DEFAULT_PREF.edit { putBoolean("enableGyro", it) }
+                            LauncherPreferences.prefs.edit { putBoolean("enableGyro", it) }
                             LauncherPreferences.loadPreferences(context)
                         }
                     )
@@ -237,7 +237,7 @@ fun ControlSettingsScreen(
                         valueRange = integerResource(R.integer.gyro_speed_seekbar_min).toFloat()..integerResource(R.integer.gyro_speed_seekbar_max).toFloat(),
                         onValueChange = {
                             gyroSensitivity = it
-                            LauncherPreferences.DEFAULT_PREF.edit { putInt("gyroSensitivity", it.toInt()) }
+                            LauncherPreferences.prefs.edit { putInt("gyroSensitivity", it.toInt()) }
                             LauncherPreferences.loadPreferences(context)
                         },
                         valueSuffix = "%"
@@ -254,7 +254,7 @@ fun ControlSettingsScreen(
                         valueRange = integerResource(R.integer.gyro_rate_seekbar_min).toFloat()..integerResource(R.integer.gyro_rate_seekbar_max).toFloat(),
                         onValueChange = {
                             gyroSampleRate = it
-                            LauncherPreferences.DEFAULT_PREF.edit { putInt("gyroSampleRate", it.toInt()) }
+                            LauncherPreferences.prefs.edit { putInt("gyroSampleRate", it.toInt()) }
                             LauncherPreferences.loadPreferences(context)
                         },
                         valueSuffix = "Hz"
@@ -270,7 +270,7 @@ fun ControlSettingsScreen(
                         checked = gyroSmoothing,
                         onCheckedChange = {
                             gyroSmoothing = it
-                            LauncherPreferences.DEFAULT_PREF.edit { putBoolean("gyroSmoothing", it) }
+                            LauncherPreferences.prefs.edit { putBoolean("gyroSmoothing", it) }
                             LauncherPreferences.loadPreferences(context)
                         }
                     )
@@ -285,7 +285,7 @@ fun ControlSettingsScreen(
                         checked = gyroInvertX,
                         onCheckedChange = {
                             gyroInvertX = it
-                            LauncherPreferences.DEFAULT_PREF.edit { putBoolean("gyroInvertX", it) }
+                            LauncherPreferences.prefs.edit { putBoolean("gyroInvertX", it) }
                             LauncherPreferences.loadPreferences(context)
                         }
                     )
@@ -300,7 +300,7 @@ fun ControlSettingsScreen(
                         checked = gyroInvertY,
                         onCheckedChange = {
                             gyroInvertY = it
-                            LauncherPreferences.DEFAULT_PREF.edit { putBoolean("gyroInvertY", it) }
+                            LauncherPreferences.prefs.edit { putBoolean("gyroInvertY", it) }
                             LauncherPreferences.loadPreferences(context)
                         }
                     )
@@ -338,7 +338,7 @@ fun ControlSettingsScreen(
                     valueRange = integerResource(R.integer.gamepad_deadzone_seekbar_min).toFloat()..integerResource(R.integer.gamepad_deadzone_seekbar_max).toFloat(),
                     onValueChange = {
                         deadzoneScale = it
-                        LauncherPreferences.DEFAULT_PREF.edit { putInt("gamepad_deadzone_scale", it.toInt()) }
+                        LauncherPreferences.prefs.edit { putInt("gamepad_deadzone_scale", it.toInt()) }
                         LauncherPreferences.loadPreferences(context)
                     },
                     valueSuffix = "%"
@@ -356,7 +356,7 @@ fun ControlSettingsScreen(
                 checked = keyboardAutoPanning,
                 onCheckedChange = {
                     keyboardAutoPanning = it
-                    LauncherPreferences.DEFAULT_PREF.edit { putBoolean("keyboardAutoPanning", it) }
+                    LauncherPreferences.prefs.edit { putBoolean("keyboardAutoPanning", it) }
                     LauncherPreferences.loadPreferences(context)
                 }
             )

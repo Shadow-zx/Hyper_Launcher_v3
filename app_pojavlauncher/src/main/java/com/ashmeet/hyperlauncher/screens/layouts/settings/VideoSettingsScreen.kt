@@ -31,7 +31,7 @@ import com.ashmeet.hyperlauncher.screens.layouts.settings.preferences.SettingsSl
 import com.ashmeet.hyperlauncher.screens.layouts.settings.preferences.SettingsSwitchItem
 import com.ashmeet.hyperlauncher.screens.layouts.settings.preferences.SingleChoiceDialog
 import net.ashmeet.hyperlauncher.R
-import com.ashmeet.hyperlauncher.prefs.LauncherPreferences
+import com.ashmeet.hyperlauncher.LauncherPreference.Preference.LauncherPreferences
 import net.kdt.pojavlaunch.utils.RendererCompatUtil
 
 @Composable
@@ -81,7 +81,7 @@ fun VideoSettingsScreen(
                     checked = ignoreNotch,
                     onCheckedChange = {
                         ignoreNotch = it
-                        LauncherPreferences.DEFAULT_PREF.edit { putBoolean("ignoreNotch", it) }
+                        LauncherPreferences.prefs.edit { putBoolean("ignoreNotch", it) }
                         LauncherPreferences.loadPreferences(context)
                     }
                 )
@@ -96,7 +96,7 @@ fun VideoSettingsScreen(
                     warningTooltip = "Disabling edge-to-edge display may cause layout issues on some devices",
                     onCheckedChange = {
                         fullscreenLauncher = it
-                        LauncherPreferences.DEFAULT_PREF.edit { putBoolean("fullscreen_launcher", it) }
+                        LauncherPreferences.prefs.edit { putBoolean("fullscreen_launcher", it) }
                         LauncherPreferences.loadPreferences(context)
                     }
                 )
@@ -111,7 +111,7 @@ fun VideoSettingsScreen(
                     valueRange = integerResource(R.integer.resolution_seekbar_min).toFloat()..100f,
                     onValueChange = {
                         resolutionRatio = it
-                        LauncherPreferences.DEFAULT_PREF.edit { putInt("resolutionRatio", it.toInt()) }
+                        LauncherPreferences.prefs.edit { putInt("resolutionRatio", it.toInt()) }
                         LauncherPreferences.loadPreferences(context)
                     },
                     valueSuffix = "%"
@@ -129,7 +129,7 @@ fun VideoSettingsScreen(
                     warningTooltip = "Surface View rendering might be unstable on some devices and could lead to graphical glitches.",
                     onCheckedChange = {
                         alternateSurface = it
-                        LauncherPreferences.DEFAULT_PREF.edit { putBoolean("alternate_surface", it) }
+                        LauncherPreferences.prefs.edit { putBoolean("alternate_surface", it) }
                         LauncherPreferences.loadPreferences(context)
                     }
                 )
@@ -144,7 +144,7 @@ fun VideoSettingsScreen(
                     checked = forceVsync,
                     onCheckedChange = {
                         forceVsync = it
-                        LauncherPreferences.DEFAULT_PREF.edit { putBoolean("force_vsync", it) }
+                        LauncherPreferences.prefs.edit { putBoolean("force_vsync", it) }
                         LauncherPreferences.loadPreferences(context)
                     }
                 )
@@ -159,7 +159,7 @@ fun VideoSettingsScreen(
                         checked = sustainedPerformance,
                         onCheckedChange = {
                             sustainedPerformance = it
-                            LauncherPreferences.DEFAULT_PREF.edit { putBoolean("sustainedPerformance", it) }
+                            LauncherPreferences.prefs.edit { putBoolean("sustainedPerformance", it) }
                             LauncherPreferences.loadPreferences(context)
                         }
                     )
@@ -181,7 +181,7 @@ fun VideoSettingsScreen(
                             checked = vsyncInZink,
                             onCheckedChange = {
                                 vsyncInZink = it
-                                LauncherPreferences.DEFAULT_PREF.edit { putBoolean("vsync_in_zink", it) }
+                                LauncherPreferences.prefs.edit { putBoolean("vsync_in_zink", it) }
                                 LauncherPreferences.loadPreferences(context)
                             }
                         )
@@ -202,7 +202,7 @@ fun VideoSettingsScreen(
                             checked = useAngle,
                             onCheckedChange = {
                                 useAngle = it
-                                LauncherPreferences.DEFAULT_PREF.edit { putBoolean("use_angle", it) }
+                                LauncherPreferences.prefs.edit { putBoolean("use_angle", it) }
                                 LauncherPreferences.loadPreferences(context)
                             }
                         )
@@ -219,7 +219,7 @@ fun VideoSettingsScreen(
                             checked = zinkForceLegacy,
                             onCheckedChange = {
                                 zinkForceLegacy = it
-                                LauncherPreferences.DEFAULT_PREF.edit { putBoolean("zinkForceLegacy", it) }
+                                LauncherPreferences.prefs.edit { putBoolean("zinkForceLegacy", it) }
                                 LauncherPreferences.loadPreferences(context)
                             }
                         )
@@ -238,7 +238,7 @@ fun VideoSettingsScreen(
             selectedValue = renderer,
             onValueChange = { newValue ->
                 renderer = newValue
-                LauncherPreferences.DEFAULT_PREF.edit { putString("renderer", newValue) }
+                LauncherPreferences.prefs.edit { putString("renderer", newValue) }
                 LauncherPreferences.loadPreferences(context)
             },
             onDismiss = { showRendererDialog = false }

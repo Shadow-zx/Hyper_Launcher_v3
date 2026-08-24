@@ -75,7 +75,7 @@ import net.kdt.pojavlaunch.instances.DisplayInstance
 import net.kdt.pojavlaunch.instances.Instance
 import net.kdt.pojavlaunch.instances.InstanceIconProvider
 import net.kdt.pojavlaunch.instances.Instances
-import com.ashmeet.hyperlauncher.prefs.LauncherPreferences
+import com.ashmeet.hyperlauncher.LauncherPreference.Preference.LauncherPreferences
 import com.ashmeet.hyperlauncher.screens.layouts.settings.layouts.CardPosition
 import com.ashmeet.hyperlauncher.screens.layouts.settings.layouts.SettingsCard
 import com.ashmeet.hyperlauncher.utils.SkinUtils
@@ -106,12 +106,12 @@ fun MainMenuFragmentCompose(
         DisposableEffect(Unit) {
             val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
                 if (key == "hide_sidebar") {
-                    hideActionButtons = LauncherPreferences.DEFAULT_PREF.getBoolean("hide_sidebar", false)
+                    hideActionButtons = LauncherPreferences.prefs.getBoolean("hide_sidebar", false)
                 }
             }
-            LauncherPreferences.DEFAULT_PREF.registerOnSharedPreferenceChangeListener(listener)
+            LauncherPreferences.prefs.registerOnSharedPreferenceChangeListener(listener)
             onDispose {
-                LauncherPreferences.DEFAULT_PREF.unregisterOnSharedPreferenceChangeListener(listener)
+                LauncherPreferences.prefs.unregisterOnSharedPreferenceChangeListener(listener)
             }
         }
     }

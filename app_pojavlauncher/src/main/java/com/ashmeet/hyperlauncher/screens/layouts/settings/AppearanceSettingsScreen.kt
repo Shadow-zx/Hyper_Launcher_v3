@@ -39,7 +39,7 @@ import com.ashmeet.hyperlauncher.screens.layouts.settings.preferences.PointerHot
 import com.ashmeet.hyperlauncher.screens.layouts.settings.preferences.SingleChoiceDialog
 import net.ashmeet.hyperlauncher.R
 import net.kdt.pojavlaunch.Tools
-import com.ashmeet.hyperlauncher.prefs.LauncherPreferences
+import com.ashmeet.hyperlauncher.LauncherPreference.Preference.LauncherPreferences
 import net.kdt.pojavlaunch.colorselector.ColorSelector
 import java.io.File
 import java.io.FileOutputStream
@@ -127,7 +127,7 @@ fun AppearanceSettingsScreen(
                     checked = isCustomTheme,
                     onCheckedChange = {
                         isCustomTheme = it
-                        LauncherPreferences.DEFAULT_PREF.edit { putBoolean("app_custom_theme", it) }
+                        LauncherPreferences.prefs.edit { putBoolean("app_custom_theme", it) }
                         LauncherPreferences.PREF_CUSTOM_THEME = it
                         LauncherPreferences.loadPreferences(context)
                     }
@@ -144,7 +144,7 @@ fun AppearanceSettingsScreen(
                             if (parent != null) {
                                 val colorSelector = ColorSelector(context, parent) { color ->
                                     themeColor = color
-                                    LauncherPreferences.DEFAULT_PREF.edit { putInt("app_theme_color", color) }
+                                    LauncherPreferences.prefs.edit { putInt("app_theme_color", color) }
                                     LauncherPreferences.PREF_THEME_COLOR = color
                                 }
                                 colorSelector.setAlphaEnabled(false)
@@ -173,7 +173,7 @@ fun AppearanceSettingsScreen(
                     checked = hideSidebar,
                     onCheckedChange = {
                         hideSidebar = it
-                        LauncherPreferences.DEFAULT_PREF.edit { putBoolean("hide_sidebar", it) }
+                        LauncherPreferences.prefs.edit { putBoolean("hide_sidebar", it) }
                         LauncherPreferences.PREF_HIDE_SIDEBAR = it
                     }
                 )
@@ -188,7 +188,7 @@ fun AppearanceSettingsScreen(
                     valueRange = 10f..100f,
                     onValueChange = {
                         drawerSizePerc = it
-                        LauncherPreferences.DEFAULT_PREF.edit { putFloat("drawer_pull_size_perc", it) }
+                        LauncherPreferences.prefs.edit { putFloat("drawer_pull_size_perc", it) }
                         LauncherPreferences.PREF_DRAWER_PULL_SIZE_PERC = it
                     },
                     valueSuffix = "%"
@@ -202,7 +202,7 @@ fun AppearanceSettingsScreen(
                     valueRange = 0f..100f,
                     onValueChange = {
                         drawerBgOpacity = it
-                        LauncherPreferences.DEFAULT_PREF.edit { putInt("drawer_pull_opacity", it.toInt()) }
+                        LauncherPreferences.prefs.edit { putInt("drawer_pull_opacity", it.toInt()) }
                         LauncherPreferences.PREF_DRAWER_PULL_BG_OPACITY = it.toInt()
                     },
                     valueSuffix = "%"
@@ -216,7 +216,7 @@ fun AppearanceSettingsScreen(
                     valueRange = 0f..100f,
                     onValueChange = {
                         drawerIconOpacity = it
-                        LauncherPreferences.DEFAULT_PREF.edit { putInt("drawer_pull_icon_opacity", it.toInt()) }
+                        LauncherPreferences.prefs.edit { putInt("drawer_pull_icon_opacity", it.toInt()) }
                         LauncherPreferences.PREF_DRAWER_PULL_ICON_OPACITY = it.toInt()
                     },
                     valueSuffix = "%"
@@ -229,7 +229,7 @@ fun AppearanceSettingsScreen(
                     checked = drawerHoldToMove,
                     onCheckedChange = {
                         drawerHoldToMove = it
-                        LauncherPreferences.DEFAULT_PREF.edit { putBoolean("drawer_pull_hold_to_move", it) }
+                        LauncherPreferences.prefs.edit { putBoolean("drawer_pull_hold_to_move", it) }
                         LauncherPreferences.PREF_DRAWER_PULL_HOLD_TO_MOVE = it
                     }
                 )
@@ -241,7 +241,7 @@ fun AppearanceSettingsScreen(
                     checked = drawerBackground,
                     onCheckedChange = {
                         drawerBackground = it
-                        LauncherPreferences.DEFAULT_PREF.edit { putBoolean("drawer_pull_background", it) }
+                        LauncherPreferences.prefs.edit { putBoolean("drawer_pull_background", it) }
                         LauncherPreferences.PREF_DRAWER_PULL_BACKGROUND = it
                     }
                 )
@@ -257,7 +257,7 @@ fun AppearanceSettingsScreen(
                                     input.copyTo(output)
                                 }
                             }
-                            LauncherPreferences.DEFAULT_PREF.edit { putString("drawer_pull_icon_path", destination.absolutePath) }
+                            LauncherPreferences.prefs.edit { putString("drawer_pull_icon_path", destination.absolutePath) }
                             LauncherPreferences.PREF_DRAWER_PULL_ICON_PATH = destination.absolutePath
                             drawerIconPath = destination.absolutePath
                         } catch (e: Exception) {
@@ -277,7 +277,7 @@ fun AppearanceSettingsScreen(
                     title = "Reset icon",
                     icon = Icons.Rounded.Restore,
                     onClick = {
-                        LauncherPreferences.DEFAULT_PREF.edit { remove("drawer_pull_icon_path") }
+                        LauncherPreferences.prefs.edit { remove("drawer_pull_icon_path") }
                         LauncherPreferences.PREF_DRAWER_PULL_ICON_PATH = null
                         drawerIconPath = null
                     }
@@ -293,7 +293,7 @@ fun AppearanceSettingsScreen(
                     valueRange = 25f..300f,
                     onValueChange = {
                         mouseScale = it
-                        LauncherPreferences.DEFAULT_PREF.edit { putInt("mousescale", it.toInt()) }
+                        LauncherPreferences.prefs.edit { putInt("mousescale", it.toInt()) }
                         LauncherPreferences.loadPreferences(context)
                     },
                     valueSuffix = "%"
@@ -309,7 +309,7 @@ fun AppearanceSettingsScreen(
                                     input.copyTo(output)
                                 }
                             }
-                            LauncherPreferences.DEFAULT_PREF.edit { putString("pointer_icon_path", destination.absolutePath) }
+                            LauncherPreferences.prefs.edit { putString("pointer_icon_path", destination.absolutePath) }
                             LauncherPreferences.PREF_POINTER_ICON_PATH = destination.absolutePath
                             pointerIconPath = destination.absolutePath
                         } catch (e: Exception) {
@@ -337,7 +337,7 @@ fun AppearanceSettingsScreen(
                     title = "Reset pointer",
                     icon = Icons.Rounded.Restore,
                     onClick = {
-                        LauncherPreferences.DEFAULT_PREF.edit {
+                        LauncherPreferences.prefs.edit {
                             remove("pointer_icon_path")
                             remove("pointer_hotspot_x")
                             remove("pointer_hotspot_y")
@@ -363,7 +363,7 @@ fun AppearanceSettingsScreen(
             selectedValue = appTheme,
             onValueChange = { newValue ->
                 appTheme = newValue
-                LauncherPreferences.DEFAULT_PREF.edit { putString("app_theme", newValue) }
+                LauncherPreferences.prefs.edit { putString("app_theme", newValue) }
                 LauncherPreferences.loadPreferences(context)
             },
             onDismiss = { showThemeDialog = false }
@@ -378,7 +378,7 @@ fun AppearanceSettingsScreen(
             selectedValue = screenTransition,
             onValueChange = { newValue ->
                 screenTransition = newValue
-                LauncherPreferences.DEFAULT_PREF.edit { putString("screen_transition", newValue) }
+                LauncherPreferences.prefs.edit { putString("screen_transition", newValue) }
                 LauncherPreferences.loadPreferences(context)
             },
             onDismiss = { showTransitionDialog = false }
@@ -394,7 +394,7 @@ fun AppearanceSettingsScreen(
             onConfirm = { x, y ->
                 pointerHotspotX = x
                 pointerHotspotY = y
-                LauncherPreferences.DEFAULT_PREF.edit {
+                LauncherPreferences.prefs.edit {
                     putInt("pointer_hotspot_x", x.toInt())
                     putInt("pointer_hotspot_y", y.toInt())
                 }

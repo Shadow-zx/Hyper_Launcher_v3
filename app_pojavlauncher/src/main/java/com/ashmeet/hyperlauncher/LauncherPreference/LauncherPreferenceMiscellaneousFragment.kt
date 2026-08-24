@@ -1,4 +1,4 @@
-package com.ashmeet.hyperlauncher.fragments.LauncherPreference
+package com.ashmeet.hyperlauncher.LauncherPreference
 
 import android.Manifest
 import android.content.SharedPreferences
@@ -17,7 +17,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import net.ashmeet.hyperlauncher.R
-import com.ashmeet.hyperlauncher.prefs.LauncherPreferences
+import com.ashmeet.hyperlauncher.LauncherPreference.Preference.LauncherPreferences
 import com.ashmeet.hyperlauncher.screens.layouts.settings.MiscSettingsScreen
 import com.ashmeet.hyperlauncher.theme.PojavTheme
 import net.kdt.pojavlaunch.tasks.DataMigrator
