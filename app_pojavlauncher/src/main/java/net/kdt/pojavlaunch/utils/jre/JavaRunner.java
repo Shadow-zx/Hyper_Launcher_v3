@@ -10,14 +10,13 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.ashmeet.hyperlauncher.prefs.LauncherPreferences;
-
 import net.kdt.pojavlaunch.AWTCanvasView;
 import net.kdt.pojavlaunch.Architecture;
 import net.kdt.pojavlaunch.Tools;
 import net.kdt.pojavlaunch.multirt.MultiRTUtils;
 import net.kdt.pojavlaunch.multirt.Runtime;
 import net.kdt.pojavlaunch.plugins.NativePluginManager;
+import com.ashmeet.hyperlauncher.prefs.LauncherPreferences;
 import net.kdt.pojavlaunch.utils.JREUtils;
 
 import java.io.File;
@@ -105,8 +104,7 @@ public class JavaRunner {
                 "-Djava.io.tmpdir=" + Tools.DIR_CACHE.getAbsolutePath(),
                 "-Djna.boot.library.path=" + NATIVE_LIB_DIR,
                 "-Duser.home=" + Tools.DIR_GAME_HOME,
-                "-Duser.language=en",
-                "-Duser.country=US",
+                "-Duser.language=" + System.getProperty("user.language"),
                 "-Dos.name=Linux",
                 "-Dos.version=Android-" + Build.VERSION.RELEASE,
                 "-Dpojav.path.minecraft=" + Tools.DIR_GAME_NEW,
@@ -115,7 +113,6 @@ public class JavaRunner {
 
                 "-Dorg.lwjgl.vulkan.libname=libvulkan.so",
                 "-Dorg.lwjgl.spvc.libname=spirv-cross-c-shared",
-                "-Dorg.lwjgl.sdl.libname=" + new File(NATIVE_LIB_DIR, "libSDL3.so").getAbsolutePath(),
                 "-Dorg.lwjgl.system.allocator=system",
                 //LWJGL 3 DEBUG FLAGS
                 //"-Dorg.lwjgl.util.Debug=true",
@@ -295,9 +292,9 @@ public class JavaRunner {
             classpathBuilder.append(entry);
         }
         runtimeArgs.add(classpathBuilder.toString());
-        // runtimeArgs.addAll(LaunchArgs.getNativePluginArgs());
 
-        // JREUtils.initializeHooks();
+
+        JREUtils.initializeHooks();
 
         setImmutableEnvVars(runtimeHomeDir);
         relocateLdLibPath(vmPath, null);

@@ -159,8 +159,8 @@ public class GameRunner {
         if(LauncherPreferences.PREF_RAM_ALLOCATION > freeDeviceMemory) {
             int finalDeviceMemory = freeDeviceMemory;
             LifecycleAwareAlertDialog.DialogCreator dialogCreator = (dialog, builder) ->
-                builder.setMessage(activity.getString(localeString, finalDeviceMemory, LauncherPreferences.PREF_RAM_ALLOCATION))
-                        .setPositiveButton(android.R.string.ok, (d, w)->{});
+                    builder.setMessage(activity.getString(localeString, finalDeviceMemory, LauncherPreferences.PREF_RAM_ALLOCATION))
+                            .setPositiveButton(android.R.string.ok, (d, w)->{});
 
             if(LifecycleAwareAlertDialog.haltOnDialog(activity.getLifecycle(), activity, dialogCreator)) {
                 return; // If the dialog's lifecycle has ended, return without
@@ -173,13 +173,12 @@ public class GameRunner {
 
         // Switch renderer to GL4ES when running a compat context version on LTW
         if(isCompatContext(versionInfo) && !hasAngelica(gamedir) && rendererName.equals("opengles3_ltw")) {
-            instance.renderer = rendererName = "holy";
+            instance.renderer = rendererName = "opengles2";
             instance.write();
         }
 
-        boolean isGl4es = rendererName.equals("opengles2") || rendererName.equals("holy");
+        boolean isGl4es = rendererName.equals("opengles2");
         boolean ltwSupported = RendererCompatUtil.getCompatibleRenderers(activity).rendererIds.contains("opengles3_ltw");
-
         // Block Sodium from running with GL4ES on 1.17+
         if(!isCompatContext(versionInfo) && isGl4es && hasSodium(gamedir)) {
             rendererName = switchLtw(ltwSupported, instance, activity, R.string.compat_sodium_not_supported);
@@ -290,7 +289,7 @@ public class GameRunner {
         String rendererLibrary = JREUtils.loadGraphicsLibrary(rendererName);
         if(rendererLibrary == null) {
             Log.i("GameRunner", "Falling back to GL4ES 1.1.4");
-            rendererName = "holy";
+            rendererName = "opengles2";
             rendererLibrary = JREUtils.loadGraphicsLibrary(rendererName);
         }
         if(rendererLibrary == null) {
@@ -309,7 +308,7 @@ public class GameRunner {
             JavaRunner.startJvm(runtime, javaArgList, launchClassPath, versionInfo.mainClass, launchArgs);
         }catch (VMLoadException e) {
             LifecycleAwareAlertDialog.DialogCreator dialogCreator = (dialog, builder) ->
-                builder.setMessage(e.toString(activity)).setPositiveButton(android.R.string.ok, (d, w)->{});
+                    builder.setMessage(e.toString(activity)).setPositiveButton(android.R.string.ok, (d, w)->{});
 
             if(LifecycleAwareAlertDialog.haltOnDialog(activity.getLifecycle(), activity, dialogCreator)) {
                 return;

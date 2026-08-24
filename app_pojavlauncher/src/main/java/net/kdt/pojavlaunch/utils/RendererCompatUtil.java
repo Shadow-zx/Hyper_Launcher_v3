@@ -59,7 +59,7 @@ public class RendererCompatUtil {
 
     /** Checks if the renderer Id is compatible with the current device */
     public static boolean checkRendererCompatible(Context context, String rendererName) {
-         return getCompatibleRenderers(context).rendererIds.contains(rendererName);
+        return getCompatibleRenderers(context).rendererIds.contains(rendererName);
     }
 
     /** Releases the cache of compatible renderers. */

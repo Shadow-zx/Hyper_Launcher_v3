@@ -28,7 +28,7 @@ import net.ashmeet.hyperlauncher.R;
 
 public class NewJREUtil {
     private static final String DOWNLOAD_URL = "https://mojolauncher.github.io/jre-download/";
-    
+
     private static String getRemoteRuntimeVersion(InternalRuntime internalRuntime) throws IOException{
         return DownloadUtils.downloadString(DOWNLOAD_URL+internalRuntime.path+"/version");
     }
@@ -63,7 +63,7 @@ public class NewJREUtil {
     }
 
     private static class RuntimeDownloaderVerifier {
-        
+
         private final Map<String, byte[]> mSignatures;
         private final String mRuntimePath;
         private final byte[] mDownloadBuffer = new byte[8192];

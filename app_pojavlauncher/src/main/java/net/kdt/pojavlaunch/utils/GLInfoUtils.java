@@ -181,9 +181,9 @@ public class GLInfoUtils {
         public boolean isAdreno500Lower(){
             return vendor.equals("Qualcomm") &&
                     (renderer.contains("Adreno (TM) 5") ||
-                    renderer.contains("Adreno (TM) 4") ||
-                    renderer.contains("Adreno (TM) 3") ||
-                    renderer.contains("Adreno (TM) 2"));
+                            renderer.contains("Adreno (TM) 4") ||
+                            renderer.contains("Adreno (TM) 3") ||
+                            renderer.contains("Adreno (TM) 2"));
         }
 
         /**

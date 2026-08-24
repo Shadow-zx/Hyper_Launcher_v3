@@ -1,10 +1,10 @@
 package net.kdt.pojavlaunch;
 
+import static net.kdt.pojavlaunch.MainActivity.touchCharInput;
+import static net.kdt.pojavlaunch.utils.MCOptionUtils.getMcScale;
 import static net.kdt.pojavlaunch.CallbackBridge.sendMouseButton;
 import static net.kdt.pojavlaunch.CallbackBridge.windowHeight;
 import static net.kdt.pojavlaunch.CallbackBridge.windowWidth;
-import static net.kdt.pojavlaunch.MainActivity.touchCharInput;
-import static net.kdt.pojavlaunch.utils.MCOptionUtils.getMcScale;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -21,16 +21,15 @@ import android.view.ViewGroup;
 
 import androidx.annotation.RequiresApi;
 
-import com.ashmeet.hyperlauncher.prefs.LauncherPreferences;
-
 import net.kdt.pojavlaunch.customcontrols.ControlLayout;
 import net.kdt.pojavlaunch.customcontrols.gamepad.DefaultDataProvider;
-import net.kdt.pojavlaunch.customcontrols.gamepad.DirectGamepad;
 import net.kdt.pojavlaunch.customcontrols.gamepad.Gamepad;
+import net.kdt.pojavlaunch.customcontrols.gamepad.DirectGamepad;
 import net.kdt.pojavlaunch.customcontrols.mouse.AndroidPointerCapture;
 import net.kdt.pojavlaunch.customcontrols.mouse.InGUIEventProcessor;
 import net.kdt.pojavlaunch.customcontrols.mouse.InGameEventProcessor;
 import net.kdt.pojavlaunch.customcontrols.mouse.TouchEventProcessor;
+import com.ashmeet.hyperlauncher.prefs.LauncherPreferences;
 import net.kdt.pojavlaunch.render.SurfaceProvider;
 import net.kdt.pojavlaunch.render.SurfaceViewSurfaceProvider;
 import net.kdt.pojavlaunch.render.TextureViewSurfaceProvider;
@@ -313,23 +312,6 @@ public class LauncherGLSurface extends View implements GrabListener, GamepadEnab
         // screen dimensions.
         int newWidth = Tools.getDisplayFriendlyRes(getWidth(), LauncherPreferences.PREF_SCALE_FACTOR);
         int newHeight = Tools.getDisplayFriendlyRes(getHeight(), LauncherPreferences.PREF_SCALE_FACTOR);
-
-        // Cap to display dimensions
-        android.util.DisplayMetrics metrics = getContext().getResources().getDisplayMetrics();
-        newWidth = Math.min(newWidth, metrics.widthPixels);
-        newHeight = Math.min(newHeight, metrics.heightPixels);
-
-        if ("holy".equals(LauncherPreferences.PREF_RENDERER)) {
-            if (newWidth > 2048 || newHeight > 2048) {
-                float ratio = Math.min(2048f / newWidth, 2048f / newHeight);
-                newWidth = (int) (newWidth * ratio);
-                newHeight = (int) (newHeight * ratio);
-
-                if (newWidth % 2 != 0) newWidth--;
-                if (newHeight % 2 != 0) newHeight--;
-            }
-        }
-
         if (newHeight < 1 || newWidth < 1) {
             Log.e("MGLSurface", String.format("Impossible resolution : %dx%d", newWidth, newHeight));
             return;
