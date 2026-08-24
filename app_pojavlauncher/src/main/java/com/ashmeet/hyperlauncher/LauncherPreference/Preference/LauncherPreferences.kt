@@ -39,7 +39,7 @@ object LauncherPreferences {
     var PREF_LONGPRESS_TRIGGER = 300
 
     @JvmField
-    var PREF_DEFAULTCTRL_PATH: String = Tools.CTRLDEF_FILE
+    var PREF_DEFAULTCTRL_PATH: String = ""
 
     @JvmField
     var PREF_CUSTOM_JAVA_ARGS: String? = null
@@ -218,7 +218,10 @@ object LauncherPreferences {
         PREF_MOUSESPEED = pref.getInt("mousespeed", 100).toFloat() / 100f
         PREF_IGNORE_NOTCH = pref.getBoolean("ignoreNotch", false)
         PREF_LONGPRESS_TRIGGER = pref.getInt("timeLongPressTrigger", 300)
-        PREF_DEFAULTCTRL_PATH = pref.getString("defaultCtrl", Tools.CTRLDEF_FILE) ?: Tools.CTRLDEF_FILE
+        PREF_DEFAULTCTRL_PATH = pref.getString("defaultCtrl", "") ?: ""
+        if (PREF_DEFAULTCTRL_PATH.isEmpty()) {
+            PREF_DEFAULTCTRL_PATH = Tools.CTRLDEF_FILE
+        }
         PREF_FORCE_ENGLISH = pref.getBoolean("force_english", false)
         PREF_DISABLE_GESTURES = pref.getBoolean("disableGestures", false)
         PREF_DISABLE_SWAP_HAND = pref.getBoolean("disableDoubleTap", false)

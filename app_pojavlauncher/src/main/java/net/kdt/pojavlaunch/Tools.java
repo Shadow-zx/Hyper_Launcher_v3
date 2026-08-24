@@ -90,7 +90,7 @@ import java.util.Objects;
 public final class Tools {
     public static final String MAVEN_CENTRAL = "https://maven-central-eu.storage-download.googleapis.com/maven2/";
     public  static final float BYTE_TO_MB = 1024 * 1024;
-    public static final Handler MAIN_HANDLER = new Handler(Looper.getMainLooper());
+    public static Handler MAIN_HANDLER;
     public static String APP_NAME = "HyperLauncher";
 
     public static final Gson GLOBAL_GSON = new GsonBuilder().setPrettyPrinting().create();
@@ -165,6 +165,9 @@ public final class Tools {
      * @param ctx the context for initialization.
      */
     public static void initEarlyConstants(Context ctx) {
+        if (MAIN_HANDLER == null) {
+            MAIN_HANDLER = new Handler(Looper.getMainLooper());
+        }
         DIR_CACHE = ctx.getCacheDir();
         DIR_DATA = ctx.getFilesDir().getParent();
         MULTIRT_HOME = DIR_DATA + "/runtimes";
