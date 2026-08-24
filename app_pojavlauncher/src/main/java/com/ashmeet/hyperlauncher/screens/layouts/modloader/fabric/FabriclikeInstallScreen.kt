@@ -29,11 +29,12 @@ fun FabriclikeInstallScreen(
     gameVersions: List<FabricVersion>,
     loaderVersions: List<FabricVersion>,
     onBack: () -> Unit,
-    onInstall: (gameVersion: String, loaderVersion: String) -> Unit
+    onInstall: (gameVersion: String, loaderVersion: String, isHyperClientEnabled: Boolean) -> Unit
 ) {
     var selectedGameVersion by remember { mutableStateOf<FabricVersion?>(null) }
     var selectedLoaderVersion by remember { mutableStateOf<FabricVersion?>(null) }
     var onlyStable by remember { mutableStateOf(true) }
+    var isHyperClientEnabled by remember { mutableStateOf(false) }
 
     val filteredGameVersions = remember(gameVersions, onlyStable) {
         if (onlyStable) gameVersions.filter { it.stable } else gameVersions
@@ -144,6 +145,33 @@ fun FabriclikeInstallScreen(
                         )
                     }
 
+                    if (loaderName.lowercase() == "fabric") {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { isHyperClientEnabled = !isHyperClientEnabled }
+                                .padding(8.dp)
+                        ) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = "Hyper Client",
+                                    style = MaterialTheme.typography.bodyLarge
+                                )
+                                Text(
+                                    text = "Installs Hyper Client",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                            DefaultSwitch(
+                                checked = isHyperClientEnabled,
+                                onCheckedChange = { isHyperClientEnabled = it }
+                            )
+                        }
+                    }
+
                     Spacer(modifier = Modifier.height(8.dp))
 
                     Button(
@@ -151,7 +179,7 @@ fun FabriclikeInstallScreen(
                             val gv = selectedGameVersion?.version
                             val lv = selectedLoaderVersion?.version
                             if (gv != null && lv != null) {
-                                onInstall(gv, lv)
+                                onInstall(gv, lv, isHyperClientEnabled)
                             }
                         },
                         enabled = !isLoading && !isInstalling && selectedGameVersion != null && selectedLoaderVersion != null,

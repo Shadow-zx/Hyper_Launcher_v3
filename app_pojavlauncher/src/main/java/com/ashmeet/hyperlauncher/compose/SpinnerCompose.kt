@@ -83,6 +83,10 @@ fun AccountSpinnerCompose(
             override fun onLoginDone(account: Account?) {
                 loginProgress = 0f
                 isAuthenticating = false
+                if (account != null) {
+                    Accounts.setCurrent(account)
+                    ExtraCore.setValue(ExtraConstants.REFRESH_ACCOUNT_SPINNER, true)
+                }
             }
 
             override fun onLoginError(errorMessage: Throwable?) {
@@ -180,8 +184,8 @@ fun AccountSpinnerCompose(
             override fun onValueSet(key: String, value: Array<String>): Boolean {
                 try {
                     val account = Accounts.create { acc: Account -> acc.username = value[0] }
+                    Accounts.setCurrent(account)
                     loginListener.onLoginDone(account)
-                    reloadAccounts(true)
                 } catch (e: IOException) {
                     loginListener.onLoginError(e)
                 }

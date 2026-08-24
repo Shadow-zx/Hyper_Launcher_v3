@@ -25,6 +25,9 @@ import net.kdt.pojavlaunch.modloaders.ModloaderListenerProxy
 import net.kdt.pojavlaunch.progresskeeper.ProgressKeeper
 import java.io.File
 import java.io.IOException
+import net.kdt.pojavlaunch.modloaders.modpacks.api.ModrinthService
+import java.net.URL
+import android.util.Log
 
 abstract class FabriclikeInstallFragment(
     private val mFabriclikeUtils: FabriclikeUtils,
@@ -53,8 +56,8 @@ abstract class FabriclikeInstallFragment(
                         gameVersions = gameVersions,
                         loaderVersions = loaderVersions,
                         onBack = { parentFragmentManager.popBackStack() },
-                        onInstall = { gameVersion, loaderVersion ->
-                            performInstallation(gameVersion, loaderVersion)
+                        onInstall = { gameVersion, loaderVersion, isHyperClientEnabled ->
+                            performInstallation(gameVersion, loaderVersion, isHyperClientEnabled)
                         }
                     )
                 }
@@ -92,7 +95,7 @@ abstract class FabriclikeInstallFragment(
         }
     }
 
-    private fun performInstallation(gameVersion: String, loaderVersion: String) {
+    private fun performInstallation(gameVersion: String, loaderVersion: String, isHyperClientEnabled: Boolean) {
         if (ProgressKeeper.hasOngoingTasks()) {
             Toast.makeText(requireContext(), R.string.tasks_ongoing, Toast.LENGTH_LONG).show()
             return
@@ -111,11 +114,16 @@ abstract class FabriclikeInstallFragment(
                     }
                     return@launch
                 }
-                Instances.createInstance({ i ->
+                val instance = Instances.createInstance({ i ->
                     i.name = mFabriclikeUtils.name
                     i.icon = mFabriclikeUtils.iconName
                     i.versionId = versionId
                 }, versionId)
+
+                if (isHyperClientEnabled && mFabriclikeUtils.name.lowercase() == "fabric") {
+                    installHyperClientMods(instance, gameVersion)
+                }
+
                 withContext(Dispatchers.Main) {
                     getListenerProxy()?.onDownloadFinished(null)
                 }
@@ -123,6 +131,35 @@ abstract class FabriclikeInstallFragment(
                 withContext(Dispatchers.Main) {
                     Tools.showErrorRemote(e)
                 }
+            }
+        }
+    }
+
+    private suspend fun installHyperClientMods(instance: net.kdt.pojavlaunch.instances.Instance, gameVersion: String) {
+        val modsFolder = File(instance.gameDirectory, "mods")
+        modsFolder.mkdirs()
+
+        val modsToInstall = listOf("hyperclient", "fabric-api", "modmenu")
+        modsToInstall.forEach { modId ->
+            try {
+                val versions = ModrinthService.getProjectVersions(modId)
+                val compatibleVersion = versions.firstOrNull { v ->
+                    v.gameVersions.contains(gameVersion) && v.loaders.any { it.equals("fabric", ignoreCase = true) }
+                }
+
+                if (compatibleVersion != null) {
+                    val url = URL(compatibleVersion.downloadUrl)
+                    val fileName = compatibleVersion.downloadUrl.substringAfterLast("/")
+                    val destFile = File(modsFolder, fileName)
+
+                    url.openStream().use { input ->
+                        destFile.outputStream().use { output ->
+                            input.copyTo(output)
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("FabriclikeInstall", "Failed to install mod $modId", e)
             }
         }
     }

@@ -34,7 +34,7 @@
     -->
 
     <!-- MCLauncherActivity: Tabs -->
-    <string name="mcl_tab_wiki">Wiki</string>
+    <string name="mcl_tab_web">Website</string>
 
     <!-- MCLauncherActivity: Account status -->
 

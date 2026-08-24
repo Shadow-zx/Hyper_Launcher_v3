@@ -109,6 +109,7 @@ public class MicrosoftBackgroundLogin implements BackgroundLogin{
     public void createAccount(@NonNull LoginListener loginListener, String code) {
         acquireAccountDetails(loginListener, ()->{
             Account account = Accounts.create(this::fillAccount);
+            Accounts.setCurrent(account);
             Tools.runOnUiThread(() -> loginListener.onLoginDone(account));
             return null;
         }, code, false);

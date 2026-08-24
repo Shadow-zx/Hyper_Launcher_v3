@@ -201,7 +201,7 @@ fun MainMenuFragmentCompose(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(60.dp),
-                            title = stringResource(id = R.string.mcl_tab_wiki),
+                            title = stringResource(id = R.string.mcl_tab_web),
                             icon = Icons.Rounded.Info,
                             position = CardPosition.TOP,
                             onClick = onWikiClick

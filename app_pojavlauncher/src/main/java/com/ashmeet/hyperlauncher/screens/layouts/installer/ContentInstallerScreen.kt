@@ -82,14 +82,21 @@ private fun isMcVersionCompatible(v1: String, v2: String): Boolean {
     if (v1 == v2) return true
 
     val releaseRegex = Regex("""^1\.\d+(\.\d+)*$""")
-    val r1 = v1.matches(releaseRegex)
-    val r2 = v2.matches(releaseRegex)
+    val isR1 = v1.matches(releaseRegex)
+    val isR2 = v2.matches(releaseRegex)
 
-    // Strict: don't mix release and non-release (snapshots, pre-releases, etc.)
-    if (r1 != r2) return false
+    // Special check for RC, Pre-release, and Snapshots to be extra strict
+    val isNonRelease1 = v1.contains("-rc", ignoreCase = true) || v1.contains("-pre", ignoreCase = true) || v1.contains(Regex("""\d+w\d+[a-z]"""))
+    val isNonRelease2 = v2.contains("-rc", ignoreCase = true) || v2.contains("-pre", ignoreCase = true) || v2.contains(Regex("""\d+w\d+[a-z]"""))
 
-    if (r1) {
-        // Both are releases. Check if they share the same minor version (e.g., 1.21.x)
+    // If one is a stable release and the other is a non-release type, they are incompatible
+    if ((isR1 && isNonRelease2) || (isR2 && isNonRelease1)) return false
+
+    // Strict: don't mix release and non-release strictly defined by regex
+    if (isR1 != isR2) return false
+
+    if (isR1) {
+        // Both are stable releases. Check if they share the same minor version (e.g., 1.21.x)
         val parts1 = v1.split(".")
         val parts2 = v2.split(".")
         if (parts1.size >= 2 && parts2.size >= 2 && parts1[1] == parts2[1]) {
@@ -97,8 +104,9 @@ private fun isMcVersionCompatible(v1: String, v2: String): Boolean {
         }
     }
 
-    // Fallback for snapshots or exact matches (contains is safer for non-standard version strings)
-    return v1.contains(v2) || v2.contains(v1)
+    // For snapshots/RCs/Pre-releases, they must be an exact match (already handled) 
+    // or very closely related, but usually we just want exact matches for them.
+    return false
 }
 
 @Composable
@@ -346,6 +354,7 @@ fun ContentInstallerScreen(
                                 selectedProjectMCVersion = selectedProjectMCVersion,
                                 instanceVersion = instanceVersion,
                                 instanceLoader = instanceLoader,
+                                selectedType = selectedType,
                                 isLoading = loading,
                                 onProjectMCVersionClick = onProjectMCVersionClick,
                                 onVersionClick = onVersionClick
@@ -441,6 +450,7 @@ private fun VersionList(
     selectedProjectMCVersion: String?,
     instanceVersion: String?,
     instanceLoader: String?,
+    selectedType: ContentInstallerType,
     isLoading: Boolean = false,
     onProjectMCVersionClick: (String) -> Unit,
     onVersionClick: (ModrinthVersion) -> Unit
@@ -512,7 +522,10 @@ private fun VersionList(
             ) {
                 items(filteredVersions, key = { it.id }) { version ->
                     val isMCCompatible = instanceVersion != null && version.gameVersions.any { isMcVersionCompatible(instanceVersion, it) }
-                    val isLoaderCompatible = instanceLoader == null || version.loaders.any { it.equals(instanceLoader, ignoreCase = true) }
+                    val isLoaderCompatible = selectedType == ContentInstallerType.RESOURCEPACKS ||
+                            selectedType == ContentInstallerType.SHADERS ||
+                            instanceLoader == null ||
+                            version.loaders.any { it.equals(instanceLoader, ignoreCase = true) }
 
                     VersionItemView(
                         version = version,
