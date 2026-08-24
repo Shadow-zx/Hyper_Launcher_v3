@@ -81,13 +81,23 @@ import kotlinx.coroutines.delay
 private fun isMcVersionCompatible(v1: String, v2: String): Boolean {
     if (v1 == v2) return true
 
-    val parts1 = v1.split(".")
-    val parts2 = v2.split(".")
+    val releaseRegex = Regex("""^1\.\d+(\.\d+)*$""")
+    val r1 = v1.matches(releaseRegex)
+    val r2 = v2.matches(releaseRegex)
 
-    if (parts1.size >= 2 && parts2.size >= 2 && parts1[0] == "1" && parts2[0] == "1") {
-        if (parts1[1] == parts2[1]) return true
+    // Strict: don't mix release and non-release (snapshots, pre-releases, etc.)
+    if (r1 != r2) return false
+
+    if (r1) {
+        // Both are releases. Check if they share the same minor version (e.g., 1.21.x)
+        val parts1 = v1.split(".")
+        val parts2 = v2.split(".")
+        if (parts1.size >= 2 && parts2.size >= 2 && parts1[1] == parts2[1]) {
+            return true
+        }
     }
 
+    // Fallback for snapshots or exact matches (contains is safer for non-standard version strings)
     return v1.contains(v2) || v2.contains(v1)
 }
 

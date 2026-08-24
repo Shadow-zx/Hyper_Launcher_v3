@@ -105,7 +105,7 @@ class ContentInstallerFragment : Fragment() {
                                 }
                             }
 
-                            val regex = Regex("""1\.\d+(\.\d+)?|\d+w\d+[a-z]""")
+                            val regex = Regex("""1\.\d+(\.\d+)*(?:-?[a-zA-Z\d]+)?|\d+w\d+[a-z]""")
                             regex.findAll(id).lastOrNull()?.value ?: id
                         }
                     }
