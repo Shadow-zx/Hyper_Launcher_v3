@@ -121,10 +121,20 @@ fun ExitScreen(
             Column(
                 modifier = Modifier
                     .weight(0.3f)
-                    .fillMaxHeight(),
+                    .fillMaxHeight()
+                    .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_hyper_full),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(80.dp)
+                        .padding(bottom = 16.dp),
+                    tint = MaterialTheme.colorScheme.onSurface
+                )
+
                 Text(
                     text = if (crashReportPath != null) "Game crashed" else title,
                     style = MaterialTheme.typography.titleLarge,
