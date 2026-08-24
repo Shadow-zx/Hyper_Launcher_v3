@@ -36,11 +36,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.InsertDriveFile
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Edit
+import androidx.compose.material.icons.rounded.Download
 import androidx.compose.material.icons.rounded.Folder
 import androidx.compose.material.icons.rounded.FolderOpen
 import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material.icons.rounded.Search
+import androidx.compose.material.icons.rounded.Update
 import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
@@ -106,18 +108,26 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import net.kdt.pojavlaunch.modloaders.modpacks.api.ModrinthService
+import com.ashmeet.hyperlauncher.screens.layouts.installer.models.ModrinthVersion
+import java.net.URL
+import android.util.Log
 
 @Composable
 fun InstanceDirectoryScreen(
     onBack: () -> Unit
 ) {
     val isPreview = LocalInspectionMode.current
-    val instanceRoot = remember {
-        if (isPreview) null else Instances.loadSelectedInstance()?.gameDirectory
+    val selectedInstance = remember {
+        if (isPreview) null else Instances.loadSelectedInstance()
+    }
+    val instanceRoot = remember(selectedInstance) {
+        selectedInstance?.gameDirectory
     }
 
     InstanceDirectoryContent(
         instanceRoot = instanceRoot,
+        selectedInstance = selectedInstance,
         onBack = onBack
     )
 }
@@ -125,6 +135,7 @@ fun InstanceDirectoryScreen(
 @Composable
 fun InstanceDirectoryContent(
     instanceRoot: File?,
+    selectedInstance: net.kdt.pojavlaunch.instances.Instance?,
     onBack: () -> Unit
 ) {
     val context = LocalContext.current
@@ -140,6 +151,46 @@ fun InstanceDirectoryContent(
 
     var searchQuery by remember { mutableStateOf("") }
     var isSearchActive by remember { mutableStateOf(false) }
+
+    val instanceVersion = remember(selectedInstance) {
+        selectedInstance?.let {
+            if (it.versionId == "latest_release" || it.versionId == "latest_snapshot") {
+                return@let null
+            }
+
+            val v = try {
+                Tools.getVersionInfo(it.versionId)
+            } catch (e: Exception) {
+                null
+            }
+            if (v != null && v.inheritsFrom != null) return@let v.inheritsFrom
+
+            val id = it.versionId
+            if (id.contains("-")) {
+                val lastPart = id.substringAfterLast("-")
+                if (lastPart.contains(".") && lastPart.any { it.isDigit() }) {
+                    return@let lastPart
+                }
+            }
+
+            val regex = Regex("""1\.\d+(\.\d+)*(?:-?[a-zA-Z\d]+)?|\d+w\d+[a-z]""")
+            regex.findAll(id).lastOrNull()?.value ?: id
+        }
+    }
+
+    val instanceLoader = remember(selectedInstance) {
+        selectedInstance?.let {
+            val vId = it.versionId.lowercase()
+            when {
+                vId.contains("fabric") -> "fabric"
+                vId.contains("forge") -> "forge"
+                vId.contains("quilt") -> "quilt"
+                vId.contains("neoforge") -> "neoforge"
+                vId.contains("optifine") -> "optifine"
+                else -> null
+            }
+        }
+    }
 
     val loadFiles = { dir: File ->
         isLoading = true
@@ -492,6 +543,8 @@ fun InstanceDirectoryContent(
                                             placementSpec = tween(300)
                                         ),
                                         file = file,
+                                        instanceVersion = instanceVersion,
+                                        instanceLoader = instanceLoader,
                                         onClick = {
                                             if (file.isDirectory) {
                                                 loadFiles(file)
@@ -523,6 +576,8 @@ fun InstanceDirectoryContent(
 fun FileListItem(
     modifier: Modifier = Modifier,
     file: File,
+    instanceVersion: String?,
+    instanceLoader: String?,
     onClick: () -> Unit,
     onDelete: () -> Unit,
     onRename: () -> Unit,
@@ -536,6 +591,10 @@ fun FileListItem(
     var modMeta by remember { mutableStateOf<ModMetadataReader.ModMetadata?>(null) }
     var worldMeta by remember { mutableStateOf<WorldMetadataReader.WorldMetadata?>(null) }
 
+    var updateAvailable by remember { mutableStateOf<ModrinthVersion?>(null) }
+    var isCheckingUpdate by remember { mutableStateOf(false) }
+    var isUpdating by remember { mutableStateOf(false) }
+
     LaunchedEffect(file) {
         withContext(Dispatchers.IO) {
             val mMeta = ModMetadataReader.getMetadata(file)
@@ -543,6 +602,27 @@ fun FileListItem(
             withContext(Dispatchers.Main) {
                 modMeta = mMeta
                 worldMeta = wMeta
+            }
+
+            if (mMeta != null && mMeta.name != null && mMeta.name.lowercase().contains("hyper client")) {
+                withContext(Dispatchers.Main) { isCheckingUpdate = true }
+                try {
+                    val versions = ModrinthService.getProjectVersions("hyperclient")
+                    val compatible = versions.filter { v ->
+                        instanceVersion != null && v.gameVersions.contains(instanceVersion) &&
+                                (instanceLoader == null || v.loaders.any { it.equals(instanceLoader, ignoreCase = true) })
+                    }
+                    if (compatible.isNotEmpty()) {
+                        val latest = compatible.first()
+                        if (mMeta.version == null || latest.name != mMeta.version) {
+                            withContext(Dispatchers.Main) { updateAvailable = latest }
+                        }
+                    }
+                } catch (e: Exception) {
+                    Log.e("InstanceDirectory", "Failed to check update", e)
+                } finally {
+                    withContext(Dispatchers.Main) { isCheckingUpdate = false }
+                }
             }
         }
     }
@@ -651,6 +731,50 @@ fun FileListItem(
 
             if (file.isFile && (file.name.endsWith(".jar") || file.name.endsWith(".jar.disabled"))) {
                 val isEnabled = !file.name.endsWith(".disabled")
+
+                if (updateAvailable != null) {
+                    IconButton(
+                        onClick = {
+                            isUpdating = true
+                            scope.launch(Dispatchers.IO) {
+                                try {
+                                    val url = URL(updateAvailable!!.downloadUrl)
+                                    val fileName = updateAvailable!!.downloadUrl.substringAfterLast("/")
+                                    val destFile = File(file.parentFile, fileName)
+
+                                    url.openStream().use { input ->
+                                        destFile.outputStream().use { output ->
+                                            input.copyTo(output)
+                                        }
+                                    }
+                                    file.delete()
+                                    withContext(Dispatchers.Main) {
+                                        onRefresh()
+                                        updateAvailable = null
+                                    }
+                                } catch (e: Exception) {
+                                    Log.e("InstanceDirectory", "Failed to update mod", e)
+                                } finally {
+                                    withContext(Dispatchers.Main) { isUpdating = false }
+                                }
+                            }
+                        },
+                        enabled = !isUpdating,
+                        modifier = Modifier.padding(end = 4.dp)
+                    ) {
+                        if (isUpdating) {
+                            CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
+                        } else {
+                            Icon(
+                                imageVector = Icons.Rounded.Update,
+                                contentDescription = "Update available",
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
+                    }
+                }
+
                 DefaultSwitch(
                     checked = isEnabled,
                     onCheckedChange = {
@@ -756,6 +880,7 @@ fun InstanceDirectoryScreenPreview() {
     PojavTheme {
         InstanceDirectoryContent(
             instanceRoot = null,
+            selectedInstance = null,
             onBack = {}
         )
     }
@@ -768,6 +893,8 @@ fun FileListItemPreview() {
         Column(modifier = Modifier.padding(16.dp)) {
             FileListItem(
                 file = File("example_mod.jar"),
+                instanceVersion = null,
+                instanceLoader = null,
                 onClick = {},
                 onDelete = {},
                 onRename = {},

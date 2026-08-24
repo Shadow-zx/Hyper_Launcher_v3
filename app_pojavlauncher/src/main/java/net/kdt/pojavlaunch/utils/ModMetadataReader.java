@@ -14,6 +14,7 @@ import net.kdt.pojavlaunch.Tools;
 public class ModMetadataReader {
     public static class ModMetadata {
         public String name;
+        public String version;
         public Bitmap icon;
     }
 
@@ -29,6 +30,7 @@ public class ModMetadataReader {
                 try (InputStream is = zip.getInputStream(fabricEntry)) {
                     JsonObject json = JsonParser.parseReader(new InputStreamReader(is)).getAsJsonObject();
                     if (json.has("name")) metadata.name = json.get("name").getAsString();
+                    if (json.has("version")) metadata.version = json.get("version").getAsString();
                     if (json.has("icon")) {
                         String iconP = null;
                         if (json.get("icon").isJsonPrimitive()) {
@@ -66,6 +68,7 @@ public class ModMetadataReader {
                                 json = JsonParser.parseString(content).getAsJsonObject();
                             }
                             if (json.has("name")) metadata.name = json.get("name").getAsString();
+                            if (json.has("version")) metadata.version = json.get("version").getAsString();
                         } catch (Exception ignored) {}
                     }
                 }

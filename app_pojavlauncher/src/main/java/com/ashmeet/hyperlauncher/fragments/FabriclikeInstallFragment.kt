@@ -113,8 +113,13 @@ abstract class FabriclikeInstallFragment(
                     return@launch
                 }
                 val instance = Instances.createInstance({ i ->
-                    i.name = mFabriclikeUtils.name
-                    i.icon = mFabriclikeUtils.iconName
+                    if (isHyperClientEnabled && mFabriclikeUtils.name.lowercase() == "fabric") {
+                        i.name = "Hyper Client"
+                        i.icon = "default"
+                    } else {
+                        i.name = mFabriclikeUtils.name
+                        i.icon = mFabriclikeUtils.iconName
+                    }
                     i.versionId = versionId
                 }, versionId)
 

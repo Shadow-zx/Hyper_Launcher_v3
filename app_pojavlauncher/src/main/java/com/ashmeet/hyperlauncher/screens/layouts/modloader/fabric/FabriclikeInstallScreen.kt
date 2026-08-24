@@ -176,7 +176,7 @@ fun FabriclikeInstallScreen(
                                 Text(
                                     text = if (!isAvailable && !isHyperClientLoading)
                                         "Not available for ${selectedGameVersion?.version ?: "this version"}"
-                                    else "Installs Hyper Client, Fabric API and Mod Menu",
+                                    else "",
                                     style = MaterialTheme.typography.bodySmall,
                                     color = if (!isAvailable && !isHyperClientLoading) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant
                                 )
@@ -299,7 +299,7 @@ private fun <T> VersionSpinnerGeneric(
 ) {
     var expanded by remember { mutableStateOf(false) }
 
-    Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp)) {
+    Box(modifier = Modifier.fillMaxWidth()) {
         OutlinedTextField(
             value = selectedItem?.let { itemLabel(it) } ?: "",
             onValueChange = {},
