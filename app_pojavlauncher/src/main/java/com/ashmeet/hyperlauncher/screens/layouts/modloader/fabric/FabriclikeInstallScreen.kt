@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.KeyboardArrowDown
 import androidx.compose.material.icons.rounded.KeyboardArrowUp
 import androidx.compose.material.icons.rounded.Warning
@@ -15,7 +14,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import net.ashmeet.hyperlauncher.R
 import net.kdt.pojavlaunch.modloaders.FabricVersion
@@ -30,7 +28,6 @@ fun FabriclikeInstallScreen(
     isInstalling: Boolean,
     gameVersions: List<FabricVersion>,
     loaderVersions: List<FabricVersion>,
-    onBack: () -> Unit,
     onInstall: (gameVersion: String, loaderVersion: String, isHyperClientEnabled: Boolean, hyperClientVersionId: String?) -> Unit
 ) {
     var selectedGameVersion by remember { mutableStateOf<FabricVersion?>(null) }
@@ -100,16 +97,6 @@ fun FabriclikeInstallScreen(
                     modifier = Modifier.weight(1f),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    IconButton(
-                        onClick = onBack,
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
-                            contentDescription = stringResource(android.R.string.cancel)
-                        )
-                    }
-
                     VersionSpinner(
                         label = stringResource(R.string.fabric_dl_game_version),
                         versions = filteredGameVersions,

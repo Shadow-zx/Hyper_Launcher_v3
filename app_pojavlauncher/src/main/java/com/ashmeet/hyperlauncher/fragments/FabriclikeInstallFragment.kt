@@ -54,7 +54,6 @@ abstract class FabriclikeInstallFragment(
                         isInstalling = isInstalling,
                         gameVersions = gameVersions,
                         loaderVersions = loaderVersions,
-                        onBack = { parentFragmentManager.popBackStack() },
                         onInstall = { gameVersion, loaderVersion, isHyperClientEnabled, hyperClientVersionId ->
                             performInstallation(gameVersion, loaderVersion, isHyperClientEnabled, hyperClientVersionId)
                         }
